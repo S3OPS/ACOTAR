@@ -98,7 +98,7 @@ Game logic is broken into focused, reusable modules:
 ```
 ACOTAR/
 ├── Assets/
-│   └── Scripts/               # 20 game systems
+│   └── Scripts/               # 25 game systems
 │       ├── Character.cs       # Character system (refactored)
 │       ├── CharacterStats.cs  # Modular stat management
 │       ├── AbilitySystem.cs   # Magic ability system
@@ -107,8 +107,8 @@ ACOTAR/
 │       ├── GameManager.cs     # Main orchestration
 │       ├── LocationManager.cs # Location management (optimized)
 │       ├── QuestManager.cs    # Quest system
-│       ├── StoryManager.cs    # NEW: Story progression tracking
-│       ├── Book1Quests.cs     # NEW: Complete Book 1 content
+│       ├── StoryManager.cs    # Story progression tracking
+│       ├── Book1Quests.cs     # Complete Book 1 content
 │       ├── Enemy.cs            # Enemy system with 8 types
 │       ├── CombatEncounter.cs # Turn-based combat manager
 │       ├── CombatSystem.cs    # Combat calculations
@@ -118,13 +118,19 @@ ACOTAR/
 │       ├── CraftingSystem.cs  # 15+ recipes
 │       ├── TimeSystem.cs      # Day/night cycle
 │       ├── InventorySystem.cs # Item management
-│       └── SaveSystem.cs      # Save/load functionality
+│       ├── SaveSystem.cs      # Save/load functionality
+│       ├── UIManager.cs       # NEW: Central UI coordination
+│       ├── CharacterCreationUI.cs # NEW: Character creation interface
+│       ├── InventoryUI.cs     # NEW: Inventory grid UI
+│       ├── QuestLogUI.cs      # NEW: Quest tracking UI
+│       └── CombatUI.cs        # NEW: Combat interface
 ├── ProjectSettings/           # Unity configuration
 ├── Packages/                  # Unity packages
 ├── scripts/                   # Build automation
 ├── Documentation/
 │   ├── THE_ONE_RING.md       # This file
 │   ├── PHASE5_COMPLETE.md    # Phase 5 report
+│   ├── PHASE6_FOUNDATION.md  # Phase 6 report
 │   ├── PROJECT_SUMMARY.md    # Overall summary
 │   ├── LORE.md               # ACOTAR lore reference
 │   ├── DEVELOPMENT.md        # Dev guide
@@ -340,6 +346,84 @@ The **StoryManager** tracks progress through ACOTAR Books 1-3:
 - Location access
 - Story progression
 
+### 9. UI & Visualization Systems
+
+#### UIManager
+**Central UI coordination system** managing all game interfaces:
+
+**Features**:
+- Panel management (8 panels: MainMenu, HUD, Inventory, QuestLog, Dialogue, Combat, PauseMenu, CharacterCreation)
+- HUD updates (health, magic, XP, location, gold)
+- Dialogue display with choice buttons
+- Combat log with auto-scroll
+- Pause system (freezes game time)
+- Notification popups
+- Keyboard shortcuts (I, Q, ESC)
+
+#### Character Creation UI
+**Visual character builder**:
+- Class selection dropdown (6 classes)
+- Court allegiance dropdown (8 courts)
+- Real-time stat preview
+- Detailed class/court descriptions
+- Randomize button
+- Name validation (2-20 characters)
+
+**Class Stats Display**:
+| Class | Health | Magic | Strength | Agility |
+|-------|--------|-------|----------|---------|
+| High Fae | 150 | 100 | 80 | 70 |
+| Illyrian | 180 | 60 | 120 | 90 |
+| Lesser Fae | 100 | 60 | 60 | 80 |
+| Human | 80 | 0 | 50 | 60 |
+| Attor | 120 | 40 | 90 | 100 |
+| Suriel | 70 | 150 | 30 | 40 |
+
+#### Inventory UI
+**Complete item management interface**:
+- Grid-based display with item slots
+- Item details panel (name, description, stats, value)
+- Equipment slots (weapon, armor)
+- Rarity color coding (Common→Artifact)
+- Actions: Use, Equip, Drop
+- Sort and filter options
+- Quest item protection
+
+**Rarity Colors**:
+- Common: White
+- Uncommon: Green
+- Rare: Blue
+- Epic: Purple
+- Legendary: Orange
+- Artifact: Red
+
+#### Quest Log UI
+**Comprehensive quest tracking**:
+- Scrollable quest list with status icons (○ active, ✓ complete)
+- Detailed quest view (title, type, description, objectives, rewards)
+- Objective checkboxes (☐ pending, ☑ complete)
+- Type filters (Main/Side/Court/Companion)
+- Status toggles (Active/Completed)
+- Quest tracking for HUD
+- Color-coded by type (Gold/Cyan/Purple/Pink)
+
+#### Combat UI
+**Turn-based battle interface**:
+- Player health/magic bars with text values
+- Multiple enemy panels with health bars
+- Action buttons (Attack, Magic, Defend, Item, Flee)
+- Expandable magic ability panel
+- Scrolling combat log (10 lines visible)
+- Turn indicator
+- Target selection (click enemies)
+- Victory screen with rewards
+- Defeat screen
+
+#### Keyboard Controls
+- **I Key**: Toggle Inventory
+- **Q Key**: Toggle Quest Log
+- **ESC Key**: Pause Menu
+
 ---
 
 ## 🚀 Performance Optimizations
@@ -440,14 +524,20 @@ The **StoryManager** tracks progress through ACOTAR Books 1-3:
 
 ### 🔮 Planned Features
 
-#### Phase 4: UI & Visualization (Q2 2026)
-- [ ] Main menu system
-- [ ] Character creation UI
-- [ ] Inventory UI with drag-drop
-- [ ] Quest log interface
-- [ ] Combat UI with animations
-- [ ] Map system
-- [ ] Save/Load menu
+#### Phase 4: UI & Visualization ✅ COMPLETE (January 2026)
+- [x] Main menu system with title screen
+- [x] Character creation UI with class/court selection
+- [x] HUD with health, magic, XP, location displays
+- [x] Inventory UI with grid, equipment, drag-drop ready
+- [x] Quest log interface with filters and tracking
+- [x] Dialogue UI with character portraits and choices
+- [x] Combat UI with turn-based actions and enemy panels
+- [x] Pause menu with settings access
+- [x] Keyboard shortcuts (I, Q, ESC)
+- [x] Color-coded rarity and quest types
+- [ ] Map system visualization
+- [ ] Save/Load menu interface
+- [ ] Settings menu (audio, graphics, controls)
 
 #### Phase 5: Advanced Gameplay ✅ COMPLETE (January 2026)
 - [x] Full combat encounters with turn-based system
