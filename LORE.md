@@ -150,7 +150,7 @@ Prythian is divided into seven courts, each ruled by a High Lord with unique pow
 - Can meld with and control shadows
 - Different from simple darkness manipulation
 
-### Truth-Telling
+### TruthTelling
 - Mor's unique ability
 - Power to detect lies and compel truth
 - Raw, devastating magical force
@@ -199,7 +199,6 @@ Prythian is divided into seven courts, each ruled by a High Lord with unique pow
 - Mates can sense each other's emotions
 - Accepting the bond strengthens both partners
 - Bond can be rejected (rare)
-- Requires concentration and power
 
 ## Key Story Events
 
@@ -349,8 +348,8 @@ The game faithfully implements:
 - Character classes based on lore (High Fae, Illyrian, Human, etc.)
 - Magic system matching book abilities including:
   - Shadowsinger (Azriel's unique ability)
-  - Truth-Telling (Mor's power)
-  - Death Manifestation (Nesta's Cauldron powers)
+  - TruthTelling (Mor's power)
+  - DeathManifestation (Nesta's Cauldron powers)
   - Daemati (mind reading/control)
   - Winnowing (teleportation)
   - Seer abilities (Elain)
