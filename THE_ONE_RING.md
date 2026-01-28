@@ -522,7 +522,7 @@ The **StoryManager** tracks progress through ACOTAR Books 1-3:
 - [x] API reference
 - [x] Developer onboarding guide
 
-### 🔮 Planned Features
+### ✅ Recently Completed Phases
 
 #### Phase 4: UI & Visualization ✅ COMPLETE (January 2026)
 - [x] Main menu system with title screen
@@ -535,9 +535,6 @@ The **StoryManager** tracks progress through ACOTAR Books 1-3:
 - [x] Pause menu with settings access
 - [x] Keyboard shortcuts (I, Q, ESC)
 - [x] Color-coded rarity and quest types
-- [ ] Map system visualization
-- [ ] Save/Load menu interface
-- [ ] Settings menu (audio, graphics, controls)
 
 #### Phase 5: Advanced Gameplay ✅ COMPLETE (January 2026)
 - [x] Full combat encounters with turn-based system
@@ -549,32 +546,64 @@ The **StoryManager** tracks progress through ACOTAR Books 1-3:
 - [x] Day/night cycle with moon phases
 - [x] Special events (Calanmai, Starfall)
 
-#### Phase 6: Story Content ✅ IN PROGRESS (January 2026)
+#### Phase 6: Story Content ✅ CORE COMPLETE (January 2026)
 - [x] Complete Book 1 storyline (20+ quests)
 - [x] Story progression system with arc tracking
 - [x] Under the Mountain trials (Worm, Naga, Three Fae)
 - [x] Side quest expansions (reading, painting, friendships)
 - [x] Story-driven character unlocking
 - [x] Location progression system
+
+### 🎯 HIGH PRIORITY: Base Game Polish
+
+> **Focus**: Complete the core game experience before adding new content. A polished Book 1 experience is more valuable than incomplete Books 1-3.
+
+#### Phase 7: Core UI Completion 🔥 HIGHEST PRIORITY
+- [ ] **Save/Load menu interface** - Critical for player experience
+- [ ] **Settings menu** (audio, graphics, controls) - Essential for accessibility
+- [ ] **Map system visualization** - Helps players navigate Prythian
+- [ ] **Tutorial/Help system** - Onboard new players effectively
+- [ ] **Loading screens with tips** - Improve perceived performance
+
+#### Phase 8: Base Game Quality 🔥 HIGH PRIORITY
+- [ ] **Combat balancing pass** - Ensure all classes are viable and fun
+- [ ] **Quest flow polish** - Smooth transitions between story beats
+- [ ] **UI/UX improvements** - Based on playtesting feedback
+- [ ] **Bug fixes and stability** - Address any gameplay issues
+- [ ] **Performance optimization** - Smooth gameplay on target hardware
+- [ ] **Accessibility features** - Text size, colorblind modes, key remapping
+
+#### Phase 9: Audio & Atmosphere 🔥 HIGH PRIORITY
+- [ ] **Sound effects** - Combat, UI, environment
+- [ ] **Ambient soundscapes** - Court-specific atmosphere
+- [ ] **Background music** - Menu, exploration, combat themes
+- [ ] **Audio settings** - Volume controls, mute options
+
+#### Phase 10: Book 1 Final Polish
+- [ ] **Book 1 playtesting** - Full playthrough validation
+- [ ] **Ending polish** - Satisfying conclusion to Book 1 arc
+- [ ] **Achievement integration** - Milestones for Book 1 content
+
+### 🔮 Future Content (After Base Game Polish)
+
+#### Phase 11: Extended Story Content
 - [ ] Book 2 content (A Court of Mist and Fury)
 - [ ] Book 3 content (A Court of Wings and Ruin)
 - [ ] Court-specific storylines
 - [ ] Companion personal quest arcs
 - [ ] Multiple endings based on choices
 
-#### Phase 7: Multiplayer (2027)
+#### Phase 12: Multiplayer (Future)
 - [ ] Co-op quest system
 - [ ] Shared world exploration
 - [ ] PvP arena (optional)
 - [ ] Trading system
 - [ ] Social hub (Velaris)
 
-#### Phase 8: Polish & Release (2027)
-- [ ] Sound effects and music
+#### Phase 13: Final Polish & Release
 - [ ] Voice acting (stretch goal)
-- [ ] Achievements system
+- [ ] Achievements system completion
 - [ ] Localization (multiple languages)
-- [ ] Performance optimization
 - [ ] Platform-specific builds
 - [ ] Public beta testing
 - [ ] Official release
@@ -857,5 +886,5 @@ See LICENSE file for details.
 *"To the stars who listen—and the dreams that are answered."*
 
 **Last Updated**: January 28, 2026
-**Version**: 1.0.0 (The Optimization Release)
+**Version**: 1.1.0 (Base Game Priority Update)
 **Maintainer**: ACOTAR Development Team
