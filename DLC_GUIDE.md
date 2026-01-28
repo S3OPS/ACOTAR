@@ -74,7 +74,7 @@ After the events Under the Mountain, Feyre struggles with trauma and a growing d
 
 ### Content Included
 
-#### Main Story Quests (21 quests)
+#### Main Story Quests (22 quests)
 **Night Court Arc:**
 1. A Bargain Kept - Leave for Night Court
 2. The City of Starlight - Discover Velaris
@@ -105,7 +105,7 @@ After the events Under the Mountain, Feyre struggles with trauma and a growing d
 21. The Wall Falls - War begins
 22. High Lady of the Night Court - Become the first
 
-#### Side Quests (10 quests)
+#### Side Quests (9 quests)
 - Starfall - Experience the festival
 - A Night at Rita's - Velaris nightlife
 - Return to the Hewn City - Court of Nightmares

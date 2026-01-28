@@ -152,28 +152,30 @@ namespace ACOTAR
             AddQuest(side1);
 
             // Companion Quests - Base Game
+            // Note: These are preview/teaser quests that give hints about future DLC content
+            // Full companion content is in DLC packages
             Quest comp1 = new Quest(
                 "companion_001",
-                "Rhysand's Secret",
-                "Discover the truth about the High Lord of the Night Court and the City of Starlight.",
+                "Glimpse of Starlight",
+                "Under the Mountain, Rhysand shares a cryptic vision with you - a city of stars you've never seen.",
                 QuestType.CompanionQuest
             );
-            comp1.objectives.Add("Visit Velaris for the first time");
-            comp1.objectives.Add("Meet the Inner Circle");
-            comp1.objectives.Add("Learn about Rhysand's true nature");
-            comp1.experienceReward = 500;
+            comp1.objectives.Add("Experience Rhysand's mysterious vision");
+            comp1.objectives.Add("See glimpses of an impossible city");
+            comp1.objectives.Add("Wonder about the Night Court's secrets");
+            comp1.experienceReward = 300;
             AddQuest(comp1);
 
             Quest comp2 = new Quest(
                 "companion_002",
-                "Cassian's Training",
-                "Train with the legendary Illyrian warrior to master combat.",
+                "The Illyrian's Challenge",
+                "A powerful Illyrian warrior issues you a challenge during your time Under the Mountain.",
                 QuestType.CompanionQuest
             );
-            comp2.objectives.Add("Train at the House of Wind");
-            comp2.objectives.Add("Master basic Illyrian combat techniques");
-            comp2.objectives.Add("Prove yourself worthy");
-            comp2.experienceReward = 350;
+            comp2.objectives.Add("Face the Illyrian's test of will");
+            comp2.objectives.Add("Prove your determination");
+            comp2.objectives.Add("Earn a measure of respect");
+            comp2.experienceReward = 250;
             AddQuest(comp2);
 
             // Initialize Book 1 extended quests (base game content)

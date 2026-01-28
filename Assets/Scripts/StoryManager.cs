@@ -63,8 +63,8 @@ namespace ACOTAR
             // Set starting arc
             currentArc = StoryArc.Book1_HumanLands;
 
-            // Starting locations
-            unlockedLocations.Add("Human Lands");
+            // Starting locations (using "Mortal Lands" to match book terminology)
+            unlockedLocations.Add("Mortal Lands");
             unlockedLocations.Add("The Wall");
         }
 
@@ -282,6 +282,10 @@ namespace ACOTAR
                     return StoryArc.Book3_War;
                 case StoryArc.Book3_War:
                     return StoryArc.Book3_Resolution;
+                    
+                // Final arc - no more progression
+                case StoryArc.Book3_Resolution:
+                    return StoryArc.Book3_Resolution; // Game complete, stay at final arc
                     
                 default:
                     return completedArc;

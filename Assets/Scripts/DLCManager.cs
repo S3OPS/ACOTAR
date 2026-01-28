@@ -260,10 +260,14 @@ namespace ACOTAR
                     break;
                     
                 case DLCPackage.ACOWAR_WingsAndRuin:
-                    // Ensure DLC 1 is installed first
+                    // Ensure DLC 1 is installed first - it's a prerequisite
                     if (!IsDLCInstalled(DLCPackage.ACOMAF_MistAndFury))
                     {
-                        InstallDLC(DLCPackage.ACOMAF_MistAndFury, quests);
+                        if (!InstallDLC(DLCPackage.ACOMAF_MistAndFury, quests))
+                        {
+                            Debug.LogError("Failed to install prerequisite DLC 1. Cannot install DLC 2.");
+                            return false;
+                        }
                     }
                     Book3Quests.InitializeBook3Quests(quests);
                     Debug.Log($"Loaded {info.questCount} quests from {info.name}");
@@ -303,21 +307,57 @@ namespace ACOTAR
 
         /// <summary>
         /// Get which DLC a quest belongs to (null if base game)
+        /// Uses safe parsing to handle edge cases
         /// </summary>
         public DLCPackage? GetQuestDLCPackage(string questId)
         {
-            if (questId.StartsWith("book2_") || 
-                (questId.StartsWith("side_") && int.Parse(questId.Substring(5)) >= 10 && int.Parse(questId.Substring(5)) <= 15) ||
-                (questId.StartsWith("companion_") && int.Parse(questId.Substring(10)) >= 3 && int.Parse(questId.Substring(10)) <= 5))
+            if (string.IsNullOrEmpty(questId))
+            {
+                return null;
+            }
+
+            // Book 2 quests are explicitly DLC 1
+            if (questId.StartsWith("book2_"))
             {
                 return DLCPackage.ACOMAF_MistAndFury;
             }
             
-            if (questId.StartsWith("book3_") ||
-                (questId.StartsWith("side_") && int.Parse(questId.Substring(5)) >= 16) ||
-                (questId.StartsWith("companion_") && int.Parse(questId.Substring(10)) >= 6))
+            // Book 3 quests are explicitly DLC 2
+            if (questId.StartsWith("book3_"))
             {
                 return DLCPackage.ACOWAR_WingsAndRuin;
+            }
+
+            // Side quests: side_010 to side_015 are DLC 1, side_016+ are DLC 2
+            if (questId.StartsWith("side_") && questId.Length > 5)
+            {
+                if (int.TryParse(questId.Substring(5), out int sideQuestNum))
+                {
+                    if (sideQuestNum >= 10 && sideQuestNum <= 15)
+                    {
+                        return DLCPackage.ACOMAF_MistAndFury;
+                    }
+                    if (sideQuestNum >= 16)
+                    {
+                        return DLCPackage.ACOWAR_WingsAndRuin;
+                    }
+                }
+            }
+
+            // Companion quests: companion_003 to companion_005 are DLC 1, companion_006+ are DLC 2
+            if (questId.StartsWith("companion_") && questId.Length > 10)
+            {
+                if (int.TryParse(questId.Substring(10), out int companionQuestNum))
+                {
+                    if (companionQuestNum >= 3 && companionQuestNum <= 5)
+                    {
+                        return DLCPackage.ACOMAF_MistAndFury;
+                    }
+                    if (companionQuestNum >= 6)
+                    {
+                        return DLCPackage.ACOWAR_WingsAndRuin;
+                    }
+                }
             }
 
             return null; // Base game content
