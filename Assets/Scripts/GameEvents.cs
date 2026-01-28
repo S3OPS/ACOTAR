@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace ACOTAR
@@ -26,6 +27,10 @@ namespace ACOTAR
         // Quest Events
         public static event Action<Quest> OnQuestStarted;
         public static event Action<Quest> OnQuestCompleted;
+
+        // Combat Events
+        public static event Action<Character, List<Enemy>> OnCombatStarted;
+        public static event Action<Character, List<Enemy>, bool> OnCombatEnded;
 
         // Trigger character created event
         public static void TriggerCharacterCreated(Character character)
@@ -85,6 +90,18 @@ namespace ACOTAR
         public static void TriggerQuestCompleted(Quest quest)
         {
             OnQuestCompleted?.Invoke(quest);
+        }
+
+        // Trigger combat started event
+        public static void TriggerCombatStarted(Character player, List<Enemy> enemies)
+        {
+            OnCombatStarted?.Invoke(player, enemies);
+        }
+
+        // Trigger combat ended event
+        public static void TriggerCombatEnded(Character player, List<Enemy> enemies, bool victory)
+        {
+            OnCombatEnded?.Invoke(player, enemies, victory);
         }
     }
 }
