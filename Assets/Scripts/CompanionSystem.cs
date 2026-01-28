@@ -128,8 +128,8 @@ namespace ACOTAR
         {
             Companion azriel = new Companion("Azriel", CharacterClass.Illyrian, Court.Night, CompanionRole.DPS);
             azriel.level = 8;
-            azriel.backstory = "Spymaster of the Night Court and master of shadows.";
-            azriel.LearnAbility(MagicType.DarknessManipulation);
+            azriel.backstory = "Spymaster of the Night Court and the only known Shadowsinger in existence. His shadows whisper secrets to him.";
+            azriel.LearnAbility(MagicType.Shadowsinger);
             azriel.LearnAbility(MagicType.Winnowing);
             azriel.dialoguePool.Add("...");
             azriel.dialoguePool.Add("The shadows tell me everything.");
@@ -143,8 +143,8 @@ namespace ACOTAR
         {
             Companion mor = new Companion("Morrigan", CharacterClass.HighFae, Court.Night, CompanionRole.DPS);
             mor.level = 7;
-            mor.backstory = "Morrigan, cousin of Rhysand and wielder of Truth.";
-            mor.LearnAbility(MagicType.LightManipulation);
+            mor.backstory = "Morrigan, cousin of Rhysand. The Morrigan - wielder of Truth. Her power is raw and devastating.";
+            mor.LearnAbility(MagicType.TruthTelling);
             mor.LearnAbility(MagicType.Winnowing);
             mor.dialoguePool.Add("I am not afraid.");
             mor.dialoguePool.Add("Let's show them what we're made of.");
@@ -168,15 +168,16 @@ namespace ACOTAR
         }
 
         /// <summary>
-        /// Create Lucien - Emissary of Spring Court
+        /// Create Lucien - Emissary (Note: Officially of Day Court by heritage)
         /// </summary>
         public static Companion CreateLucien()
         {
-            Companion lucien = new Companion("Lucien", CharacterClass.HighFae, Court.Spring, CompanionRole.Balanced);
+            Companion lucien = new Companion("Lucien", CharacterClass.HighFae, Court.None, CompanionRole.Balanced);
             lucien.level = 6;
-            lucien.backstory = "Emissary of the Spring Court and son of the Autumn Court High Lord.";
+            lucien.backstory = "Former emissary of the Spring Court, son of High Lord Helion of the Day Court. Mate to Elain Archeron.";
             lucien.LearnAbility(MagicType.FireManipulation);
             lucien.LearnAbility(MagicType.ShieldCreation);
+            lucien.LearnAbility(MagicType.MatingBond);
             lucien.dialoguePool.Add("I've been through worse.");
             lucien.dialoguePool.Add("Let me help you with that.");
             return lucien;
@@ -205,9 +206,9 @@ namespace ACOTAR
             Companion nesta = new Companion("Nesta Archeron", CharacterClass.HighFae, Court.Night, CompanionRole.DPS);
             nesta.level = 5;
             nesta.isMadeByTheCauldron = true;
-            nesta.backstory = "Feyre's eldest sister, Made by the Cauldron with devastating power.";
+            nesta.backstory = "Feyre's eldest sister, Made by the Cauldron. She stole power from the Cauldron itself - Death given form.";
+            nesta.LearnAbility(MagicType.DeathManifestation);
             nesta.LearnAbility(MagicType.ShieldCreation);
-            nesta.LearnAbility(MagicType.DarknessManipulation);
             nesta.dialoguePool.Add("I am not afraid of you.");
             nesta.dialoguePool.Add("Stand back.");
             return nesta;

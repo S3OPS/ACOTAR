@@ -193,10 +193,11 @@ namespace ACOTAR
 
         /// <summary>
         /// Create an Attor (flying monster from ACOTAR)
+        /// Note: Attor served Amarantha and Hybern, not any Prythian court
         /// </summary>
         public static Enemy CreateAttor(EnemyDifficulty difficulty = EnemyDifficulty.Hard)
         {
-            Enemy attor = new Enemy("Attor", CharacterClass.Attor, Court.Spring, difficulty);
+            Enemy attor = new Enemy("Attor", CharacterClass.Attor, Court.None, difficulty);
             attor.behavior = EnemyBehavior.Aggressive;
             attor.AddLoot("crafting_attor_wing");
             attor.AddLoot("weapon_attor_claw");
@@ -205,10 +206,11 @@ namespace ACOTAR
 
         /// <summary>
         /// Create a Suriel (prophetic creature)
+        /// Note: Suriel are ancient creatures not aligned with any court
         /// </summary>
         public static Enemy CreateSuriel(EnemyDifficulty difficulty = EnemyDifficulty.Easy)
         {
-            Enemy suriel = new Enemy("Suriel", CharacterClass.Suriel, Court.Spring, difficulty);
+            Enemy suriel = new Enemy("Suriel", CharacterClass.Suriel, Court.None, difficulty);
             suriel.behavior = EnemyBehavior.Defensive;
             suriel.LearnAbility(MagicType.Seer);
             suriel.AddLoot("magical_suriel_blessing");
@@ -217,10 +219,11 @@ namespace ACOTAR
 
         /// <summary>
         /// Create Amarantha (main antagonist, boss fight)
+        /// Note: Amarantha was from Hybern, not any Prythian court
         /// </summary>
         public static Enemy CreateAmarantha()
         {
-            Enemy amarantha = new Enemy("Amarantha", CharacterClass.HighFae, Court.Spring, EnemyDifficulty.Boss);
+            Enemy amarantha = new Enemy("Amarantha", CharacterClass.HighFae, Court.None, EnemyDifficulty.Boss);
             amarantha.behavior = EnemyBehavior.Tactical;
             amarantha.level = 10;
             amarantha.LearnAbility(MagicType.DarknessManipulation);

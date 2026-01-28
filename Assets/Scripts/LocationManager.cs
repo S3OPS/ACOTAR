@@ -141,26 +141,48 @@ namespace ACOTAR
                 LocationType.Court
             ));
 
-            // Special locations
+            // Special locations - not owned by any single court
             AddLocation(new Location(
                 "Under the Mountain",
-                "The cursed realm where Amarantha held court for 49 years",
-                Court.Spring,
+                "The cursed realm where Amarantha held court for 49 years. Located beneath the central mountain of Prythian.",
+                Court.None,
                 LocationType.UnderTheMountain
             ));
 
             AddLocation(new Location(
                 "Human Lands",
-                "The mortal realm south of the Wall, where humans live without magic",
-                Court.Spring,
+                "The mortal realm south of the Wall, where humans live without magic. Home to the Archeron family.",
+                Court.None,
                 LocationType.HumanLands
             ));
 
             AddLocation(new Location(
                 "The Wall",
-                "The magical barrier separating the mortal lands from Prythian",
-                Court.Spring,
+                "The magical barrier separating the mortal lands from Prythian. Created by the Treaty after the War.",
+                Court.None,
                 LocationType.Forest
+            ));
+
+            // Additional lore-accurate locations
+            AddLocation(new Location(
+                "The Prison",
+                "Ancient prison carved into a mountain, holding the most dangerous beings in existence.",
+                Court.Night,
+                LocationType.MountainRange
+            ));
+
+            AddLocation(new Location(
+                "The Middle",
+                "Treacherous lands in the heart of Prythian where the Weaver dwells.",
+                Court.None,
+                LocationType.Forest
+            ));
+
+            AddLocation(new Location(
+                "Hybern",
+                "Island kingdom across the sea, ruled by the King of Hybern. Enemy of Prythian.",
+                Court.None,
+                LocationType.Court
             ));
         }
 
