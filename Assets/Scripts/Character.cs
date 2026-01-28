@@ -4,11 +4,12 @@ using UnityEngine;
 namespace ACOTAR
 {
     /// <summary>
-    /// Represents the seven High Fae Courts of Prythian
+    /// Represents the seven High Fae Courts of Prythian plus neutral option
     /// Based on ACOTAR lore
     /// </summary>
     public enum Court
     {
+        None,       // No court allegiance (mortals, outcasts)
         Spring,
         Summer,
         Autumn,
@@ -46,8 +47,12 @@ namespace ACOTAR
         IceManipulation,
         Healing,
         ShieldCreation,
-        Daemati,      // Mind reading/manipulation
-        Seer          // Prophetic visions
+        Daemati,            // Mind reading/manipulation
+        Seer,               // Prophetic visions
+        Shadowsinger,       // Azriel's unique shadow ability
+        TruthTelling,       // Mor's ability to detect and compel truth
+        DeathManifestation, // Nesta's power taken from the Cauldron
+        MatingBond          // Ability to sense/strengthen mate connection
     }
 
     /// <summary>

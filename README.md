@@ -4,16 +4,53 @@ A lore-accurate Fantasy RPG based on Sarah J. Maas's *A Court of Thorns and Rose
 
 ## 🌟 About
 
-Experience the world of Prythian in this immersive RPG that faithfully recreates the courts, characters, and magic from the ACOTAR series. Play through the complete Book 1 storyline with a full user interface, explore all seven courts, recruit legendary companions, and develop your character from human to High Fae with powerful magical abilities. Now with complete UI/UX for character creation, inventory management, quest tracking, and turn-based combat!
+Experience the world of Prythian in this immersive RPG that faithfully recreates the courts, characters, and magic from the ACOTAR series. The **base game** includes the complete Book 1 storyline - play from human lands through Under the Mountain, face Amarantha's trials, and transform from mortal to High Fae! Expand your adventure with DLC packs that continue the story through Books 2 and 3.
+
+## 🎮 Game Content
+
+### 📖 BASE GAME: A Court of Thorns and Roses (Book 1)
+*Included with purchase*
+
+Experience Feyre's complete journey in the first book:
+- **Complete Story Arc**: From mortal hunter to High Fae
+- **The Three Trials**: Face the Middengard Wyrm, solve riddles, and make impossible choices
+- **Under the Mountain**: Confront Amarantha and break the curse
+- **20+ Quests**: Main story and side quests
+- **4 Story Arcs**: Human Lands, Spring Court, Under the Mountain, Aftermath
+- **Key Characters**: Tamlin, Lucien, Rhysand, Amarantha, Alis
+- **Locations**: Human Lands, The Wall, Spring Court Manor, Under the Mountain
+
+### 📦 DLC 1: A Court of Mist and Fury (Book 2)
+*Requires base game*
+
+Continue Feyre's story in the Night Court:
+- **31 New Quests**: Night Court discovery, training, Summer Court heist, Hybern confrontation
+- **3 Story Arcs**: Night Court, War Preparations, Hybern
+- **The Inner Circle**: Meet Cassian, Azriel, Mor, and Amren
+- **New Locations**: Velaris, House of Wind, Hewn City, Illyrian Mountains, Summer Court, Adriata, Hybern
+- **Become High Lady**: The first in Prythian history
+- **11,350 XP available**
+
+### 📦 DLC 2: A Court of Wings and Ruin (Book 3)
+*Requires base game + DLC 1*
+
+Experience the epic conclusion to the trilogy:
+- **30 New Quests**: Spy missions, alliance building, final war
+- **3 Story Arcs**: Alliance, War, Resolution
+- **Unite the Courts**: Forge alliances with all seven High Lords
+- **New Locations**: Dawn Court, Day Court, The Battlefield, The Prison
+- **New Characters**: Thesan, Helion, Kallias, Viviane, Beron, Eris, Vassa
+- **Epic Final Battle**: Defeat the King of Hybern and save Prythian
+- **12,900 XP available**
 
 ## 🎮 Features
 
 ### Lore-Accurate Content
 - **Seven High Fae Courts**: Spring, Summer, Autumn, Winter, Night, Dawn, and Day
 - **Character Classes**: High Fae, Lesser Fae, Human, Illyrian, Attor, and Suriel
-- **Magic System**: 12 different magic types including Winnowing, Daemati, Shapeshifting, and elemental powers
-- **Story Quests**: Complete Book 1 storyline with 20+ main and side quests
-- **Locations**: Visit 13+ iconic locations like Velaris, Under the Mountain, Spring Court Manor, and more
+- **Magic System**: 16 different magic types including Winnowing, Daemati, Shadowsinger, TruthTelling, and more
+- **Story Quests**: 81 total quests across base game and DLCs
+- **Locations**: Visit 20+ iconic locations
 - **Legendary Companions**: Recruit and adventure with 9 companions including Rhysand, Cassian, Azriel, and more
 
 ### Advanced Gameplay Systems
@@ -25,6 +62,7 @@ Experience the world of Prythian in this immersive RPG that faithfully recreates
 - **Crafting System**: 15+ recipes across 5 crafting stations
 - **Time System**: Day/night cycle with moon phases affecting magic power
 - **Inventory System**: Complete item management with grid UI, drag-drop ready, and equipment slots
+- **DLC Manager**: Seamless content loading for purchased expansions
 
 ### User Interface & Visualization
 - **Main Menu System**: Title screen with New Game, Continue, Load, Settings
@@ -37,21 +75,14 @@ Experience the world of Prythian in this immersive RPG that faithfully recreates
 - **Pause Menu**: In-game menu with settings and save/load options
 - **Keyboard Shortcuts**: Quick access (I for Inventory, Q for Quest Log, ESC for Pause)
 
-### Story Content
-- **Complete Book 1 Arc**: From mortal lands to Under the Mountain
-- **The Three Trials**: Face the Middengard Wyrm, Naga, and impossible choices
-- **Character Transformation**: Experience being Made by the Cauldron
-- **Story Progression**: Unlock locations and characters as you progress
-- **Side Quests**: Learning to read, painting, friendships, and more
-- **Multiple Story Arcs**: Foundation for Books 1-3 content
-
 ### Technical Features
 - Built with **Unity 2022.3.0f1**
 - **Docker-based build system** for consistent, reproducible builds
 - Cross-platform support (Windows, Mac, Linux)
-- Modular, extensible codebase with 25 game systems
+- Modular, extensible codebase with 26 game systems
 - Complete save/load functionality
 - Full UI/UX implementation with 8 interactive panels
+- **DLC Content Management System**
 - Keyboard shortcut system
 - Event-driven architecture
 - 0 security vulnerabilities (CodeQL verified)
@@ -318,15 +349,15 @@ This is a fan project based on the ACOTAR series. Contributions are welcome!
 - ✅ **Phase 1-3**: Optimization, Enhancement, Documentation (Complete)
 - ✅ **Phase 4**: UI & Visualization (Complete)
 - ✅ **Phase 5**: Advanced Gameplay Systems (Complete)
-- ✅ **Phase 6**: Story Content (In Progress - Book 1 Complete)
+- ✅ **Phase 6**: Story Content (Complete - All 3 Books)
 - 🔜 **Phase 7**: Multiplayer Features
 - 🔜 **Phase 8**: Polish & Release
 
 ### Areas for Contribution
-- Book 2 and Book 3 quest content
+- Novella content (ACOFAS, ACOSF)
 - Additional dialogue trees
 - Court-specific storylines
-- Companion personal quests
+- Companion personal quests (expanded)
 - UI design and implementation
 - Sound and music
 - Testing and bug reports
@@ -340,16 +371,39 @@ This is a fan project based on the ACOTAR series. Contributions are welcome!
 
 ## 📊 Project Statistics
 
-- **Total Lines of Code**: 8,000+
-- **Game Systems**: 20 complete systems
+### Base Game (Book 1)
+- **Quests**: 20+ main and side quests
+- **Story Arcs**: 4 complete arcs
+- **XP Available**: ~6,250 XP
+- **Locations**: 4 (Human Lands, The Wall, Spring Court Manor, Under the Mountain)
+- **Key Characters**: 5 (Tamlin, Lucien, Rhysand, Amarantha, Alis)
+
+### DLC 1: Mist and Fury (Book 2)
+- **Quests**: 31 quests
+- **Story Arcs**: 3 arcs
+- **XP Available**: 11,350 XP
+- **New Locations**: 8
+- **New Characters**: 8
+
+### DLC 2: Wings and Ruin (Book 3)
+- **Quests**: 30 quests
+- **Story Arcs**: 3 arcs
+- **XP Available**: 12,900 XP
+- **New Locations**: 6
+- **New Characters**: 10
+
+### Total (with all DLC)
+- **Total Lines of Code**: 14,000+
+- **Game Systems**: 26 complete systems
 - **Character Classes**: 6 classes
-- **Magic Types**: 12 abilities
-- **Locations**: 13+ unique places
-- **Quests**: 30+ main and side quests
+- **Magic Types**: 16 abilities
+- **Locations**: 20+ unique places
+- **Quests**: 81 main and side quests
 - **Enemies**: 8 creature types
 - **Companions**: 9 legendary characters
 - **Crafting Recipes**: 15+ items
-- **Story Arcs**: 10 defined arcs (Books 1-3)
+- **Story Arcs**: 10 defined arcs
+- **Total Quest XP**: 30,500 XP available
 - **Security**: 0 vulnerabilities (CodeQL verified)
 
 ## 📜 License
