@@ -185,6 +185,9 @@ namespace ACOTAR
             comp2.objectives.Add("Prove yourself worthy");
             comp2.experienceReward = 350;
             AddQuest(comp2);
+
+            // Initialize Book 1 extended quests
+            Book1Quests.InitializeBook1Quests(quests);
         }
 
         private void AddQuest(Quest quest)

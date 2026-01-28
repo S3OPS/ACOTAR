@@ -5,7 +5,7 @@ namespace ACOTAR
 {
     /// <summary>
     /// Main game manager that orchestrates the ACOTAR RPG experience
-    /// Enhanced with Phase 5 advanced gameplay systems
+    /// Enhanced with Phase 5 advanced gameplay systems and Phase 6 story content
     /// </summary>
     public class GameManager : MonoBehaviour
     {
@@ -17,6 +17,7 @@ namespace ACOTAR
         public CompanionManager companionManager;
         public DialogueSystem dialogueSystem;
         public TimeSystem timeSystem;
+        public StoryManager storyManager;
 
         [Header("Player")]
         public Character playerCharacter;
