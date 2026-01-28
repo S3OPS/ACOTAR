@@ -1,4 +1,4 @@
-FROM unityci/editor:2022.3.0f1-windows-mono-1.0.1
+FROM unityci/editor:2022.3.0f1-windows-mono-1
 
 # Set working directory
 WORKDIR /workspace
@@ -8,7 +8,7 @@ COPY . /workspace/
 
 # Set Unity license (will be provided via environment variable)
 ARG UNITY_LICENSE
-ENV UNITY_LICENSE_CONTENT=$UNITY_LICENSE
+ENV UNITY_LICENSE=$UNITY_LICENSE
 
 # Create build directory
 RUN mkdir -p /workspace/Build

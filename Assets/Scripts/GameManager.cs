@@ -70,12 +70,23 @@ namespace ACOTAR
                 playerCharacter.isMadeByTheCauldron = true;
                 playerCharacter.isFae = true;
                 
-                // Upgrade stats for High Fae
-                playerCharacter.maxHealth = 150;
-                playerCharacter.health = 150;
-                playerCharacter.magicPower = 100;
-                playerCharacter.strength = 80;
-                playerCharacter.agility = 70;
+                // Recalculate stats using SetBaseStats for consistency
+                int currentXP = playerCharacter.experience;
+                int currentLevel = playerCharacter.level;
+                // Store abilities before reset
+                List<MagicType> currentAbilities = new List<MagicType>(playerCharacter.abilities);
+                
+                // Reset to High Fae base stats
+                playerCharacter = new Character(playerCharacter.name, CharacterClass.HighFae, playerCharacter.allegiance);
+                playerCharacter.isMadeByTheCauldron = true;
+                
+                // Restore progression
+                playerCharacter.experience = currentXP;
+                playerCharacter.level = currentLevel;
+                foreach (var ability in currentAbilities)
+                {
+                    playerCharacter.LearnAbility(ability);
+                }
 
                 Debug.Log($"{playerCharacter.name} has been Made by the Cauldron and transformed into High Fae!");
             }
@@ -95,20 +106,23 @@ namespace ACOTAR
         /// </summary>
         public void TravelTo(string locationName)
         {
-            if (locationManager != null)
+            if (locationManager == null)
             {
-                Location location = locationManager.GetLocation(locationName);
-                if (location != null)
-                {
-                    currentLocation = locationName;
-                    gameTime++;
-                    Debug.Log($"Traveled to: {locationName}");
-                    Debug.Log($"Description: {location.description}");
-                }
-                else
-                {
-                    Debug.LogWarning($"Location not found: {locationName}");
-                }
+                Debug.LogWarning("LocationManager not initialized");
+                return;
+            }
+            
+            Location location = locationManager.GetLocation(locationName);
+            if (location != null)
+            {
+                currentLocation = locationName;
+                gameTime++;
+                Debug.Log($"Traveled to: {locationName}");
+                Debug.Log($"Description: {location.description}");
+            }
+            else
+            {
+                Debug.LogWarning($"Location not found: {locationName}");
             }
         }
 
@@ -156,6 +170,8 @@ namespace ACOTAR
             Debug.Log($"Name: {playerCharacter.name}");
             Debug.Log($"Class: {playerCharacter.characterClass}");
             Debug.Log($"Court: {playerCharacter.allegiance}");
+            Debug.Log($"Level: {playerCharacter.level}");
+            Debug.Log($"Experience: {playerCharacter.experience}/{playerCharacter.level * 100}");
             Debug.Log($"Health: {playerCharacter.health}/{playerCharacter.maxHealth}");
             Debug.Log($"Magic Power: {playerCharacter.magicPower}");
             Debug.Log($"Strength: {playerCharacter.strength}");

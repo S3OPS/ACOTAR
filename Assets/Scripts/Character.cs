@@ -65,6 +65,8 @@ namespace ACOTAR
         public int magicPower;
         public int strength;
         public int agility;
+        public int experience;
+        public int level;
         public bool isFae;
         public bool isMadeByTheCauldron;
 
@@ -76,6 +78,8 @@ namespace ACOTAR
             this.abilities = new List<MagicType>();
             this.isFae = charClass != CharacterClass.Human;
             this.isMadeByTheCauldron = false;
+            this.experience = 0;
+            this.level = 1;
             
             // Set base stats based on class
             SetBaseStats();
@@ -148,6 +152,30 @@ namespace ACOTAR
         public bool IsAlive()
         {
             return health > 0;
+        }
+
+        public void GainExperience(int xp)
+        {
+            experience += xp;
+            // Simple level up system: 100 XP per level
+            int requiredXP = level * 100;
+            while (experience >= requiredXP)
+            {
+                experience -= requiredXP;
+                LevelUp();
+                requiredXP = level * 100;
+            }
+        }
+
+        private void LevelUp()
+        {
+            level++;
+            // Increase stats on level up
+            maxHealth += 10;
+            health = maxHealth;
+            magicPower += 5;
+            strength += 3;
+            agility += 3;
         }
     }
 }

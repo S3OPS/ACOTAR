@@ -14,7 +14,7 @@ services:
       - build-cache:/workspace/Library
       - build-output:/workspace/Build
     environment:
-      - UNITY_LICENSE_CONTENT=${UNITY_LICENSE}
+      - UNITY_LICENSE=${UNITY_LICENSE}
       - UNITY_EMAIL=${UNITY_EMAIL}
       - UNITY_PASSWORD=${UNITY_PASSWORD}
     networks:

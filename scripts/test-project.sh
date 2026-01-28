@@ -217,7 +217,7 @@ lore_keywords=(
 
 lore_ok=true
 for keyword in "${lore_keywords[@]}"; do
-    if grep -r -q "$keyword" Assets/Scripts/ LORE.md 2>/dev/null; then
+    if grep -r -q "$keyword" Assets/Scripts/ LORE.md; then
         echo "  ✓ Found reference to '$keyword'"
     else
         echo "  ✗ Missing reference to '$keyword'"

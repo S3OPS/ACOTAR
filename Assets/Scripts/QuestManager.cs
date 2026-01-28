@@ -217,7 +217,17 @@ namespace ACOTAR
                     quest.isActive = false;
                     activeQuests.Remove(quest);
                     completedQuests.Add(quest);
-                    Debug.Log($"Quest Completed: {quest.title} - Reward: {quest.experienceReward} XP");
+                    
+                    // Grant experience to player if GameManager exists
+                    if (GameManager.Instance != null && GameManager.Instance.playerCharacter != null)
+                    {
+                        GameManager.Instance.playerCharacter.GainExperience(quest.experienceReward);
+                        Debug.Log($"Quest Completed: {quest.title} - Granted {quest.experienceReward} XP to {GameManager.Instance.playerCharacter.name}");
+                    }
+                    else
+                    {
+                        Debug.Log($"Quest Completed: {quest.title} - Reward: {quest.experienceReward} XP");
+                    }
 
                     // Start next quest if available
                     if (!string.IsNullOrEmpty(quest.nextQuestId))

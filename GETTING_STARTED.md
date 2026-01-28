@@ -277,7 +277,7 @@ GameManager.Instance.GrantAbility(MagicType.MyNewAbility);
 
 ## Resources
 
-- **ACOTAR Wiki**: [fandom.com/wiki/A_Court_of_Thorns_and_Roses](https://acourtofthornsandroses.fandom.com/)
+- **ACOTAR Wiki**: [acourtofthornsandroses.fandom.com](https://acourtofthornsandroses.fandom.com/)
 - **Unity Documentation**: [docs.unity3d.com](https://docs.unity3d.com/)
 - **Docker Docs**: [docs.docker.com](https://docs.docker.com/)
 - **Unity CI Images**: [game-ci/docker](https://github.com/game-ci/docker)

@@ -186,10 +186,10 @@ case CharacterClass.NewClass:
 
 Modify `scripts/build-unity.sh` for different targets:
 ```bash
-# Change BUILD_TARGET variable
-BUILD_TARGET=Windows64    # Windows
-BUILD_TARGET=OSXUniversal # Mac
-BUILD_TARGET=Linux64      # Linux
+# Change BUILD_TARGET variable or pass as argument
+./scripts/build-unity.sh StandaloneWindows64    # Windows
+./scripts/build-unity.sh StandaloneLinux64      # Linux
+./scripts/build-unity.sh StandaloneOSX          # Mac
 ```
 
 ## Testing

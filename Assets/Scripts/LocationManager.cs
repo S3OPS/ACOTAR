@@ -56,14 +56,7 @@ namespace ACOTAR
             // Spring Court locations
             AddLocation(new Location(
                 "Spring Court Manor",
-                "The elegant manor of the High Lord of the Spring Court, surrounded by eternal gardens",
-                Court.Spring,
-                LocationType.Manor
-            ));
-
-            AddLocation(new Location(
-                "Tamlin's Estate",
-                "The sprawling estate with beautiful gardens that bloom year-round",
+                "The elegant manor of the High Lord Tamlin, surrounded by eternal gardens that bloom year-round with roses and vibrant flowers",
                 Court.Spring,
                 LocationType.Manor
             ));
