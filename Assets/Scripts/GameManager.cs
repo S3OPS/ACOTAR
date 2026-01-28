@@ -5,7 +5,8 @@ namespace ACOTAR
 {
     /// <summary>
     /// Main game manager that orchestrates the ACOTAR RPG experience
-    /// Enhanced with Phase 5 advanced gameplay systems and Phase 6 story content
+    /// Enhanced with Phase 5 advanced gameplay systems, Phase 6 story content,
+    /// and base game improvements (status effects, difficulty, currency, elements)
     /// </summary>
     public class GameManager : MonoBehaviour
     {
@@ -26,6 +27,8 @@ namespace ACOTAR
         private InventorySystem inventorySystem;
         private ReputationSystem reputationSystem;
         private CraftingSystem craftingSystem;
+        private CurrencySystem currencySystem;
+        private StatusEffectManager statusEffectManager;
 
         [Header("Game State")]
         public string currentLocation;
@@ -55,6 +58,9 @@ namespace ACOTAR
             Debug.Log("=== ACOTAR Fantasy RPG Initialized ===");
             Debug.Log("Welcome to Prythian!");
             
+            // Initialize save system
+            SaveSystem.Initialize();
+            
             // Initialize player with configuration
             playerCharacter = new Character(
                 GameConfig.DEFAULT_PLAYER_NAME, 
@@ -66,6 +72,8 @@ namespace ACOTAR
             inventorySystem = new InventorySystem();
             reputationSystem = new ReputationSystem(playerCharacter);
             craftingSystem = new CraftingSystem(inventorySystem, playerCharacter);
+            currencySystem = new CurrencySystem();
+            statusEffectManager = new StatusEffectManager();
             
             // Set starting location
             currentLocation = GameConfig.DEFAULT_STARTING_LOCATION;
@@ -76,7 +84,15 @@ namespace ACOTAR
             Debug.Log($"Created character: {playerCharacter.name}");
             Debug.Log($"Class: {playerCharacter.characterClass}");
             Debug.Log($"Starting location: {currentLocation}");
+            Debug.Log($"Difficulty: {DifficultySettings.CurrentDifficulty}");
+            Debug.Log($"Starting Gold: {currencySystem.Gold}");
             Debug.Log("All systems initialized successfully!");
+        }
+
+        private void Update()
+        {
+            // Try auto-save periodically
+            SaveSystem.TryAutoSave();
         }
 
         /// <summary>
@@ -162,6 +178,16 @@ namespace ACOTAR
         }
 
         /// <summary>
+        /// Set game difficulty
+        /// </summary>
+        public void SetDifficulty(DifficultyLevel difficulty)
+        {
+            DifficultySettings.CurrentDifficulty = difficulty;
+            Debug.Log($"Difficulty set to: {difficulty}");
+            DifficultySettings.DisplaySettings();
+        }
+
+        /// <summary>
         /// Showcase game features for demonstration
         /// </summary>
         private void Start()
@@ -204,6 +230,7 @@ namespace ACOTAR
             Debug.Log($"Agility: {playerCharacter.agility}");
             Debug.Log($"Is Fae: {playerCharacter.isFae}");
             Debug.Log($"Made by Cauldron: {playerCharacter.isMadeByTheCauldron}");
+            Debug.Log($"Gold: {currencySystem.Gold}");
             
             if (playerCharacter.abilities.Count > 0)
             {
@@ -403,6 +430,95 @@ namespace ACOTAR
         }
 
         /// <summary>
+        /// Demo new base game enhancements
+        /// </summary>
+        public void DemoBaseGameEnhancements()
+        {
+            Debug.Log("\n\n╔══════════════════════════════════════════════════════════╗");
+            Debug.Log("║    BASE GAME ENHANCEMENTS Demo                          ║");
+            Debug.Log("╚══════════════════════════════════════════════════════════╝\n");
+
+            // 1. Difficulty Settings Demo
+            Debug.Log("=== 1. DIFFICULTY SETTINGS ===\n");
+            DifficultySettings.DisplaySettings();
+            
+            Debug.Log("Changing difficulty to Hard...");
+            SetDifficulty(DifficultyLevel.Hard);
+            
+            Debug.Log("\n=== Difficulty Demo Complete ===\n");
+
+            // 2. Currency System Demo
+            Debug.Log("=== 2. CURRENCY SYSTEM ===\n");
+            
+            currencySystem.DisplayCurrency();
+            
+            Debug.Log("Earning gold from combat...");
+            Enemy testEnemy = EnemyFactory.CreateBogge(EnemyDifficulty.Normal);
+            int goldDrop = CurrencySystem.CalculateEnemyGoldDrop(testEnemy);
+            currencySystem.AddGold(goldDrop);
+            
+            Debug.Log("Earning court tokens...");
+            currencySystem.AddCourtTokens(Court.Night, 10);
+            currencySystem.AddFaeCrystals(5);
+            
+            currencySystem.DisplayCurrency();
+            
+            Debug.Log("\n=== Currency Demo Complete ===\n");
+
+            // 3. Elemental System Demo
+            Debug.Log("=== 3. ELEMENTAL SYSTEM ===\n");
+            
+            Debug.Log("Fire vs Ice: " + ElementalSystem.GetDamageMultiplier(Element.Fire, Element.Ice));
+            Debug.Log("Ice vs Fire: " + ElementalSystem.GetDamageMultiplier(Element.Ice, Element.Fire));
+            Debug.Log("Darkness vs Light: " + ElementalSystem.GetDamageMultiplier(Element.Darkness, Element.Light));
+            Debug.Log("Light vs Darkness: " + ElementalSystem.GetDamageMultiplier(Element.Light, Element.Darkness));
+            
+            ElementalSystem.DisplayElementInfo(Element.Darkness);
+            
+            Debug.Log("\n=== Elemental Demo Complete ===\n");
+
+            // 4. Status Effects Demo
+            Debug.Log("=== 4. STATUS EFFECTS ===\n");
+            
+            Debug.Log("Applying Burning to enemy...");
+            Enemy burnTarget = EnemyFactory.CreateNaga(EnemyDifficulty.Easy);
+            statusEffectManager.ApplyEffect(burnTarget, StatusEffectType.Burning, 3, 1);
+            
+            Debug.Log("Applying Strengthened to player...");
+            statusEffectManager.ApplyEffect(playerCharacter, StatusEffectType.Strengthened, 3, 1);
+            statusEffectManager.ApplyEffect(playerCharacter, StatusEffectType.Regenerating, 5, 2);
+            
+            Debug.Log("\nPlayer active effects:");
+            foreach (var effect in statusEffectManager.GetActiveEffects(playerCharacter))
+            {
+                Debug.Log($"  - {effect.name}: {effect.description} ({effect.duration} turns)");
+            }
+            
+            Debug.Log("\nProcessing turn for player...");
+            statusEffectManager.ProcessTurnStart(playerCharacter);
+            
+            Debug.Log("\nProcessing turn for enemy...");
+            statusEffectManager.ProcessTurnStart(burnTarget);
+            
+            Debug.Log("\n=== Status Effects Demo Complete ===\n");
+
+            // 5. Save System Demo
+            Debug.Log("=== 5. ENHANCED SAVE SYSTEM ===\n");
+            
+            SaveSystem.DisplaySaveSlots();
+            
+            Debug.Log($"Current play time: {SaveSystem.GetPlayTimeHours():F2} hours");
+            Debug.Log($"Auto-save enabled: {SaveSystem.AutoSaveEnabled}");
+            
+            Debug.Log("\n=== Save System Demo Complete ===\n");
+
+            Debug.Log("\n╔══════════════════════════════════════════════════════════╗");
+            Debug.Log("║    Base Game Enhancements Demo Complete!                ║");
+            Debug.Log("║    New systems: Difficulty, Currency, Elements, Status  ║");
+            Debug.Log("╚══════════════════════════════════════════════════════════╝\n");
+        }
+
+        /// <summary>
         /// Get inventory system (for external access)
         /// </summary>
         public InventorySystem GetInventorySystem()
@@ -424,6 +540,22 @@ namespace ACOTAR
         public CraftingSystem GetCraftingSystem()
         {
             return craftingSystem;
+        }
+
+        /// <summary>
+        /// Get currency system (for external access)
+        /// </summary>
+        public CurrencySystem GetCurrencySystem()
+        {
+            return currencySystem;
+        }
+
+        /// <summary>
+        /// Get status effect manager (for external access)
+        /// </summary>
+        public StatusEffectManager GetStatusEffectManager()
+        {
+            return statusEffectManager;
         }
     }
 }
