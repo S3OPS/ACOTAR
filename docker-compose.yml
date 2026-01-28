@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  unity-builder:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - UNITY_LICENSE=${UNITY_LICENSE}
+    image: acotar-unity-builder:latest
+    container_name: acotar-builder
+    volumes:
+      - .:/workspace
+      - build-cache:/workspace/Library
+      - build-output:/workspace/Build
+    environment:
+      - UNITY_LICENSE=${UNITY_LICENSE}
+      - UNITY_EMAIL=${UNITY_EMAIL}
+      - UNITY_PASSWORD=${UNITY_PASSWORD}
+    networks:
+      - acotar-network
+
+volumes:
+  build-cache:
+  build-output:
+
+networks:
+  acotar-network:
+    driver: bridge

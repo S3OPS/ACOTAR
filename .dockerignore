@@ -1,0 +1,24 @@
+# Docker ignore patterns
+.git
+.gitignore
+*.md
+.vscode
+.idea
+
+# Unity generated (should not be in Docker context)
+Library/
+Temp/
+obj/
+Logs/
+UserSettings/
+
+# Build outputs (built inside container)
+Build/
+Builds/
+*.exe
+*.apk
+*.aab
+
+# OS files
+.DS_Store
+Thumbs.db
