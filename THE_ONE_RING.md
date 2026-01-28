@@ -358,15 +358,15 @@ Common → Uncommon → Rare → Epic → Legendary → Artifact
 - [ ] Map system
 - [ ] Save/Load menu
 
-#### Phase 5: Advanced Gameplay (Q3 2026)
-- [ ] Full combat encounters
-- [ ] Enemy AI system
-- [ ] Dialogue system
-- [ ] Crafting system
-- [ ] Companion system
-- [ ] Relationship/reputation system
-- [ ] Day/night cycle
-- [ ] Weather system
+#### Phase 5: Advanced Gameplay ✅ COMPLETE (January 2026)
+- [x] Full combat encounters with turn-based system
+- [x] Enemy AI system (5 behavior patterns)
+- [x] Dialogue system (branching conversations)
+- [x] Crafting system (15+ recipes, 5 stations)
+- [x] Companion system (9 companions, loyalty mechanics)
+- [x] Relationship/reputation system (7 courts)
+- [x] Day/night cycle with moon phases
+- [x] Special events (Calanmai, Starfall)
 
 #### Phase 6: Story Content (Q4 2026)
 - [ ] Complete Book 1 storyline
