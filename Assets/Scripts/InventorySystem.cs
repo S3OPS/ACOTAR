@@ -165,6 +165,148 @@ namespace ACOTAR
                 ItemType.Magical,
                 ItemRarity.Epic
             ) { magicPowerBonus = 15 });
+
+            // Crafting Materials
+            AddCraftingMaterials();
+        }
+
+        /// <summary>
+        /// Add all crafting materials to the database
+        /// </summary>
+        private void AddCraftingMaterials()
+        {
+            // Basic Materials
+            AddItemToDatabase(new Item(
+                "crafting_ash_wood",
+                "Ash Wood",
+                "Wood from an ash tree, effective against Fae creatures",
+                ItemType.Crafting,
+                ItemRarity.Common
+            ));
+
+            AddItemToDatabase(new Item(
+                "crafting_iron_ingot",
+                "Iron Ingot",
+                "A refined bar of iron for crafting",
+                ItemType.Crafting,
+                ItemRarity.Common
+            ));
+
+            AddItemToDatabase(new Item(
+                "crafting_leather",
+                "Leather",
+                "Tanned animal hide for armor and accessories",
+                ItemType.Crafting,
+                ItemRarity.Common
+            ));
+
+            AddItemToDatabase(new Item(
+                "crafting_silk",
+                "Fae Silk",
+                "Delicate silk woven by Fae artisans",
+                ItemType.Crafting,
+                ItemRarity.Uncommon
+            ));
+
+            // Alchemy Materials
+            AddItemToDatabase(new Item(
+                "crafting_healing_herb",
+                "Healing Herb",
+                "A common herb with restorative properties",
+                ItemType.Crafting,
+                ItemRarity.Common
+            ));
+
+            AddItemToDatabase(new Item(
+                "crafting_water_vial",
+                "Pure Water Vial",
+                "Pristine water for potion brewing",
+                ItemType.Crafting,
+                ItemRarity.Common
+            ));
+
+            AddItemToDatabase(new Item(
+                "crafting_moonflower",
+                "Moonflower",
+                "A rare flower that blooms only under moonlight",
+                ItemType.Crafting,
+                ItemRarity.Rare
+            ));
+
+            AddItemToDatabase(new Item(
+                "crafting_starlight_essence",
+                "Starlight Essence",
+                "Captured essence of starlight, precious to the Night Court",
+                ItemType.Crafting,
+                ItemRarity.Epic
+            ));
+
+            // Advanced Materials
+            AddItemToDatabase(new Item(
+                "crafting_illyrian_steel",
+                "Illyrian Steel",
+                "Legendary steel forged by Illyrian warriors",
+                ItemType.Crafting,
+                ItemRarity.Rare
+            ));
+
+            AddItemToDatabase(new Item(
+                "crafting_moonstone",
+                "Moonstone",
+                "A gem that glows with inner light",
+                ItemType.Crafting,
+                ItemRarity.Rare
+            ));
+
+            AddItemToDatabase(new Item(
+                "crafting_mithril",
+                "Mithril",
+                "A rare, lightweight magical metal",
+                ItemType.Crafting,
+                ItemRarity.Epic
+            ));
+
+            AddItemToDatabase(new Item(
+                "crafting_silver",
+                "Silver Bar",
+                "Refined silver for enchanting",
+                ItemType.Crafting,
+                ItemRarity.Uncommon
+            ));
+
+            // Magical Essences
+            AddItemToDatabase(new Item(
+                "magical_fae_essence",
+                "Fae Essence",
+                "Concentrated magical energy from the Fae realm",
+                ItemType.Magical,
+                ItemRarity.Epic
+            ));
+
+            AddItemToDatabase(new Item(
+                "crafting_suriel_feather",
+                "Suriel Feather",
+                "A rare feather from a Suriel, imbued with prophetic power",
+                ItemType.Crafting,
+                ItemRarity.Legendary
+            ));
+
+            // Monster Drops
+            AddItemToDatabase(new Item(
+                "crafting_naga_scale",
+                "Naga Scale",
+                "A tough scale from a Naga serpent",
+                ItemType.Crafting,
+                ItemRarity.Uncommon
+            ));
+
+            AddItemToDatabase(new Item(
+                "crafting_attor_wing",
+                "Attor Wing Fragment",
+                "Leathery wing membrane from an Attor",
+                ItemType.Crafting,
+                ItemRarity.Rare
+            ));
         }
 
         private void AddItemToDatabase(Item item)

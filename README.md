@@ -55,6 +55,11 @@ Experience the epic conclusion to the trilogy:
 
 ### Advanced Gameplay Systems
 - **Turn-based Combat**: Strategic battles with 5 AI behavior patterns and full combat UI
+- **Combo System**: Chain attacks for increasing damage bonuses (up to 5x combo)
+- **Status Effects**: 14 buffs/debuffs including Bleeding, Burning, Frozen, Stunned, and more
+- **Elemental System**: Rock-paper-scissors style weaknesses based on ACOTAR court powers
+- **Difficulty Settings**: Story, Normal, Hard, and Nightmare modes with scaling rewards
+- **Currency System**: Gold, Fae Crystals, and Court Tokens for trading
 - **Enemy System**: 8 enemy types from ACOTAR lore with difficulty scaling
 - **Companion System**: Party of up to 3 companions with loyalty mechanics
 - **Reputation System**: Track standing with all 7 courts, affecting prices and access
@@ -62,6 +67,7 @@ Experience the epic conclusion to the trilogy:
 - **Crafting System**: 15+ recipes across 5 crafting stations
 - **Time System**: Day/night cycle with moon phases affecting magic power
 - **Inventory System**: Complete item management with grid UI, drag-drop ready, and equipment slots
+- **Save System**: 5 save slots with auto-save and play time tracking
 - **DLC Manager**: Seamless content loading for purchased expansions
 
 ### User Interface & Visualization
@@ -79,10 +85,11 @@ Experience the epic conclusion to the trilogy:
 - Built with **Unity 2022.3.0f1**
 - **Docker-based build system** for consistent, reproducible builds
 - Cross-platform support (Windows, Mac, Linux)
-- Modular, extensible codebase with 26 game systems
-- Complete save/load functionality
+- Modular, extensible codebase with 32 game systems
+- Complete save/load functionality with 5 slots and auto-save
 - Full UI/UX implementation with 8 interactive panels
 - **DLC Content Management System**
+- Centralized game configuration for easy balancing
 - Keyboard shortcut system
 - Event-driven architecture
 - 0 security vulnerabilities (CodeQL verified)
@@ -393,15 +400,21 @@ This is a fan project based on the ACOTAR series. Contributions are welcome!
 - **New Characters**: 10
 
 ### Total (with all DLC)
-- **Total Lines of Code**: 14,000+
-- **Game Systems**: 26 complete systems
+- **Total Lines of Code**: 16,500+
+- **Game Systems**: 32 complete systems
 - **Character Classes**: 6 classes
 - **Magic Types**: 16 abilities
+- **Status Effects**: 14 buff/debuff types
+- **Elements**: 8 elemental types with interactions
+- **Difficulty Levels**: 4 (Story, Normal, Hard, Nightmare)
+- **Currency Types**: 3 (Gold, Fae Crystals, Court Tokens)
 - **Locations**: 20+ unique places
 - **Quests**: 81 main and side quests
 - **Enemies**: 8 creature types
 - **Companions**: 9 legendary characters
 - **Crafting Recipes**: 15+ items
+- **Crafting Materials**: 20+ materials
+- **Save Slots**: 5 with auto-save
 - **Story Arcs**: 10 defined arcs
 - **Total Quest XP**: 30,500 XP available
 - **Security**: 0 vulnerabilities (CodeQL verified)
