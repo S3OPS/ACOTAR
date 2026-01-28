@@ -202,7 +202,12 @@ namespace ACOTAR
                     quest.isActive = true;
                     activeQuests.Add(quest);
                     Debug.Log($"Quest Started: {quest.title}");
+                    GameEvents.TriggerQuestStarted(quest);
                 }
+            }
+            else
+            {
+                Debug.LogWarning($"Quest not found: {questId}");
             }
         }
 
@@ -229,12 +234,18 @@ namespace ACOTAR
                         Debug.Log($"Quest Completed: {quest.title} - Reward: {quest.experienceReward} XP");
                     }
 
+                    GameEvents.TriggerQuestCompleted(quest);
+
                     // Start next quest if available
                     if (!string.IsNullOrEmpty(quest.nextQuestId))
                     {
                         StartQuest(quest.nextQuestId);
                     }
                 }
+            }
+            else
+            {
+                Debug.LogWarning($"Quest not found: {questId}");
             }
         }
 

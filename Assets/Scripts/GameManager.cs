@@ -45,11 +45,15 @@ namespace ACOTAR
             Debug.Log("=== ACOTAR Fantasy RPG Initialized ===");
             Debug.Log("Welcome to Prythian!");
             
-            // Initialize player as human (Feyre's starting point)
-            playerCharacter = new Character("Feyre Archeron", CharacterClass.Human, Court.Spring);
+            // Initialize player with configuration
+            playerCharacter = new Character(
+                GameConfig.DEFAULT_PLAYER_NAME, 
+                GameConfig.DEFAULT_PLAYER_CLASS, 
+                GameConfig.DEFAULT_PLAYER_COURT
+            );
             
             // Set starting location
-            currentLocation = "Human Lands";
+            currentLocation = GameConfig.DEFAULT_STARTING_LOCATION;
             gameTime = 0;
             hasMetRhysand = false;
             hasCompletedCurse = false;
@@ -61,23 +65,25 @@ namespace ACOTAR
 
         /// <summary>
         /// Transform player from human to High Fae (lore-accurate transformation)
+        /// Optimized to preserve progression and abilities
         /// </summary>
         public void TransformToHighFae()
         {
             if (playerCharacter.characterClass == CharacterClass.Human)
             {
-                playerCharacter.characterClass = CharacterClass.HighFae;
-                playerCharacter.isMadeByTheCauldron = true;
-                playerCharacter.isFae = true;
+                CharacterClass oldClass = playerCharacter.characterClass;
                 
-                // Recalculate stats using SetBaseStats for consistency
+                // Store current progression
                 int currentXP = playerCharacter.experience;
                 int currentLevel = playerCharacter.level;
-                // Store abilities before reset
                 List<MagicType> currentAbilities = new List<MagicType>(playerCharacter.abilities);
                 
-                // Reset to High Fae base stats
-                playerCharacter = new Character(playerCharacter.name, CharacterClass.HighFae, playerCharacter.allegiance);
+                // Create new High Fae character preserving identity
+                playerCharacter = new Character(
+                    playerCharacter.name, 
+                    CharacterClass.HighFae, 
+                    playerCharacter.allegiance
+                );
                 playerCharacter.isMadeByTheCauldron = true;
                 
                 // Restore progression
@@ -89,6 +95,7 @@ namespace ACOTAR
                 }
 
                 Debug.Log($"{playerCharacter.name} has been Made by the Cauldron and transformed into High Fae!");
+                GameEvents.TriggerCharacterTransformed(playerCharacter, CharacterClass.HighFae);
             }
         }
 
@@ -102,7 +109,7 @@ namespace ACOTAR
         }
 
         /// <summary>
-        /// Travel to a new location
+        /// Travel to a new location with event notification
         /// </summary>
         public void TravelTo(string locationName)
         {
@@ -115,10 +122,12 @@ namespace ACOTAR
             Location location = locationManager.GetLocation(locationName);
             if (location != null)
             {
+                string previousLocation = currentLocation;
                 currentLocation = locationName;
                 gameTime++;
                 Debug.Log($"Traveled to: {locationName}");
                 Debug.Log($"Description: {location.description}");
+                GameEvents.TriggerLocationChanged(previousLocation, locationName);
             }
             else
             {
@@ -127,12 +136,13 @@ namespace ACOTAR
         }
 
         /// <summary>
-        /// Change player's court allegiance
+        /// Change player's court allegiance with event notification
         /// </summary>
         public void ChangeCourtAllegiance(Court newCourt)
         {
             playerCharacter.allegiance = newCourt;
             Debug.Log($"{playerCharacter.name} now serves the {newCourt} Court");
+            GameEvents.TriggerCourtAllegianceChanged(playerCharacter, newCourt);
         }
 
         /// <summary>
@@ -171,7 +181,7 @@ namespace ACOTAR
             Debug.Log($"Class: {playerCharacter.characterClass}");
             Debug.Log($"Court: {playerCharacter.allegiance}");
             Debug.Log($"Level: {playerCharacter.level}");
-            Debug.Log($"Experience: {playerCharacter.experience}/{playerCharacter.level * 100}");
+            Debug.Log($"Experience: {playerCharacter.experience}/{playerCharacter.GetXPRequiredForNextLevel()}");
             Debug.Log($"Health: {playerCharacter.health}/{playerCharacter.maxHealth}");
             Debug.Log($"Magic Power: {playerCharacter.magicPower}");
             Debug.Log($"Strength: {playerCharacter.strength}");
