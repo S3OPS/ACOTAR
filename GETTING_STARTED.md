@@ -25,9 +25,10 @@ Welcome to the ACOTAR Fantasy RPG development guide! This document will help you
    ```
 
 4. **Open in Unity**:
-   - In Unity Hub, click "Open" → "Add project from disk"
+   - In Unity Hub, click "Add" (or the dropdown arrow next to "Open")
+   - Select "Add project from disk"
    - Select the ACOTAR folder
-   - Wait for Unity to import assets (first time may take a few minutes)
+   - Unity will automatically import assets when you first open the project (may take a few minutes)
 
 5. **Play**:
    - Open `Assets/Scenes/MainScene.unity`
