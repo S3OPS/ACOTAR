@@ -380,7 +380,7 @@ namespace ACOTAR
             }
 
             // Create button for each ability
-            foreach (MagicType ability in playerCharacter.abilities.GetLearnedAbilities())
+            foreach (MagicType ability in playerCharacter.abilitySystem.GetLearnedAbilities())
             {
                 if (magicButtonPrefab != null)
                 {
