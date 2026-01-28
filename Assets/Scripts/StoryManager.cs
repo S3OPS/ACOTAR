@@ -8,13 +8,18 @@ namespace ACOTAR
     /// </summary>
     public enum StoryArc
     {
+        // BASE GAME - Book 1: A Court of Thorns and Roses
         Book1_HumanLands,
         Book1_SpringCourt,
         Book1_UnderTheMountain,
         Book1_Aftermath,
+        
+        // DLC 1 - Book 2: A Court of Mist and Fury
         Book2_NightCourt,
         Book2_WarPreparations,
         Book2_Hybern,
+        
+        // DLC 2 - Book 3: A Court of Wings and Ruin
         Book3_Alliance,
         Book3_War,
         Book3_Resolution
@@ -23,6 +28,10 @@ namespace ACOTAR
     /// <summary>
     /// Manages story progression through ACOTAR books
     /// Tracks which story arcs are complete and unlocks new content
+    /// 
+    /// BASE GAME: Book 1 story arcs (Book1_*)
+    /// DLC 1: Book 2 story arcs (Book2_*) - requires DLC purchase
+    /// DLC 2: Book 3 story arcs (Book3_*) - requires DLC purchase
     /// </summary>
     public class StoryManager : MonoBehaviour
     {
@@ -60,6 +69,50 @@ namespace ACOTAR
         }
 
         /// <summary>
+        /// Check if a story arc is part of DLC content
+        /// </summary>
+        public bool IsArcDLCContent(StoryArc arc)
+        {
+            switch (arc)
+            {
+                case StoryArc.Book2_NightCourt:
+                case StoryArc.Book2_WarPreparations:
+                case StoryArc.Book2_Hybern:
+                    return true; // DLC 1
+                    
+                case StoryArc.Book3_Alliance:
+                case StoryArc.Book3_War:
+                case StoryArc.Book3_Resolution:
+                    return true; // DLC 2
+                    
+                default:
+                    return false; // Base game
+            }
+        }
+
+        /// <summary>
+        /// Get which DLC a story arc belongs to
+        /// </summary>
+        public DLCPackage? GetArcDLCPackage(StoryArc arc)
+        {
+            switch (arc)
+            {
+                case StoryArc.Book2_NightCourt:
+                case StoryArc.Book2_WarPreparations:
+                case StoryArc.Book2_Hybern:
+                    return DLCPackage.ACOMAF_MistAndFury;
+                    
+                case StoryArc.Book3_Alliance:
+                case StoryArc.Book3_War:
+                case StoryArc.Book3_Resolution:
+                    return DLCPackage.ACOWAR_WingsAndRuin;
+                    
+                default:
+                    return null;
+            }
+        }
+
+        /// <summary>
         /// Complete a story arc and unlock next content
         /// </summary>
         public void CompleteArc(StoryArc arc)
@@ -84,6 +137,9 @@ namespace ACOTAR
         {
             switch (arc)
             {
+                // =====================================================
+                // BASE GAME - Book 1: A Court of Thorns and Roses
+                // =====================================================
                 case StoryArc.Book1_HumanLands:
                     UnlockLocation("Spring Court Manor");
                     UnlockCharacter("Tamlin");
@@ -97,28 +153,35 @@ namespace ACOTAR
                     break;
 
                 case StoryArc.Book1_UnderTheMountain:
-                    UnlockLocation("Velaris");
-                    UnlockLocation("House of Wind");
-                    UnlockCharacter("Cassian");
-                    UnlockCharacter("Azriel");
-                    UnlockCharacter("Mor");
+                    // Preview of Night Court from Rhysand's memory (base game teaser)
+                    UnlockCharacter("Alis");
                     break;
 
                 case StoryArc.Book1_Aftermath:
+                    // Base game ending - player becomes High Fae
+                    Debug.Log("=== BASE GAME COMPLETE ===");
+                    Debug.Log("Congratulations! You have completed A Court of Thorns and Roses!");
+                    Debug.Log("To continue Feyre's journey, purchase DLC 1: A Court of Mist and Fury");
+                    break;
+
+                // =====================================================
+                // DLC 1 - Book 2: A Court of Mist and Fury
+                // =====================================================
+                case StoryArc.Book2_NightCourt:
+                    UnlockLocation("Velaris");
+                    UnlockLocation("House of Wind");
                     UnlockLocation("Hewn City");
                     UnlockLocation("Illyrian Mountains");
+                    UnlockCharacter("Cassian");
+                    UnlockCharacter("Azriel");
+                    UnlockCharacter("Mor");
                     UnlockCharacter("Amren");
                     break;
 
-                case StoryArc.Book2_NightCourt:
+                case StoryArc.Book2_WarPreparations:
                     UnlockLocation("Summer Court");
                     UnlockLocation("Adriata");
                     UnlockCharacter("Tarquin");
-                    break;
-
-                case StoryArc.Book2_WarPreparations:
-                    UnlockLocation("Autumn Court");
-                    UnlockLocation("Winter Court");
                     UnlockCharacter("Nesta");
                     UnlockCharacter("Elain");
                     break;
@@ -128,11 +191,19 @@ namespace ACOTAR
                     UnlockLocation("Mortal Lands");
                     UnlockCharacter("King of Hybern");
                     UnlockCharacter("Jurian");
+                    Debug.Log("=== DLC 1 COMPLETE ===");
+                    Debug.Log("Congratulations! You have completed A Court of Mist and Fury!");
+                    Debug.Log("To continue the story, purchase DLC 2: A Court of Wings and Ruin");
                     break;
 
+                // =====================================================
+                // DLC 2 - Book 3: A Court of Wings and Ruin
+                // =====================================================
                 case StoryArc.Book3_Alliance:
                     UnlockLocation("Dawn Court");
                     UnlockLocation("Day Court");
+                    UnlockLocation("Autumn Court");
+                    UnlockLocation("Winter Court");
                     UnlockCharacter("Thesan");
                     UnlockCharacter("Helion");
                     UnlockCharacter("Kallias");
@@ -152,6 +223,9 @@ namespace ACOTAR
                 case StoryArc.Book3_Resolution:
                     UnlockLocation("Rebuilt Velaris");
                     UnlockLocation("New Prythian");
+                    Debug.Log("=== DLC 2 COMPLETE ===");
+                    Debug.Log("Congratulations! You have completed A Court of Wings and Ruin!");
+                    Debug.Log("You have finished the complete ACOTAR trilogy!");
                     break;
             }
         }
@@ -161,38 +235,57 @@ namespace ACOTAR
         /// </summary>
         private void AdvanceStory(StoryArc completedArc)
         {
+            StoryArc nextArc = GetNextArc(completedArc);
+            
+            // Check if next arc requires DLC
+            DLCPackage? dlcPackage = GetArcDLCPackage(nextArc);
+            if (dlcPackage.HasValue)
+            {
+                if (DLCManager.Instance == null || !DLCManager.Instance.IsDLCInstalled(dlcPackage.Value))
+                {
+                    Debug.Log($"Next story content requires DLC: {dlcPackage.Value}");
+                    return;
+                }
+            }
+            
+            currentArc = nextArc;
+            Debug.Log($"Now in Story Arc: {currentArc}");
+        }
+
+        /// <summary>
+        /// Get the next story arc after completing the current one
+        /// </summary>
+        private StoryArc GetNextArc(StoryArc completedArc)
+        {
             switch (completedArc)
             {
+                // Base Game progression
                 case StoryArc.Book1_HumanLands:
-                    currentArc = StoryArc.Book1_SpringCourt;
-                    break;
+                    return StoryArc.Book1_SpringCourt;
                 case StoryArc.Book1_SpringCourt:
-                    currentArc = StoryArc.Book1_UnderTheMountain;
-                    break;
+                    return StoryArc.Book1_UnderTheMountain;
                 case StoryArc.Book1_UnderTheMountain:
-                    currentArc = StoryArc.Book1_Aftermath;
-                    break;
+                    return StoryArc.Book1_Aftermath;
                 case StoryArc.Book1_Aftermath:
-                    currentArc = StoryArc.Book2_NightCourt;
-                    break;
+                    return StoryArc.Book2_NightCourt; // Requires DLC 1
+                    
+                // DLC 1 progression
                 case StoryArc.Book2_NightCourt:
-                    currentArc = StoryArc.Book2_WarPreparations;
-                    break;
+                    return StoryArc.Book2_WarPreparations;
                 case StoryArc.Book2_WarPreparations:
-                    currentArc = StoryArc.Book2_Hybern;
-                    break;
+                    return StoryArc.Book2_Hybern;
                 case StoryArc.Book2_Hybern:
-                    currentArc = StoryArc.Book3_Alliance;
-                    break;
+                    return StoryArc.Book3_Alliance; // Requires DLC 2
+                    
+                // DLC 2 progression
                 case StoryArc.Book3_Alliance:
-                    currentArc = StoryArc.Book3_War;
-                    break;
+                    return StoryArc.Book3_War;
                 case StoryArc.Book3_War:
-                    currentArc = StoryArc.Book3_Resolution;
-                    break;
+                    return StoryArc.Book3_Resolution;
+                    
+                default:
+                    return completedArc;
             }
-
-            Debug.Log($"Now in Story Arc: {currentArc}");
         }
 
         /// <summary>
@@ -252,6 +345,14 @@ namespace ACOTAR
         }
 
         /// <summary>
+        /// Check if base game is complete
+        /// </summary>
+        public bool IsBaseGameComplete()
+        {
+            return IsArcComplete(StoryArc.Book1_Aftermath);
+        }
+
+        /// <summary>
         /// Get all unlocked locations
         /// </summary>
         public List<string> GetUnlockedLocations()
@@ -274,14 +375,37 @@ namespace ACOTAR
         {
             Debug.Log("\n=== Story Progress ===");
             Debug.Log($"Current Arc: {currentArc}");
-            Debug.Log($"\nCompleted Arcs:");
-            foreach (var arc in completedArcs)
+            
+            Debug.Log("\n--- BASE GAME (Book 1) ---");
+            DisplayArcStatus(StoryArc.Book1_HumanLands);
+            DisplayArcStatus(StoryArc.Book1_SpringCourt);
+            DisplayArcStatus(StoryArc.Book1_UnderTheMountain);
+            DisplayArcStatus(StoryArc.Book1_Aftermath);
+            
+            if (DLCManager.Instance != null && DLCManager.Instance.IsDLCInstalled(DLCPackage.ACOMAF_MistAndFury))
             {
-                if (arc.Value)
-                {
-                    Debug.Log($"  ✓ {arc.Key}");
-                }
+                Debug.Log("\n--- DLC 1 (Book 2) ---");
+                DisplayArcStatus(StoryArc.Book2_NightCourt);
+                DisplayArcStatus(StoryArc.Book2_WarPreparations);
+                DisplayArcStatus(StoryArc.Book2_Hybern);
             }
+            else
+            {
+                Debug.Log("\n--- DLC 1 (Book 2) --- NOT INSTALLED");
+            }
+            
+            if (DLCManager.Instance != null && DLCManager.Instance.IsDLCInstalled(DLCPackage.ACOWAR_WingsAndRuin))
+            {
+                Debug.Log("\n--- DLC 2 (Book 3) ---");
+                DisplayArcStatus(StoryArc.Book3_Alliance);
+                DisplayArcStatus(StoryArc.Book3_War);
+                DisplayArcStatus(StoryArc.Book3_Resolution);
+            }
+            else
+            {
+                Debug.Log("\n--- DLC 2 (Book 3) --- NOT INSTALLED");
+            }
+            
             Debug.Log($"\nUnlocked Locations ({unlockedLocations.Count}):");
             foreach (string location in unlockedLocations)
             {
@@ -293,6 +417,13 @@ namespace ACOTAR
                 Debug.Log($"  - {character}");
             }
             Debug.Log("======================\n");
+        }
+
+        private void DisplayArcStatus(StoryArc arc)
+        {
+            string status = completedArcs[arc] ? "✓" : " ";
+            string current = (arc == currentArc) ? " <-- CURRENT" : "";
+            Debug.Log($"  [{status}] {arc}{current}");
         }
     }
 }

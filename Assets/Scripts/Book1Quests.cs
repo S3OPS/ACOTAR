@@ -131,7 +131,7 @@ namespace ACOTAR
             aftermath1.nextQuestId = "main_014";
             quests[aftermath1.questId] = aftermath1;
 
-            // Nightmares and Walls
+            // Nightmares and Walls - BASE GAME ENDING
             Quest aftermath2 = new Quest(
                 "main_014",
                 "Nightmares and Walls",
@@ -142,10 +142,15 @@ namespace ACOTAR
             aftermath2.objectives.Add("Deal with nightmares and trauma");
             aftermath2.objectives.Add("Notice the growing distance");
             aftermath2.experienceReward = 250;
-            aftermath2.nextQuestId = "book2_001";
+            // Note: nextQuestId leads to DLC content - handled by DLCManager
+            aftermath2.nextQuestId = "book2_001";  // DLC content - will be checked at runtime
             quests[aftermath2.questId] = aftermath2;
 
-            // Bridge to Book 2
+            // =====================================================
+            // DLC CONTENT BRIDGE - Included but requires DLC
+            // =====================================================
+            
+            // Bridge to Book 2 (DLC 1: A Court of Mist and Fury)
             Quest bridge = new Quest(
                 "book2_001",
                 "A Bargain Kept",
@@ -156,6 +161,7 @@ namespace ACOTAR
             bridge.objectives.Add("Leave the Spring Court");
             bridge.objectives.Add("Journey to the Night Court");
             bridge.experienceReward = 400;
+            bridge.isDLCContent = true;  // Mark as DLC content
             quests[bridge.questId] = bridge;
 
             // Add more side quests for Book 1

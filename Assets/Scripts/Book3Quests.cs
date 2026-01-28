@@ -4,16 +4,24 @@ using UnityEngine;
 namespace ACOTAR
 {
     /// <summary>
-    /// Quest content for Book 3 (A Court of Wings and Ruin) storyline
-    /// Covers the war against Hybern and the final battle for Prythian
+    /// DLC 2: Quest content for Book 3 (A Court of Wings and Ruin) storyline
+    /// 
+    /// REQUIRES: DLC Package ACOWAR_WingsAndRuin (also requires ACOMAF_MistAndFury)
+    /// 
+    /// Covers the war against Hybern and the final battle for Prythian.
+    /// Includes Spring Court infiltration, alliance building with all courts,
+    /// war preparations, and the epic final battle.
     /// </summary>
     public static class Book3Quests
     {
         /// <summary>
         /// Initialize all Book 3 quests into the quest manager
+        /// NOTE: This is DLC content - check DLCManager.IsDLCOwned before calling
         /// </summary>
         public static void InitializeBook3Quests(Dictionary<string, Quest> quests)
         {
+            Debug.Log("Loading DLC 2: A Court of Wings and Ruin content...");
+            
             // Spring Court Return Arc
             AddSpringCourtArc(quests);
             
@@ -28,6 +36,8 @@ namespace ACOTAR
             
             // Book 3 Side Quests
             AddBook3SideQuests(quests);
+            
+            Debug.Log("DLC 2 content loaded successfully.");
         }
 
         /// <summary>

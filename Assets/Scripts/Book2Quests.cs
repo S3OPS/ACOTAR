@@ -4,16 +4,24 @@ using UnityEngine;
 namespace ACOTAR
 {
     /// <summary>
-    /// Quest content for Book 2 (A Court of Mist and Fury) storyline
-    /// Covers Feyre's journey from Spring Court to the Night Court and the war with Hybern
+    /// DLC 1: Quest content for Book 2 (A Court of Mist and Fury) storyline
+    /// 
+    /// REQUIRES: DLC Package ACOMAF_MistAndFury
+    /// 
+    /// Covers Feyre's journey from Spring Court to the Night Court and the war with Hybern.
+    /// Includes Night Court discovery, Inner Circle introduction, training, Summer Court heist,
+    /// and the confrontation with Hybern.
     /// </summary>
     public static class Book2Quests
     {
         /// <summary>
         /// Initialize all Book 2 quests into the quest manager
+        /// NOTE: This is DLC content - check DLCManager.IsDLCOwned before calling
         /// </summary>
         public static void InitializeBook2Quests(Dictionary<string, Quest> quests)
         {
+            Debug.Log("Loading DLC 1: A Court of Mist and Fury content...");
+            
             // Night Court Arc
             AddNightCourtQuests(quests);
             
@@ -28,6 +36,8 @@ namespace ACOTAR
             
             // Book 2 Side Quests
             AddBook2SideQuests(quests);
+            
+            Debug.Log("DLC 1 content loaded successfully.");
         }
 
         /// <summary>
