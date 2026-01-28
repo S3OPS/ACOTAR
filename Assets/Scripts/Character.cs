@@ -52,6 +52,7 @@ namespace ACOTAR
 
     /// <summary>
     /// Game character with ACOTAR attributes
+    /// Refactored to use modular systems for better organization
     /// </summary>
     [System.Serializable]
     public class Character
@@ -59,123 +60,102 @@ namespace ACOTAR
         public string name;
         public CharacterClass characterClass;
         public Court allegiance;
-        public List<MagicType> abilities;
-        public int health;
-        public int maxHealth;
-        public int magicPower;
-        public int strength;
-        public int agility;
-        public int experience;
-        public int level;
         public bool isFae;
         public bool isMadeByTheCauldron;
+
+        // Modular systems
+        private CharacterStats stats;
+        private AbilitySystem abilitySystem;
+
+        // Property accessors for stats (maintains compatibility)
+        public int health { get { return stats.health; } set { stats.health = value; } }
+        public int maxHealth { get { return stats.maxHealth; } set { stats.maxHealth = value; } }
+        public int magicPower { get { return stats.magicPower; } set { stats.magicPower = value; } }
+        public int strength { get { return stats.strength; } set { stats.strength = value; } }
+        public int agility { get { return stats.agility; } set { stats.agility = value; } }
+        public int experience { get { return stats.experience; } set { stats.experience = value; } }
+        public int level { get { return stats.level; } set { stats.level = value; } }
+        public List<MagicType> abilities { get { return abilitySystem.GetAbilities(); } }
 
         public Character(string name, CharacterClass charClass, Court court)
         {
             this.name = name;
             this.characterClass = charClass;
             this.allegiance = court;
-            this.abilities = new List<MagicType>();
             this.isFae = charClass != CharacterClass.Human;
             this.isMadeByTheCauldron = false;
-            this.experience = 0;
-            this.level = 1;
             
-            // Set base stats based on class
-            SetBaseStats();
+            // Initialize modular systems
+            stats = new CharacterStats();
+            stats.InitializeForClass(charClass);
+            abilitySystem = new AbilitySystem(charClass);
+            
+            GameEvents.TriggerCharacterCreated(this);
         }
 
-        private void SetBaseStats()
-        {
-            switch (characterClass)
-            {
-                case CharacterClass.HighFae:
-                    maxHealth = 150;
-                    magicPower = 100;
-                    strength = 80;
-                    agility = 70;
-                    break;
-                case CharacterClass.Illyrian:
-                    maxHealth = 180;
-                    magicPower = 60;
-                    strength = 120;
-                    agility = 90;
-                    break;
-                case CharacterClass.LesserFae:
-                    maxHealth = 100;
-                    magicPower = 60;
-                    strength = 60;
-                    agility = 80;
-                    break;
-                case CharacterClass.Human:
-                    maxHealth = 80;
-                    magicPower = 0;
-                    strength = 50;
-                    agility = 60;
-                    break;
-                case CharacterClass.Attor:
-                    maxHealth = 120;
-                    magicPower = 40;
-                    strength = 90;
-                    agility = 100;
-                    break;
-                case CharacterClass.Suriel:
-                    maxHealth = 70;
-                    magicPower = 150;
-                    strength = 30;
-                    agility = 40;
-                    break;
-            }
-            health = maxHealth;
-        }
-
+        /// <summary>
+        /// Learn a new magic ability
+        /// </summary>
         public void LearnAbility(MagicType ability)
         {
-            if (!abilities.Contains(ability))
+            if (abilitySystem.LearnAbility(ability))
             {
-                abilities.Add(ability);
+                GameEvents.TriggerAbilityLearned(this, ability);
             }
         }
 
+        /// <summary>
+        /// Check if character has a specific ability
+        /// </summary>
+        public bool HasAbility(MagicType ability)
+        {
+            return abilitySystem.HasAbility(ability);
+        }
+
+        /// <summary>
+        /// Take damage with event notification
+        /// </summary>
         public void TakeDamage(int damage)
         {
-            health -= damage;
-            if (health < 0) health = 0;
+            stats.TakeDamage(damage);
+            GameEvents.TriggerCharacterTakeDamage(this, damage);
         }
 
+        /// <summary>
+        /// Heal with event notification
+        /// </summary>
         public void Heal(int amount)
         {
-            health += amount;
-            if (health > maxHealth) health = maxHealth;
+            stats.Heal(amount);
+            GameEvents.TriggerCharacterHealed(this, amount);
         }
 
+        /// <summary>
+        /// Check if character is alive
+        /// </summary>
         public bool IsAlive()
         {
-            return health > 0;
+            return stats.IsAlive();
         }
 
+        /// <summary>
+        /// Gain experience with level up notification
+        /// </summary>
         public void GainExperience(int xp)
         {
-            experience += xp;
-            // Simple level up system: 100 XP per level
-            int requiredXP = level * 100;
-            while (experience >= requiredXP)
+            int oldLevel = stats.level;
+            if (stats.GainExperience(xp))
             {
-                experience -= requiredXP;
-                LevelUp();
-                requiredXP = level * 100;
+                GameEvents.TriggerCharacterLevelUp(this, stats.level);
             }
         }
 
-        private void LevelUp()
+        /// <summary>
+        /// Get XP required for next level
+        /// </summary>
+        public int GetXPRequiredForNextLevel()
         {
-            level++;
-            // Increase stats on level up
-            maxHealth += 10;
-            health = maxHealth;
-            magicPower += 5;
-            strength += 3;
-            agility += 3;
+            return stats.GetXPRequiredForNextLevel();
         }
     }
 }

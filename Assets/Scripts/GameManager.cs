@@ -5,6 +5,7 @@ namespace ACOTAR
 {
     /// <summary>
     /// Main game manager that orchestrates the ACOTAR RPG experience
+    /// Enhanced with Phase 5 advanced gameplay systems and Phase 6 story content
     /// </summary>
     public class GameManager : MonoBehaviour
     {
@@ -13,9 +14,18 @@ namespace ACOTAR
         [Header("Managers")]
         public LocationManager locationManager;
         public QuestManager questManager;
+        public CompanionManager companionManager;
+        public DialogueSystem dialogueSystem;
+        public TimeSystem timeSystem;
+        public StoryManager storyManager;
 
         [Header("Player")]
         public Character playerCharacter;
+
+        [Header("Systems")]
+        private InventorySystem inventorySystem;
+        private ReputationSystem reputationSystem;
+        private CraftingSystem craftingSystem;
 
         [Header("Game State")]
         public string currentLocation;
@@ -45,11 +55,20 @@ namespace ACOTAR
             Debug.Log("=== ACOTAR Fantasy RPG Initialized ===");
             Debug.Log("Welcome to Prythian!");
             
-            // Initialize player as human (Feyre's starting point)
-            playerCharacter = new Character("Feyre Archeron", CharacterClass.Human, Court.Spring);
+            // Initialize player with configuration
+            playerCharacter = new Character(
+                GameConfig.DEFAULT_PLAYER_NAME, 
+                GameConfig.DEFAULT_PLAYER_CLASS, 
+                GameConfig.DEFAULT_PLAYER_COURT
+            );
+            
+            // Initialize game systems
+            inventorySystem = new InventorySystem();
+            reputationSystem = new ReputationSystem(playerCharacter);
+            craftingSystem = new CraftingSystem(inventorySystem, playerCharacter);
             
             // Set starting location
-            currentLocation = "Human Lands";
+            currentLocation = GameConfig.DEFAULT_STARTING_LOCATION;
             gameTime = 0;
             hasMetRhysand = false;
             hasCompletedCurse = false;
@@ -57,27 +76,30 @@ namespace ACOTAR
             Debug.Log($"Created character: {playerCharacter.name}");
             Debug.Log($"Class: {playerCharacter.characterClass}");
             Debug.Log($"Starting location: {currentLocation}");
+            Debug.Log("All systems initialized successfully!");
         }
 
         /// <summary>
         /// Transform player from human to High Fae (lore-accurate transformation)
+        /// Optimized to preserve progression and abilities
         /// </summary>
         public void TransformToHighFae()
         {
             if (playerCharacter.characterClass == CharacterClass.Human)
             {
-                playerCharacter.characterClass = CharacterClass.HighFae;
-                playerCharacter.isMadeByTheCauldron = true;
-                playerCharacter.isFae = true;
+                CharacterClass oldClass = playerCharacter.characterClass;
                 
-                // Recalculate stats using SetBaseStats for consistency
+                // Store current progression
                 int currentXP = playerCharacter.experience;
                 int currentLevel = playerCharacter.level;
-                // Store abilities before reset
                 List<MagicType> currentAbilities = new List<MagicType>(playerCharacter.abilities);
                 
-                // Reset to High Fae base stats
-                playerCharacter = new Character(playerCharacter.name, CharacterClass.HighFae, playerCharacter.allegiance);
+                // Create new High Fae character preserving identity
+                playerCharacter = new Character(
+                    playerCharacter.name, 
+                    CharacterClass.HighFae, 
+                    playerCharacter.allegiance
+                );
                 playerCharacter.isMadeByTheCauldron = true;
                 
                 // Restore progression
@@ -89,6 +111,7 @@ namespace ACOTAR
                 }
 
                 Debug.Log($"{playerCharacter.name} has been Made by the Cauldron and transformed into High Fae!");
+                GameEvents.TriggerCharacterTransformed(playerCharacter, CharacterClass.HighFae);
             }
         }
 
@@ -102,7 +125,7 @@ namespace ACOTAR
         }
 
         /// <summary>
-        /// Travel to a new location
+        /// Travel to a new location with event notification
         /// </summary>
         public void TravelTo(string locationName)
         {
@@ -115,10 +138,12 @@ namespace ACOTAR
             Location location = locationManager.GetLocation(locationName);
             if (location != null)
             {
+                string previousLocation = currentLocation;
                 currentLocation = locationName;
                 gameTime++;
                 Debug.Log($"Traveled to: {locationName}");
                 Debug.Log($"Description: {location.description}");
+                GameEvents.TriggerLocationChanged(previousLocation, locationName);
             }
             else
             {
@@ -127,12 +152,13 @@ namespace ACOTAR
         }
 
         /// <summary>
-        /// Change player's court allegiance
+        /// Change player's court allegiance with event notification
         /// </summary>
         public void ChangeCourtAllegiance(Court newCourt)
         {
             playerCharacter.allegiance = newCourt;
             Debug.Log($"{playerCharacter.name} now serves the {newCourt} Court");
+            GameEvents.TriggerCourtAllegianceChanged(playerCharacter, newCourt);
         }
 
         /// <summary>
@@ -171,7 +197,7 @@ namespace ACOTAR
             Debug.Log($"Class: {playerCharacter.characterClass}");
             Debug.Log($"Court: {playerCharacter.allegiance}");
             Debug.Log($"Level: {playerCharacter.level}");
-            Debug.Log($"Experience: {playerCharacter.experience}/{playerCharacter.level * 100}");
+            Debug.Log($"Experience: {playerCharacter.experience}/{playerCharacter.GetXPRequiredForNextLevel()}");
             Debug.Log($"Health: {playerCharacter.health}/{playerCharacter.maxHealth}");
             Debug.Log($"Magic Power: {playerCharacter.magicPower}");
             Debug.Log($"Strength: {playerCharacter.strength}");
@@ -241,6 +267,163 @@ namespace ACOTAR
             ShowCharacterStats();
 
             Debug.Log("\n=== Demo Complete ===");
+        }
+
+        /// <summary>
+        /// Demo Phase 5 advanced gameplay systems
+        /// </summary>
+        public void DemoPhase5Systems()
+        {
+            Debug.Log("\n\n╔══════════════════════════════════════════════════════════╗");
+            Debug.Log("║    PHASE 5: Advanced Gameplay Systems Demo              ║");
+            Debug.Log("╚══════════════════════════════════════════════════════════╝\n");
+
+            // 1. Combat System Demo
+            Debug.Log("=== 1. COMBAT SYSTEM DEMO ===\n");
+            
+            // Create enemies
+            Enemy bogge = EnemyFactory.CreateBogge(EnemyDifficulty.Normal);
+            Enemy naga = EnemyFactory.CreateNaga(EnemyDifficulty.Easy);
+            
+            List<Enemy> enemies = new List<Enemy> { bogge };
+            CombatEncounter encounter = new CombatEncounter(playerCharacter, enemies);
+            encounter.StartEncounter();
+            
+            // Simulate combat turns
+            encounter.PlayerPhysicalAttack(bogge);
+            if (bogge.IsAlive())
+            {
+                encounter.PlayerMagicAttack(bogge, MagicType.ShieldCreation);
+            }
+            
+            Debug.Log("\n=== Combat Demo Complete ===\n");
+
+            // 2. Companion System Demo
+            Debug.Log("=== 2. COMPANION SYSTEM DEMO ===\n");
+            
+            if (companionManager != null)
+            {
+                companionManager.RecruitCompanion("Rhysand");
+                companionManager.RecruitCompanion("Cassian");
+                companionManager.RecruitCompanion("Azriel");
+                
+                companionManager.AddToParty("Rhysand");
+                companionManager.AddToParty("Cassian");
+                companionManager.AddToParty("Azriel");
+                
+                List<Companion> party = companionManager.GetActiveParty();
+                Debug.Log($"\nActive Party ({party.Count}/3):");
+                foreach (Companion comp in party)
+                {
+                    Debug.Log($"  - {comp.name} ({comp.role}) - Loyalty: {comp.loyalty}/100");
+                }
+            }
+            
+            Debug.Log("\n=== Companion Demo Complete ===\n");
+
+            // 3. Reputation System Demo
+            Debug.Log("=== 3. REPUTATION SYSTEM DEMO ===\n");
+            
+            reputationSystem.GainReputation(Court.Night, 40);
+            reputationSystem.GainReputation(Court.Summer, 15);
+            reputationSystem.LoseReputation(Court.Spring, 20);
+            
+            reputationSystem.DisplayReputations();
+            
+            Debug.Log("=== Reputation Demo Complete ===\n");
+
+            // 4. Dialogue System Demo
+            Debug.Log("=== 4. DIALOGUE SYSTEM DEMO ===\n");
+            
+            if (dialogueSystem != null)
+            {
+                dialogueSystem.StartDialogue("rhysand_greeting", playerCharacter, reputationSystem);
+                Debug.Log("\n(Dialogue system initialized - player would interact via UI)");
+            }
+            
+            Debug.Log("\n=== Dialogue Demo Complete ===\n");
+
+            // 5. Crafting System Demo
+            Debug.Log("=== 5. CRAFTING SYSTEM DEMO ===\n");
+            
+            // Add some materials to inventory
+            inventorySystem.AddItem("crafting_ash_wood", 10);
+            inventorySystem.AddItem("crafting_iron_ingot", 5);
+            inventorySystem.AddItem("crafting_healing_herb", 15);
+            inventorySystem.AddItem("crafting_water_vial", 10);
+            
+            Debug.Log("Materials added to inventory!");
+            Debug.Log("\nAttempting to craft Ash Wood Dagger...");
+            craftingSystem.CraftItem("craft_ash_dagger", CraftingStationType.Forge);
+            
+            Debug.Log("\nAttempting to craft Healing Potions...");
+            craftingSystem.CraftItem("craft_healing_potion", CraftingStationType.AlchemyTable);
+            
+            Debug.Log("\n=== Crafting Demo Complete ===\n");
+
+            // 6. Time System Demo
+            Debug.Log("=== 6. TIME SYSTEM DEMO ===\n");
+            
+            if (timeSystem != null)
+            {
+                timeSystem.DisplayTimeInfo();
+                
+                Debug.Log("Advancing time by 6 hours...");
+                timeSystem.AddHours(6);
+                timeSystem.DisplayTimeInfo();
+                
+                Debug.Log("Advancing to next day...");
+                timeSystem.AddDays(1);
+                
+                string activeEvent = timeSystem.GetActiveEvent();
+                if (activeEvent != "None")
+                {
+                    Debug.Log($"Special Event Active: {activeEvent}");
+                }
+            }
+            
+            Debug.Log("\n=== Time Demo Complete ===\n");
+
+            // 7. Inventory Display
+            Debug.Log("=== 7. INVENTORY DISPLAY ===\n");
+            
+            List<InventorySlot> allItems = inventorySystem.GetAllItems();
+            Debug.Log($"Inventory: {allItems.Count} unique items");
+            foreach (InventorySlot slot in allItems)
+            {
+                Debug.Log($"  - {slot.item.name} x{slot.quantity} ({slot.item.rarity})");
+            }
+            
+            Debug.Log("\n=== Inventory Demo Complete ===\n");
+
+            Debug.Log("\n╔══════════════════════════════════════════════════════════╗");
+            Debug.Log("║    Phase 5 Advanced Gameplay Systems Demo Complete!     ║");
+            Debug.Log("║    All systems operational and ready for gameplay!       ║");
+            Debug.Log("╚══════════════════════════════════════════════════════════╝\n");
+        }
+
+        /// <summary>
+        /// Get inventory system (for external access)
+        /// </summary>
+        public InventorySystem GetInventorySystem()
+        {
+            return inventorySystem;
+        }
+
+        /// <summary>
+        /// Get reputation system (for external access)
+        /// </summary>
+        public ReputationSystem GetReputationSystem()
+        {
+            return reputationSystem;
+        }
+
+        /// <summary>
+        /// Get crafting system (for external access)
+        /// </summary>
+        public CraftingSystem GetCraftingSystem()
+        {
+            return craftingSystem;
         }
     }
 }

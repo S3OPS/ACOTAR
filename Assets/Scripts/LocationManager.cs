@@ -39,10 +39,13 @@ namespace ACOTAR
 
     /// <summary>
     /// Manages all locations in Prythian
+    /// Optimized with caching for court-based lookups
     /// </summary>
     public class LocationManager : MonoBehaviour
     {
         private Dictionary<string, Location> locations;
+        private Dictionary<Court, List<Location>> courtLocationCache;
+        private List<string> locationNamesCache;
 
         void Awake()
         {
@@ -52,6 +55,7 @@ namespace ACOTAR
         private void InitializeLocations()
         {
             locations = new Dictionary<string, Location>();
+            courtLocationCache = new Dictionary<Court, List<Location>>();
 
             // Spring Court locations
             AddLocation(new Location(
@@ -163,6 +167,10 @@ namespace ACOTAR
         private void AddLocation(Location location)
         {
             locations[location.name] = location;
+            
+            // Invalidate cache when adding new location
+            courtLocationCache.Clear();
+            locationNamesCache = null;
         }
 
         public Location GetLocation(string name)
@@ -174,8 +182,18 @@ namespace ACOTAR
             return null;
         }
 
+        /// <summary>
+        /// Get locations by court with caching for optimization
+        /// </summary>
         public List<Location> GetLocationsByCourt(Court court)
         {
+            // Check cache first
+            if (courtLocationCache.ContainsKey(court))
+            {
+                return new List<Location>(courtLocationCache[court]);
+            }
+
+            // Build cache entry
             List<Location> courtLocations = new List<Location>();
             foreach (var location in locations.Values)
             {
@@ -184,12 +202,21 @@ namespace ACOTAR
                     courtLocations.Add(location);
                 }
             }
-            return courtLocations;
+            
+            courtLocationCache[court] = courtLocations;
+            return new List<Location>(courtLocations);
         }
 
+        /// <summary>
+        /// Get all location names with caching for optimization
+        /// </summary>
         public List<string> GetAllLocationNames()
         {
-            return new List<string>(locations.Keys);
+            if (locationNamesCache == null)
+            {
+                locationNamesCache = new List<string>(locations.Keys);
+            }
+            return new List<string>(locationNamesCache);
         }
     }
 }

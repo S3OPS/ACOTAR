@@ -185,6 +185,9 @@ namespace ACOTAR
             comp2.objectives.Add("Prove yourself worthy");
             comp2.experienceReward = 350;
             AddQuest(comp2);
+
+            // Initialize Book 1 extended quests
+            Book1Quests.InitializeBook1Quests(quests);
         }
 
         private void AddQuest(Quest quest)
@@ -202,7 +205,12 @@ namespace ACOTAR
                     quest.isActive = true;
                     activeQuests.Add(quest);
                     Debug.Log($"Quest Started: {quest.title}");
+                    GameEvents.TriggerQuestStarted(quest);
                 }
+            }
+            else
+            {
+                Debug.LogWarning($"Quest not found: {questId}");
             }
         }
 
@@ -229,12 +237,18 @@ namespace ACOTAR
                         Debug.Log($"Quest Completed: {quest.title} - Reward: {quest.experienceReward} XP");
                     }
 
+                    GameEvents.TriggerQuestCompleted(quest);
+
                     // Start next quest if available
                     if (!string.IsNullOrEmpty(quest.nextQuestId))
                     {
                         StartQuest(quest.nextQuestId);
                     }
                 }
+            }
+            else
+            {
+                Debug.LogWarning($"Quest not found: {questId}");
             }
         }
 
