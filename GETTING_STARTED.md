@@ -4,7 +4,45 @@ Welcome to the ACOTAR Fantasy RPG development guide! This document will help you
 
 ## Quick Start (5 Minutes)
 
-### Option 1: Using Docker (Recommended)
+### Option 1: Using Unity Editor (Recommended)
+
+**This is the easiest option and requires NO license setup!** Unity Personal is completely FREE.
+
+1. **Prerequisites**: 
+   - [Unity Hub](https://unity.com/download) (free download)
+   - Create a free Unity account
+   - Unity Personal license is automatically activated when you sign in
+
+2. **Install Unity**:
+   - Open Unity Hub
+   - Go to "Installs" → "Install Editor"
+   - Install Unity **2022.3.0f1** (or compatible LTS version)
+
+3. **Clone the repository**:
+   ```bash
+   git clone https://github.com/S3OPS/ACOTAR.git
+   cd ACOTAR
+   ```
+
+4. **Open in Unity**:
+   - In Unity Hub, click "Add" (or the dropdown arrow next to "Open")
+   - Select "Add project from disk"
+   - Select the ACOTAR folder
+   - Unity will automatically import assets when you first open the project (may take a few minutes)
+
+5. **Play**:
+   - Open `Assets/Scenes/MainScene.unity`
+   - Press the Play button
+   - Check the Console window (Window → General → Console) for game output
+
+6. **Build** (optional):
+   - Go to File → Build Settings
+   - Select your platform
+   - Click "Build" and choose a location
+
+### Option 2: Using Docker (For CI/CD and Automated Builds)
+
+Docker builds are useful for CI/CD pipelines but require additional license setup.
 
 1. **Prerequisites**: Install [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 
@@ -14,16 +52,16 @@ Welcome to the ACOTAR Fantasy RPG development guide! This document will help you
    cd ACOTAR
    ```
 
-3. **Set Unity License** (required for building):
-   ```bash
-   # Get your license from Unity
-   # Then set the environment variable:
+3. **Set Unity License** (required for Docker/headless builds):
    
+   For Docker builds, you need a Unity license file (`.ulf`). See the [Unity Manual Activation Guide](https://docs.unity3d.com/Manual/ManualActivationGuide.html) for how to obtain one.
+   
+   ```bash
    # Linux/Mac:
-   export UNITY_LICENSE='your-license-content'
+   export UNITY_LICENSE='<contents-of-your-.ulf-file>'
    
    # Windows:
-   set UNITY_LICENSE=your-license-content
+   set UNITY_LICENSE=<contents-of-your-.ulf-file>
    ```
 
 4. **Build and Run**:
@@ -41,25 +79,31 @@ Welcome to the ACOTAR Fantasy RPG development guide! This document will help you
    - Find the executable in `Build/ACOTAR_RPG.exe`
    - Run it and check console output for game demo
 
-### Option 2: Using Unity Editor (For Development)
+## Unity Licensing - Important Information
 
-1. **Prerequisites**:
-   - [Unity Hub](https://unity.com/download)
-   - Unity 2022.3.0f1 (install via Unity Hub)
+### Is Unity Free?
 
-2. **Clone and Open**:
-   ```bash
-   git clone https://github.com/S3OPS/ACOTAR.git
-   ```
-   - Open Unity Hub
-   - Click "Add project from disk"
-   - Select the ACOTAR folder
-   - Open with Unity 2022.3.0f1
+**YES!** Unity Personal is completely **FREE** for:
+- Individuals
+- Companies/organizations with less than $100,000 USD in annual revenue
 
-3. **Explore**:
-   - Open `Assets/Scenes/MainScene.unity`
-   - Press Play button
-   - Check Console window for game output
+### Do I need the UNITY_LICENSE environment variable?
+
+**Only for Docker/headless builds.** If you're using Unity Editor directly:
+- Just download Unity Hub
+- Create a free Unity account  
+- Sign in - your Personal license activates automatically
+- No environment variables needed!
+
+### Why does Docker need special setup?
+
+Docker runs Unity in "batch mode" (no GUI), which requires a license file to be provided via environment variable. This is a Unity requirement for headless/automated builds.
+
+### How to get a license file for Docker?
+
+1. Follow the [Unity Manual Activation Guide](https://docs.unity3d.com/Manual/ManualActivationGuide.html)
+2. This generates a `.ulf` license file
+3. Set the contents as `UNITY_LICENSE` environment variable
 
 ## What's Included?
 
@@ -258,12 +302,19 @@ GameManager.Instance.GrantAbility(MagicType.MyNewAbility);
 
 ### "Unity version not found"
 - Install Unity 2022.3.0f1 via Unity Hub
-- Or use Docker build (no Unity installation needed)
+- Or use Docker build (requires license setup - see above)
 
 ### "Docker build fails"
 - Check Docker is running: `docker --version`
 - Ensure Unity license is set: `echo $UNITY_LICENSE`
+- Make sure you're using the contents of your `.ulf` file, not a license key
 - Check logs in `Build/build.log`
+- **Tip**: If you don't need CI/CD, just use Unity Editor directly - it's much simpler!
+
+### "Unity license not working in Docker"
+- The `UNITY_LICENSE` must contain the full contents of a `.ulf` license file
+- See [Unity Manual Activation](https://docs.unity3d.com/Manual/ManualActivationGuide.html)
+- **Alternative**: Use Unity Editor for local builds - no special license setup needed!
 
 ### "Game doesn't start"
 - Check Unity Console for errors

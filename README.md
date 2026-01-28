@@ -98,11 +98,40 @@ Experience the epic conclusion to the trilogy:
 
 ### Prerequisites
 
-- **Docker** and **Docker Compose** installed
-- **Unity License** (for building)
-- Git
+- **Git** for cloning the repository
+- **One of the following** for building:
+  - **Unity Editor** (recommended for development) - FREE with Unity Personal license
+  - **Docker** and **Docker Compose** (for automated/headless builds)
 
 ### Quick Start
+
+#### Option 1: Unity Editor (Recommended - No License Setup Required)
+
+This is the easiest way to build and play the game. **Unity Personal is FREE** for individuals and organizations with less than $100,000 in annual revenue.
+
+1. **Install Unity Hub and Unity**
+   - Download [Unity Hub](https://unity.com/download) (free)
+   - Install Unity 2022.3.0f1 through Unity Hub
+   - Unity Personal license is automatically activated when you sign in
+
+2. **Clone and Open**
+   ```bash
+   git clone https://github.com/S3OPS/ACOTAR.git
+   cd ACOTAR
+   ```
+   - Open Unity Hub
+   - Click "Add project from disk"
+   - Select the ACOTAR folder
+   - Open with Unity 2022.3.0f1
+
+3. **Build the Game**
+   - In Unity: File → Build Settings
+   - Select your platform (Windows, Mac, Linux)
+   - Click "Build" and choose output location
+
+#### Option 2: Docker Build (For CI/CD and Automated Builds)
+
+Docker builds require a Unity license file for headless/batch mode operation.
 
 1. **Clone the repository**
    ```bash
@@ -110,16 +139,22 @@ Experience the epic conclusion to the trilogy:
    cd ACOTAR
    ```
 
-2. **Set up Unity License** (required for building)
+2. **Get Unity License File**
+   
+   You need to obtain a Unity license file (`.ulf`) for Docker builds. See [Unity's Manual Activation Guide](https://docs.unity3d.com/Manual/ManualActivationGuide.html) for details.
+   
+   **Note**: Unity Personal license can be used for Docker builds if you qualify (< $100K revenue).
+
+3. **Set up Unity License**
    ```bash
    # Linux/Mac
-   export UNITY_LICENSE='<your-unity-license-content>'
+   export UNITY_LICENSE='<contents-of-your-.ulf-file>'
    
    # Windows
-   set UNITY_LICENSE=<your-unity-license-content>
+   set UNITY_LICENSE=<contents-of-your-.ulf-file>
    ```
 
-3. **Build Docker image**
+4. **Build Docker image**
    ```bash
    # Linux/Mac
    ./scripts/build-docker.sh
@@ -128,7 +163,7 @@ Experience the epic conclusion to the trilogy:
    scripts\build-docker.bat
    ```
 
-4. **Build the game**
+5. **Build the game**
    ```bash
    # Linux/Mac
    ./scripts/build-unity.sh
@@ -137,8 +172,19 @@ Experience the epic conclusion to the trilogy:
    scripts\build-unity.bat
    ```
 
-5. **Run the game**
+6. **Run the game**
    The built executable will be in `Build/ACOTAR_RPG.exe`
+
+### Unity Licensing FAQ
+
+**Q: Do I need to pay for Unity?**
+A: No! Unity Personal is completely **FREE** for individuals and companies with less than $100,000 in annual revenue. Just download Unity Hub, create a free account, and start building.
+
+**Q: What is the UNITY_LICENSE environment variable for?**
+A: The `UNITY_LICENSE` environment variable is only needed for Docker/headless builds (CI/CD pipelines). If you're using the Unity Editor directly on your computer, you don't need to set this variable.
+
+**Q: How do I get a license file for Docker builds?**
+A: Follow Unity's [Manual Activation Guide](https://docs.unity3d.com/Manual/ManualActivationGuide.html) to generate a license request file and obtain a license file (`.ulf`).
 
 ## 🏗️ Project Structure
 
