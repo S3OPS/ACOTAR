@@ -11,8 +11,8 @@ echo ""
 # Check if Unity license is set
 if [ -z "$UNITY_LICENSE" ]; then
     echo "Warning: UNITY_LICENSE environment variable is not set."
-    echo "You'll need to provide a Unity license to build."
-    echo "Set it using: export UNITY_LICENSE='<your-license-content>'"
+    echo "You'll need to provide a Unity license to build with Docker."
+    echo "Note: If you're using the Unity Editor directly, you don't need this variable."
 fi
 
 # Build Docker image
