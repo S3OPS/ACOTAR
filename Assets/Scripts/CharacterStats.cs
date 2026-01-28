@@ -17,6 +17,13 @@ namespace ACOTAR
         public int experience;
         public int level;
 
+        // Property accessors for UI compatibility
+        public int CurrentHealth { get { return health; } set { health = value; } }
+        public int MaxHealth { get { return maxHealth; } set { maxHealth = value; } }
+        public int MaxMagicPower { get { return maxHealth; } } // Placeholder for max magic
+        public int Level { get { return level; } set { level = value; } }
+        public int Experience { get { return experience; } set { experience = value; } }
+
         public CharacterStats()
         {
             level = 1;

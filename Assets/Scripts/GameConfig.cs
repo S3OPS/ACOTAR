@@ -193,6 +193,67 @@ namespace ACOTAR
             public const float NOTIFICATION_DURATION = 3.0f;
             public const float FADE_DURATION = 0.3f;
             public const int MAX_COMBAT_LOG_ENTRIES = 50;
+            public const float BUTTON_TRANSITION_DURATION = 0.1f;
+            public const float PANEL_FADE_DURATION = 0.25f;
+            public const float UI_ANIMATION_SPEED = 1.0f;
+        }
+
+        // =====================================================
+        // GRAPHICS SETTINGS
+        // =====================================================
+        public static class GraphicsSettings
+        {
+            // Default quality
+            public const int DEFAULT_QUALITY_LEVEL = 2; // High
+            public const bool DEFAULT_VSYNC = true;
+            public const int DEFAULT_TARGET_FPS = 60;
+            
+            // Screen effects
+            public const float DEFAULT_SCREEN_SHAKE_INTENSITY = 0.1f;
+            public const float DEFAULT_SCREEN_SHAKE_DURATION = 0.3f;
+            public const float CRITICAL_HIT_SHAKE_MULTIPLIER = 2.0f;
+            public const float SCREEN_FLASH_DURATION = 0.15f;
+            
+            // Particle effects
+            public const int LOW_PARTICLE_DENSITY = 25;
+            public const int MEDIUM_PARTICLE_DENSITY = 50;
+            public const int HIGH_PARTICLE_DENSITY = 100;
+            public const int ULTRA_PARTICLE_DENSITY = 150;
+            
+            // Shadow settings
+            public const int LOW_SHADOW_RESOLUTION = 512;
+            public const int MEDIUM_SHADOW_RESOLUTION = 1024;
+            public const int HIGH_SHADOW_RESOLUTION = 2048;
+            public const int ULTRA_SHADOW_RESOLUTION = 4096;
+            
+            // Render scale
+            public const float LOW_RENDER_SCALE = 0.75f;
+            public const float MEDIUM_RENDER_SCALE = 1.0f;
+            public const float HIGH_RENDER_SCALE = 1.0f;
+            public const float ULTRA_RENDER_SCALE = 1.25f;
+        }
+
+        // =====================================================
+        // VISUAL EFFECTS SETTINGS
+        // =====================================================
+        public static class VFXSettings
+        {
+            // Effect durations
+            public const float HIT_EFFECT_DURATION = 0.3f;
+            public const float CRITICAL_EFFECT_DURATION = 0.5f;
+            public const float MAGIC_CAST_DURATION = 0.5f;
+            public const float MAGIC_IMPACT_DURATION = 0.4f;
+            public const float HEAL_EFFECT_DURATION = 1.0f;
+            public const float LEVEL_UP_EFFECT_DURATION = 2.0f;
+            
+            // Effect scales
+            public const float DEFAULT_EFFECT_SCALE = 1.0f;
+            public const float CRITICAL_EFFECT_SCALE = 1.5f;
+            public const float LEVEL_UP_EFFECT_SCALE = 2.0f;
+            
+            // Trail effect
+            public const float TRAIL_EFFECT_DURATION = 0.3f;
+            public const float PROJECTILE_SPEED = 10f;
         }
 
         // =====================================================
@@ -204,6 +265,8 @@ namespace ACOTAR
             public const bool INFINITE_GOLD = false;
             public const bool INFINITE_HEALTH = false;
             public const bool UNLOCK_ALL_ABILITIES = false;
+            public const bool SHOW_VFX_DEBUG = false;
+            public const bool SHOW_GRAPHICS_DEBUG = false;
         }
     }
 }
