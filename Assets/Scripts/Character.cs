@@ -69,18 +69,24 @@ namespace ACOTAR
         public bool isMadeByTheCauldron;
 
         // Modular systems
-        private CharacterStats stats;
-        private AbilitySystem abilitySystem;
+        private CharacterStats _stats;
+        private AbilitySystem _abilitySystem;
 
         // Property accessors for stats (maintains compatibility)
-        public int health { get { return stats.health; } set { stats.health = value; } }
-        public int maxHealth { get { return stats.maxHealth; } set { stats.maxHealth = value; } }
-        public int magicPower { get { return stats.magicPower; } set { stats.magicPower = value; } }
-        public int strength { get { return stats.strength; } set { stats.strength = value; } }
-        public int agility { get { return stats.agility; } set { stats.agility = value; } }
-        public int experience { get { return stats.experience; } set { stats.experience = value; } }
-        public int level { get { return stats.level; } set { stats.level = value; } }
-        public List<MagicType> abilities { get { return abilitySystem.GetAbilities(); } }
+        public int health { get { return _stats.health; } set { _stats.health = value; } }
+        public int maxHealth { get { return _stats.maxHealth; } set { _stats.maxHealth = value; } }
+        public int magicPower { get { return _stats.magicPower; } set { _stats.magicPower = value; } }
+        public int strength { get { return _stats.strength; } set { _stats.strength = value; } }
+        public int agility { get { return _stats.agility; } set { _stats.agility = value; } }
+        public int experience { get { return _stats.experience; } set { _stats.experience = value; } }
+        public int level { get { return _stats.level; } set { _stats.level = value; } }
+        public List<MagicType> abilities { get { return _abilitySystem.GetAbilities(); } }
+
+        // Alias properties for UI compatibility
+        public string characterName { get { return name; } set { name = value; } }
+        public Court courtAllegiance { get { return allegiance; } set { allegiance = value; } }
+        public CharacterStats stats { get { return _stats; } }
+        public AbilitySystem abilitySystem { get { return _abilitySystem; } }
 
         public Character(string name, CharacterClass charClass, Court court)
         {
@@ -91,11 +97,21 @@ namespace ACOTAR
             this.isMadeByTheCauldron = false;
             
             // Initialize modular systems
-            stats = new CharacterStats();
-            stats.InitializeForClass(charClass);
-            abilitySystem = new AbilitySystem(charClass);
+            _stats = new CharacterStats();
+            _stats.InitializeForClass(charClass);
+            _abilitySystem = new AbilitySystem(charClass);
             
             GameEvents.TriggerCharacterCreated(this);
+        }
+
+        /// <summary>
+        /// Initialize stats for a character - called after character creation UI
+        /// </summary>
+        public void InitializeStats()
+        {
+            _stats = new CharacterStats();
+            _stats.InitializeForClass(characterClass);
+            _abilitySystem = new AbilitySystem(characterClass);
         }
 
         /// <summary>
@@ -103,7 +119,7 @@ namespace ACOTAR
         /// </summary>
         public void LearnAbility(MagicType ability)
         {
-            if (abilitySystem.LearnAbility(ability))
+            if (_abilitySystem.LearnAbility(ability))
             {
                 GameEvents.TriggerAbilityLearned(this, ability);
             }
@@ -114,7 +130,7 @@ namespace ACOTAR
         /// </summary>
         public bool HasAbility(MagicType ability)
         {
-            return abilitySystem.HasAbility(ability);
+            return _abilitySystem.HasAbility(ability);
         }
 
         /// <summary>
@@ -122,7 +138,7 @@ namespace ACOTAR
         /// </summary>
         public void TakeDamage(int damage)
         {
-            stats.TakeDamage(damage);
+            _stats.TakeDamage(damage);
             GameEvents.TriggerCharacterTakeDamage(this, damage);
         }
 
@@ -131,7 +147,7 @@ namespace ACOTAR
         /// </summary>
         public void Heal(int amount)
         {
-            stats.Heal(amount);
+            _stats.Heal(amount);
             GameEvents.TriggerCharacterHealed(this, amount);
         }
 
@@ -140,7 +156,7 @@ namespace ACOTAR
         /// </summary>
         public bool IsAlive()
         {
-            return stats.IsAlive();
+            return _stats.IsAlive();
         }
 
         /// <summary>
@@ -148,10 +164,16 @@ namespace ACOTAR
         /// </summary>
         public void GainExperience(int xp)
         {
-            int oldLevel = stats.level;
-            if (stats.GainExperience(xp))
+            int oldLevel = _stats.level;
+            if (_stats.GainExperience(xp))
             {
-                GameEvents.TriggerCharacterLevelUp(this, stats.level);
+                GameEvents.TriggerCharacterLevelUp(this, _stats.level);
+                
+                // Trigger level up visual effect
+                if (ScreenEffectsManager.Instance != null)
+                {
+                    ScreenEffectsManager.Instance.LevelUpFeedback();
+                }
             }
         }
 
@@ -160,7 +182,7 @@ namespace ACOTAR
         /// </summary>
         public int GetXPRequiredForNextLevel()
         {
-            return stats.GetXPRequiredForNextLevel();
+            return _stats.GetXPRequiredForNextLevel();
         }
     }
 }

@@ -57,6 +57,14 @@ namespace ACOTAR
         }
 
         /// <summary>
+        /// Get all learned abilities (alias for UI compatibility)
+        /// </summary>
+        public List<MagicType> GetLearnedAbilities()
+        {
+            return GetAbilities();
+        }
+
+        /// <summary>
         /// Validate if a character class can learn an ability
         /// Optimized with early returns
         /// </summary>

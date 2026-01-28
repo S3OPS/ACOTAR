@@ -70,6 +70,9 @@ namespace ACOTAR
             target.TakeDamage(result.damage);
             LogMessage(result.description);
 
+            // Trigger visual effects
+            TriggerHitVisualEffects(result, Vector3.zero);
+
             CheckEnemyDefeated(target);
             EndPlayerTurn();
         }
@@ -88,6 +91,9 @@ namespace ACOTAR
             CombatResult result = CombatSystem.CalculateMagicAttack(player, target, magicType);
             target.TakeDamage(result.damage);
             LogMessage(result.description);
+
+            // Trigger magic visual effects
+            TriggerMagicVisualEffects(magicType, result, Vector3.zero, Vector3.zero);
 
             CheckEnemyDefeated(target);
             EndPlayerTurn();
@@ -318,9 +324,9 @@ namespace ACOTAR
         }
 
         /// <summary>
-        /// Check if all enemies are defeated
+        /// Check if all enemies are defeated (public accessor)
         /// </summary>
-        private bool CheckVictory()
+        public bool CheckVictory()
         {
             foreach (Enemy enemy in enemies)
             {
@@ -333,11 +339,19 @@ namespace ACOTAR
         }
 
         /// <summary>
-        /// Check if player is defeated
+        /// Check if player is defeated (public accessor)
         /// </summary>
-        private bool CheckDefeat()
+        public bool CheckDefeat()
         {
             return !player.IsAlive();
+        }
+
+        /// <summary>
+        /// Get list of enemies in the encounter
+        /// </summary>
+        public List<Enemy> GetEnemies()
+        {
+            return enemies;
         }
 
         /// <summary>
@@ -358,6 +372,9 @@ namespace ACOTAR
         {
             state = EncounterState.Victory;
             LogMessage("\n=== VICTORY ===");
+
+            // Trigger victory visual effects
+            TriggerVictoryEffects();
 
             // Grant experience
             int totalXP = 0;
@@ -389,6 +406,10 @@ namespace ACOTAR
             state = EncounterState.Defeat;
             LogMessage("\n=== DEFEAT ===");
             LogMessage($"{player.name} has fallen...");
+            
+            // Trigger defeat visual effects
+            TriggerDefeatEffects();
+            
             GameEvents.TriggerCombatEnded(player, enemies, false);
         }
 
@@ -437,5 +458,93 @@ namespace ACOTAR
         {
             return new List<string>(combatLog);
         }
+
+        #region Visual Effects Integration
+
+        /// <summary>
+        /// Trigger visual effects for physical hit
+        /// </summary>
+        private void TriggerHitVisualEffects(CombatResult result, Vector3 targetPosition)
+        {
+            // Spawn hit particle effect
+            if (VisualEffectsManager.Instance != null)
+            {
+                VisualEffectsManager.Instance.SpawnHitEffect(targetPosition, result.isCritical, result.damageType);
+            }
+
+            // Trigger screen effects
+            if (ScreenEffectsManager.Instance != null)
+            {
+                ScreenEffectsManager.Instance.CombatHitFeedback(result.isCritical, result.damageType);
+            }
+        }
+
+        /// <summary>
+        /// Trigger visual effects for magic attack
+        /// </summary>
+        private void TriggerMagicVisualEffects(MagicType magicType, CombatResult result, Vector3 casterPosition, Vector3 targetPosition)
+        {
+            // Spawn magic effect
+            if (VisualEffectsManager.Instance != null)
+            {
+                VisualEffectsManager.Instance.SpawnMagicEffect(magicType, casterPosition, targetPosition);
+            }
+
+            // Trigger screen flash for elemental magic
+            if (ScreenEffectsManager.Instance != null)
+            {
+                Element element = ElementalSystem.GetElementFromMagic(magicType);
+                if (element != Element.None)
+                {
+                    ScreenEffectsManager.Instance.MagicFlash(element);
+                }
+                
+                if (result.isCritical)
+                {
+                    ScreenEffectsManager.Instance.CriticalFlash();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Trigger visual effects when player takes damage
+        /// </summary>
+        private void TriggerPlayerDamageEffects(int damage)
+        {
+            if (ScreenEffectsManager.Instance != null)
+            {
+                float damagePercent = (float)damage / player.maxHealth;
+                ScreenEffectsManager.Instance.PlayerDamageFeedback(damagePercent);
+            }
+        }
+
+        /// <summary>
+        /// Trigger victory visual effects
+        /// </summary>
+        private void TriggerVictoryEffects()
+        {
+            if (VisualEffectsManager.Instance != null)
+            {
+                VisualEffectsManager.Instance.SpawnEffect(VFXType.QuestComplete, Vector3.zero);
+            }
+
+            if (ScreenEffectsManager.Instance != null)
+            {
+                ScreenEffectsManager.Instance.QuestCompleteFeedback();
+            }
+        }
+
+        /// <summary>
+        /// Trigger defeat visual effects
+        /// </summary>
+        private void TriggerDefeatEffects()
+        {
+            if (ScreenEffectsManager.Instance != null)
+            {
+                ScreenEffectsManager.Instance.FadeToBlack(1f);
+            }
+        }
+
+        #endregion
     }
 }
