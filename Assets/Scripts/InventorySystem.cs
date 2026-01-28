@@ -100,7 +100,9 @@ namespace ACOTAR
         public InventoryItem(InventorySlot slot)
         {
             if (slot == null || slot.item == null)
-                return;
+            {
+                throw new System.ArgumentNullException(nameof(slot), "InventorySlot and its item cannot be null");
+            }
 
             this.itemId = slot.item.itemId;
             this.name = slot.item.name;
@@ -492,7 +494,7 @@ namespace ACOTAR
             int count = 0;
             foreach (var slot in inventory)
             {
-                if (slot.item.itemId == itemId)
+                if (slot.item != null && slot.item.itemId == itemId)
                 {
                     count += slot.quantity;
                 }
@@ -507,7 +509,7 @@ namespace ACOTAR
         {
             foreach (var slot in inventory)
             {
-                if (slot.item.itemId == itemId)
+                if (slot.item != null && slot.item.itemId == itemId)
                 {
                     return new InventoryItem(slot);
                 }
@@ -538,7 +540,7 @@ namespace ACOTAR
         {
             foreach (var slot in inventory)
             {
-                if (slot.item.itemId == itemId)
+                if (slot.item != null && slot.item.itemId == itemId)
                     return slot;
             }
             return null;
