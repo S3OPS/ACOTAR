@@ -98,6 +98,39 @@ Game logic is broken into focused, reusable modules:
 ```
 ACOTAR/
 ├── Assets/
+│   └── Scripts/               # 20 game systems
+│       ├── Character.cs       # Character system (refactored)
+│       ├── CharacterStats.cs  # Modular stat management
+│       ├── AbilitySystem.cs   # Magic ability system
+│       ├── GameConfig.cs      # Centralized configuration
+│       ├── GameEvents.cs      # Event-driven architecture
+│       ├── GameManager.cs     # Main orchestration
+│       ├── LocationManager.cs # Location management (optimized)
+│       ├── QuestManager.cs    # Quest system
+│       ├── StoryManager.cs    # NEW: Story progression tracking
+│       ├── Book1Quests.cs     # NEW: Complete Book 1 content
+│       ├── Enemy.cs            # Enemy system with 8 types
+│       ├── CombatEncounter.cs # Turn-based combat manager
+│       ├── CombatSystem.cs    # Combat calculations
+│       ├── CompanionSystem.cs # 9 companions with loyalty
+│       ├── ReputationSystem.cs # 7-court reputation
+│       ├── DialogueSystem.cs  # Branching conversations
+│       ├── CraftingSystem.cs  # 15+ recipes
+│       ├── TimeSystem.cs      # Day/night cycle
+│       ├── InventorySystem.cs # Item management
+│       └── SaveSystem.cs      # Save/load functionality
+├── ProjectSettings/           # Unity configuration
+├── Packages/                  # Unity packages
+├── scripts/                   # Build automation
+├── Documentation/
+│   ├── THE_ONE_RING.md       # This file
+│   ├── PHASE5_COMPLETE.md    # Phase 5 report
+│   ├── PROJECT_SUMMARY.md    # Overall summary
+│   ├── LORE.md               # ACOTAR lore reference
+│   ├── DEVELOPMENT.md        # Dev guide
+│   └── GETTING_STARTED.md    # Quick start
+└── README.md                  # Project overview
+```
 │   └── Scripts/
 │       ├── Character.cs          # Character definition and management
 │       ├── CharacterStats.cs     # Stat system (health, magic, etc.)
@@ -249,6 +282,64 @@ Common → Uncommon → Rare → Epic → Legendary → Artifact
 - Save file existence check
 - Delete save functionality
 
+### 8. Story Progression System
+
+#### Story Arc System
+The **StoryManager** tracks progress through ACOTAR Books 1-3:
+
+**Book 1 Arcs**:
+- HumanLands → SpringCourt → UnderTheMountain → Aftermath
+
+**Book 2 Arcs**:
+- NightCourt → WarPreparations → Hybern
+
+**Book 3 Arcs**:
+- Alliance → War → Resolution
+
+#### Features
+- **Progressive Unlocking**: Locations and characters unlock as story advances
+- **Arc Completion Tracking**: Know which parts of the story are complete
+- **Content Gating**: New quests and areas unlock based on story progress
+- **Character Encounters**: Track which major characters have been met
+
+#### Book 1 Quest Content
+**The Complete Under the Mountain Arc** (20+ quests):
+
+**Main Story Quests**:
+1. Beyond the Wall (Human lands)
+2. The Spring Court's Beast (Capture by Tamlin)
+3. Life at the Manor (Learning the curse)
+4. Calanmai (Fire Night ritual)
+5. Under the Mountain (Arrival)
+6. First Trial: The Worm
+7. Nights Under the Mountain (Rhysand)
+8. Second Trial: The Naga
+9. The Cost of Defiance (Clare Beddor)
+10. Third Trial: Hearts of Stone
+11. The Final Riddle
+12. Breaking the Curse
+13. Return to Spring
+14. Nightmares and Walls
+15. A Bargain Kept (Bridge to Book 2)
+
+**Side Quests**:
+- The Suriel's Wisdom
+- Summer Court Alliance
+- The Book of Breathings
+- Letters and Words (learning to read)
+- Canvas and Color (painting)
+- A Servant's Wisdom (Alis)
+- Memory of Starlight (Rhysand's gift)
+- The Bone Carver's Gift
+- The Court of Nightmares
+
+#### Quest Rewards
+- Experience points (100-1500 XP per quest)
+- Item rewards
+- Character unlocks
+- Location access
+- Story progression
+
 ---
 
 ## 🚀 Performance Optimizations
@@ -368,13 +459,18 @@ Common → Uncommon → Rare → Epic → Legendary → Artifact
 - [x] Day/night cycle with moon phases
 - [x] Special events (Calanmai, Starfall)
 
-#### Phase 6: Story Content (Q4 2026)
-- [ ] Complete Book 1 storyline
+#### Phase 6: Story Content ✅ IN PROGRESS (January 2026)
+- [x] Complete Book 1 storyline (20+ quests)
+- [x] Story progression system with arc tracking
+- [x] Under the Mountain trials (Worm, Naga, Three Fae)
+- [x] Side quest expansions (reading, painting, friendships)
+- [x] Story-driven character unlocking
+- [x] Location progression system
 - [ ] Book 2 content (A Court of Mist and Fury)
 - [ ] Book 3 content (A Court of Wings and Ruin)
-- [ ] Side quest expansions
 - [ ] Court-specific storylines
-- [ ] Multiple endings
+- [ ] Companion personal quest arcs
+- [ ] Multiple endings based on choices
 
 #### Phase 7: Multiplayer (2027)
 - [ ] Co-op quest system
