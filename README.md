@@ -146,12 +146,11 @@ Docker builds require a Unity license file for headless/batch mode operation.
    **Note**: Unity Personal license can be used for Docker builds if you qualify (< $100K revenue).
 
 3. **Set up Unity License**
-   ```bash
-   # Linux/Mac
-   export UNITY_LICENSE='<contents-of-your-.ulf-file>'
    
-   # Windows
-   set UNITY_LICENSE=<contents-of-your-.ulf-file>
+   > **Note**: This step is only required for Docker builds. If you're using the Unity Editor directly on your computer, you don't need to set this variable - your license is handled automatically when you sign in.
+   
+   ```bash
+   export UNITY_LICENSE='<contents-of-your-.ulf-file>'
    ```
 
 4. **Build Docker image**

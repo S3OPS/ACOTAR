@@ -56,12 +56,10 @@ Docker builds are useful for CI/CD pipelines but require additional license setu
    
    For Docker builds, you need a Unity license file (`.ulf`). See the [Unity Manual Activation Guide](https://docs.unity3d.com/Manual/ManualActivationGuide.html) for how to obtain one.
    
-   ```bash
-   # Linux/Mac:
-   export UNITY_LICENSE='<contents-of-your-.ulf-file>'
+   > **Note**: This step is only required for Docker builds. If you're using the Unity Editor directly on your computer, you don't need to set this variable - your license is handled automatically when you sign in.
    
-   # Windows:
-   set UNITY_LICENSE=<contents-of-your-.ulf-file>
+   ```bash
+   export UNITY_LICENSE='<contents-of-your-.ulf-file>'
    ```
 
 4. **Build and Run**:
