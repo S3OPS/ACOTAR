@@ -122,6 +122,37 @@ namespace ACOTAR
                     UnlockCharacter("Nesta");
                     UnlockCharacter("Elain");
                     break;
+
+                case StoryArc.Book2_Hybern:
+                    UnlockLocation("Hybern");
+                    UnlockLocation("Mortal Lands");
+                    UnlockCharacter("King of Hybern");
+                    UnlockCharacter("Jurian");
+                    break;
+
+                case StoryArc.Book3_Alliance:
+                    UnlockLocation("Dawn Court");
+                    UnlockLocation("Day Court");
+                    UnlockCharacter("Thesan");
+                    UnlockCharacter("Helion");
+                    UnlockCharacter("Kallias");
+                    UnlockCharacter("Viviane");
+                    UnlockCharacter("Beron");
+                    UnlockCharacter("Eris");
+                    break;
+
+                case StoryArc.Book3_War:
+                    UnlockLocation("The Battlefield");
+                    UnlockLocation("The Prison");
+                    UnlockCharacter("Bryaxis");
+                    UnlockCharacter("Bone Carver (freed)");
+                    UnlockCharacter("Vassa");
+                    break;
+
+                case StoryArc.Book3_Resolution:
+                    UnlockLocation("Rebuilt Velaris");
+                    UnlockLocation("New Prythian");
+                    break;
             }
         }
 

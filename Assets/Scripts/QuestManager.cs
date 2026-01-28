@@ -188,6 +188,12 @@ namespace ACOTAR
 
             // Initialize Book 1 extended quests
             Book1Quests.InitializeBook1Quests(quests);
+
+            // Initialize Book 2 quests (A Court of Mist and Fury)
+            Book2Quests.InitializeBook2Quests(quests);
+
+            // Initialize Book 3 quests (A Court of Wings and Ruin)
+            Book3Quests.InitializeBook3Quests(quests);
         }
 
         private void AddQuest(Quest quest)

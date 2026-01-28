@@ -318,15 +318,15 @@ This is a fan project based on the ACOTAR series. Contributions are welcome!
 - ✅ **Phase 1-3**: Optimization, Enhancement, Documentation (Complete)
 - ✅ **Phase 4**: UI & Visualization (Complete)
 - ✅ **Phase 5**: Advanced Gameplay Systems (Complete)
-- ✅ **Phase 6**: Story Content (In Progress - Book 1 Complete)
+- ✅ **Phase 6**: Story Content (Complete - All 3 Books)
 - 🔜 **Phase 7**: Multiplayer Features
 - 🔜 **Phase 8**: Polish & Release
 
 ### Areas for Contribution
-- Book 2 and Book 3 quest content
+- Novella content (ACOFAS, ACOSF)
 - Additional dialogue trees
 - Court-specific storylines
-- Companion personal quests
+- Companion personal quests (expanded)
 - UI design and implementation
 - Sound and music
 - Testing and bug reports
@@ -340,16 +340,17 @@ This is a fan project based on the ACOTAR series. Contributions are welcome!
 
 ## 📊 Project Statistics
 
-- **Total Lines of Code**: 8,000+
-- **Game Systems**: 20 complete systems
+- **Total Lines of Code**: 12,000+
+- **Game Systems**: 25 complete systems
 - **Character Classes**: 6 classes
 - **Magic Types**: 12 abilities
-- **Locations**: 13+ unique places
-- **Quests**: 30+ main and side quests
+- **Locations**: 20+ unique places
+- **Quests**: 81 main and side quests (All 3 books complete)
 - **Enemies**: 8 creature types
 - **Companions**: 9 legendary characters
 - **Crafting Recipes**: 15+ items
-- **Story Arcs**: 10 defined arcs (Books 1-3)
+- **Story Arcs**: 10 defined arcs (Books 1-3 complete)
+- **Total Quest XP**: 30,500 XP available
 - **Security**: 0 vulnerabilities (CodeQL verified)
 
 ## 📜 License
