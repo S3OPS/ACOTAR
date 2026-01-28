@@ -81,6 +81,59 @@ namespace ACOTAR
     }
 
     /// <summary>
+    /// View model for inventory items used by UI
+    /// Combines Item data with inventory slot information
+    /// </summary>
+    [Serializable]
+    public class InventoryItem
+    {
+        public string itemId;
+        public string name;
+        public string description;
+        public ItemType itemType;
+        public ItemRarity rarity;
+        public int quantity;
+        public int value;
+        public int power;
+        public bool isEquipped;
+
+        public InventoryItem(InventorySlot slot)
+        {
+            if (slot == null || slot.item == null)
+                return;
+
+            this.itemId = slot.item.itemId;
+            this.name = slot.item.name;
+            this.description = slot.item.description;
+            this.itemType = slot.item.type;
+            this.rarity = slot.item.rarity;
+            this.quantity = slot.quantity;
+            this.isEquipped = slot.isEquipped;
+            
+            // Calculate value based on rarity
+            this.value = CalculateValue(slot.item);
+            
+            // Calculate power based on stat bonuses
+            this.power = slot.item.strengthBonus + slot.item.magicPowerBonus;
+        }
+
+        private int CalculateValue(Item item)
+        {
+            int baseValue = 10;
+            switch (item.rarity)
+            {
+                case ItemRarity.Common: return baseValue;
+                case ItemRarity.Uncommon: return baseValue * 3;
+                case ItemRarity.Rare: return baseValue * 10;
+                case ItemRarity.Epic: return baseValue * 25;
+                case ItemRarity.Legendary: return baseValue * 50;
+                case ItemRarity.Artifact: return baseValue * 100;
+                default: return baseValue;
+            }
+        }
+    }
+
+    /// <summary>
     /// Manages character inventory and equipment
     /// Foundation for item collection and management
     /// </summary>
@@ -411,19 +464,159 @@ namespace ACOTAR
         }
 
         /// <summary>
-        /// Get all items in inventory
+        /// Get all items in inventory as InventoryItem view models
         /// </summary>
-        public List<InventorySlot> GetAllItems()
+        public List<InventoryItem> GetAllItems()
         {
-            return new List<InventorySlot>(inventory);
+            var items = new List<InventoryItem>();
+            foreach (var slot in inventory)
+            {
+                items.Add(new InventoryItem(slot));
+            }
+            return items;
         }
 
         /// <summary>
-        /// Get total item count
+        /// Get total inventory slot count
         /// </summary>
         public int GetItemCount()
         {
             return inventory.Count;
+        }
+
+        /// <summary>
+        /// Get count of a specific item by ID
+        /// </summary>
+        public int GetItemCount(string itemId)
+        {
+            int count = 0;
+            foreach (var slot in inventory)
+            {
+                if (slot.item.itemId == itemId)
+                {
+                    count += slot.quantity;
+                }
+            }
+            return count;
+        }
+
+        /// <summary>
+        /// Get a specific item from inventory by ID
+        /// </summary>
+        public InventoryItem GetItem(string itemId)
+        {
+            foreach (var slot in inventory)
+            {
+                if (slot.item.itemId == itemId)
+                {
+                    return new InventoryItem(slot);
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Use a consumable item
+        /// </summary>
+        public bool UseItem(string itemId)
+        {
+            var slot = FindSlot(itemId);
+            if (slot == null || slot.item.type != ItemType.Consumable)
+                return false;
+
+            // Apply item effects
+            ApplyItemEffects(slot.item);
+            
+            // Remove one from quantity
+            return RemoveItem(itemId, 1);
+        }
+
+        /// <summary>
+        /// Find an inventory slot by item ID
+        /// </summary>
+        private InventorySlot FindSlot(string itemId)
+        {
+            foreach (var slot in inventory)
+            {
+                if (slot.item.itemId == itemId)
+                    return slot;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Apply item effects (placeholder for actual game logic)
+        /// </summary>
+        private void ApplyItemEffects(Item item)
+        {
+            if (item.healthBonus > 0)
+            {
+                Debug.Log($"Restored {item.healthBonus} health");
+            }
+            if (item.magicPowerBonus > 0)
+            {
+                Debug.Log($"Magic power increased by {item.magicPowerBonus}");
+            }
+        }
+
+        /// <summary>
+        /// Equip a weapon
+        /// </summary>
+        public bool EquipWeapon(string itemId)
+        {
+            var slot = FindSlot(itemId);
+            if (slot == null || slot.item.type != ItemType.Weapon)
+                return false;
+
+            // Unequip current weapon
+            if (equippedWeapon != null)
+            {
+                var oldSlot = FindSlot(equippedWeapon.itemId);
+                if (oldSlot != null) oldSlot.isEquipped = false;
+            }
+
+            equippedWeapon = slot.item;
+            slot.isEquipped = true;
+            Debug.Log($"Equipped weapon: {slot.item.name}");
+            return true;
+        }
+
+        /// <summary>
+        /// Equip armor
+        /// </summary>
+        public bool EquipArmor(string itemId)
+        {
+            var slot = FindSlot(itemId);
+            if (slot == null || slot.item.type != ItemType.Armor)
+                return false;
+
+            // Unequip current armor
+            if (equippedArmor != null)
+            {
+                var oldSlot = FindSlot(equippedArmor.itemId);
+                if (oldSlot != null) oldSlot.isEquipped = false;
+            }
+
+            equippedArmor = slot.item;
+            slot.isEquipped = true;
+            Debug.Log($"Equipped armor: {slot.item.name}");
+            return true;
+        }
+
+        /// <summary>
+        /// Get equipped weapon ID
+        /// </summary>
+        public string GetEquippedWeapon()
+        {
+            return equippedWeapon?.itemId;
+        }
+
+        /// <summary>
+        /// Get equipped armor ID
+        /// </summary>
+        public string GetEquippedArmor()
+        {
+            return equippedArmor?.itemId;
         }
 
         /// <summary>

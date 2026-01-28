@@ -414,11 +414,11 @@ namespace ACOTAR
             // 7. Inventory Display
             Debug.Log("=== 7. INVENTORY DISPLAY ===\n");
             
-            List<InventorySlot> allItems = inventorySystem.GetAllItems();
+            List<InventoryItem> allItems = inventorySystem.GetAllItems();
             Debug.Log($"Inventory: {allItems.Count} unique items");
-            foreach (InventorySlot slot in allItems)
+            foreach (InventoryItem item in allItems)
             {
-                Debug.Log($"  - {slot.item.name} x{slot.quantity} ({slot.item.rarity})");
+                Debug.Log($"  - {item.name} x{item.quantity} ({item.rarity})");
             }
             
             Debug.Log("\n=== Inventory Demo Complete ===\n");
