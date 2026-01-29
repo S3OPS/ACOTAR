@@ -133,8 +133,8 @@ ACOTAR/
 │   ├── PHASE6_FOUNDATION.md  # Phase 6 report
 │   ├── PROJECT_SUMMARY.md    # Overall summary
 │   ├── LORE.md               # ACOTAR lore reference
-│   ├── DEVELOPMENT.md        # Dev guide
-│   └── GETTING_STARTED.md    # Quick start
+│   ├── SETUP.md              # Complete setup guide
+│   └── DLC_GUIDE.md          # DLC content guide
 └── README.md                  # Project overview
 ```
 │   └── Scripts/
@@ -817,7 +817,7 @@ void OnLevelUpHandler(Character character, int newLevel)
 - Read through this documentation
 - Check existing code examples
 - Look at Unity console for error messages
-- Review DEVELOPMENT.md for technical details
+- Review THE_ONE_RING.md for technical details
 - Check LORE.md for world-building reference
 
 ### Contributing
@@ -861,9 +861,9 @@ See LICENSE file for details.
 ### Important Files
 - 📄 `THE_ONE_RING.md` - This document
 - 📄 `README.md` - Project overview
-- 📄 `DEVELOPMENT.md` - Development guide
+- 📄 `SETUP.md` - Complete setup and installation guide
 - 📄 `LORE.md` - ACOTAR lore reference
-- 📄 `GETTING_STARTED.md` - Setup instructions
+- 📄 `DLC_GUIDE.md` - DLC content information
 
 ### Key Concepts
 - **Courts**: The seven political divisions of Prythian

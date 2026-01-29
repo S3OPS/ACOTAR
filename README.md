@@ -96,94 +96,31 @@ Experience the epic conclusion to the trilogy:
 
 ## 🚀 Getting Started
 
-### Prerequisites
-
-- **Git** for cloning the repository
-- **One of the following** for building:
-  - **Unity Editor** (recommended for development) - FREE with Unity Personal license
-  - **Docker** and **Docker Compose** (for automated/headless builds)
+**For complete setup instructions, see [SETUP.md](SETUP.md)**
 
 ### Quick Start
 
-#### Option 1: Unity Editor (Recommended - No License Setup Required)
-
-This is the easiest way to build and play the game. **Unity Personal is FREE** for individuals and organizations with less than $100,000 in annual revenue.
-
-1. **Install Unity Hub and Unity**
-   - Download [Unity Hub](https://unity.com/download) (free)
-   - Install Unity 2022.3.0f1 through Unity Hub
-   - Unity Personal license is automatically activated when you sign in
-
-2. **Clone and Open**
-   ```bash
-   git clone https://github.com/S3OPS/ACOTAR.git
-   cd ACOTAR
-   ```
-   - Open Unity Hub
-   - Click "Add project from disk"
-   - Select the ACOTAR folder
-   - Open with Unity 2022.3.0f1
-
-3. **Build the Game**
-   - In Unity: File → Build Settings
-   - Select your platform (Windows, Mac, Linux)
-   - Click "Build" and choose output location
-
-#### Option 2: Docker Build (For CI/CD and Automated Builds)
-
-Docker builds require a Unity license file for headless/batch mode operation.
-
-1. **Clone the repository**
+1. **Clone the repository:**
    ```bash
    git clone https://github.com/S3OPS/ACOTAR.git
    cd ACOTAR
    ```
 
-2. **Get Unity License File**
-   
-   You need to obtain a Unity license file (`.ulf`) for Docker builds. See [Unity's Manual Activation Guide](https://docs.unity3d.com/Manual/ManualActivationGuide.html) for details.
-   
-   **Note**: Unity Personal license can be used for Docker builds if you qualify (< $100K revenue).
+2. **Choose your build method:**
+   - **Unity Editor** (Recommended): Download [Unity Hub](https://unity.com/download), install Unity 2022.3.0f1, and open the project
+   - **Docker** (For CI/CD): Install Docker, set up Unity license, and run build scripts
 
-3. **Set up Unity License**
-   
-   > **Note**: This step is only required for Docker builds. If you're using the Unity Editor directly on your computer, you don't need to set this variable - your license is handled automatically when you sign in.
-   
-   ```bash
-   export UNITY_LICENSE='<contents-of-your-.ulf-file>'
-   ```
+3. **Build and play:**
+   - Unity Editor: File → Build Settings → Build
+   - Docker: Run `./scripts/build-docker.sh` then `./scripts/build-unity.sh`
 
-4. **Build Docker image**
-   ```bash
-   # Linux/Mac
-   ./scripts/build-docker.sh
-   
-   # Windows
-   scripts\build-docker.bat
-   ```
+**📖 See [SETUP.md](SETUP.md) for detailed step-by-step instructions, troubleshooting, and more.**
 
-5. **Build the game**
-   ```bash
-   # Linux/Mac
-   ./scripts/build-unity.sh
-   
-   # Windows
-   scripts\build-unity.bat
-   ```
+### Prerequisites
 
-6. **Run the game**
-   The built executable will be in `Build/ACOTAR_RPG.exe`
-
-### Unity Licensing FAQ
-
-**Q: Do I need to pay for Unity?**
-A: No! Unity Personal is completely **FREE** for individuals and companies with less than $100,000 in annual revenue. Just download Unity Hub, create a free account, and start building.
-
-**Q: What is the UNITY_LICENSE environment variable for?**
-A: The `UNITY_LICENSE` environment variable is only needed for Docker/headless builds (CI/CD pipelines). If you're using the Unity Editor directly on your computer, you don't need to set this variable.
-
-**Q: How do I get a license file for Docker builds?**
-A: Follow Unity's [Manual Activation Guide](https://docs.unity3d.com/Manual/ManualActivationGuide.html) to generate a license request file and obtain a license file (`.ulf`).
+- **Git** for cloning the repository
+- **Unity Hub + Unity 2022.3.0f1** (recommended) OR **Docker + Docker Compose** (for CI/CD)
+- Unity Personal license is **FREE** for individuals and organizations with less than $100,000 in annual revenue
 
 ## 🏗️ Project Structure
 
@@ -229,19 +166,33 @@ ACOTAR/
 │   └── build-unity.bat       # Unity project build (Windows)
 ├── Dockerfile                # Docker configuration
 ├── docker-compose.yml        # Docker Compose configuration
+├── archive/                  # Archived documentation
+├── SETUP.md                  # Complete setup and installation guide
 ├── LORE.md                   # Detailed ACOTAR lore reference
 ├── THE_ONE_RING.md          # Complete technical documentation
+├── DLC_GUIDE.md             # DLC content information
 ├── PHASE5_COMPLETE.md       # Phase 5 completion report
+├── PHASE6_COMPLETE.md       # Phase 6 completion report
 └── README.md                 # This file
 ```
 
 ## 📖 Documentation
 
-- **[THE_ONE_RING.md](THE_ONE_RING.md)**: Complete technical documentation covering architecture, systems, API reference, and development roadmap
+### Setup & Getting Started
+- **[SETUP.md](SETUP.md)**: **Complete setup guide** - Step-by-step instructions for installation, configuration, and building the game
+
+### Game Content & Lore
 - **[LORE.md](LORE.md)**: Comprehensive lore reference covering all seven courts, character classes, magic systems, locations, and story events from the ACOTAR series
-- **[PHASE5_COMPLETE.md](PHASE5_COMPLETE.md)**: Detailed completion report for Phase 5 advanced gameplay systems
-- **[DEVELOPMENT.md](DEVELOPMENT.md)**: Development guide and best practices
-- **[GETTING_STARTED.md](GETTING_STARTED.md)**: Quick start guide for new developers
+- **[DLC_GUIDE.md](DLC_GUIDE.md)**: DLC content overview for Books 2 and 3
+
+### Technical Documentation
+- **[THE_ONE_RING.md](THE_ONE_RING.md)**: Complete technical documentation covering architecture, systems, API reference, and development roadmap
+- **[PHASE5_COMPLETE.md](PHASE5_COMPLETE.md)**: Phase 5 completion report (advanced gameplay systems)
+- **[PHASE6_COMPLETE.md](PHASE6_COMPLETE.md)**: Phase 6 completion report (story content)
+
+### Archived Documentation
+- **[archive/DEVELOPMENT.md](archive/DEVELOPMENT.md)**: Legacy development guide (superseded by SETUP.md and THE_ONE_RING.md)
+- **[archive/GETTING_STARTED.md](archive/GETTING_STARTED.md)**: Legacy quick start guide (superseded by SETUP.md)
 
 ## 🎯 Game Systems
 
