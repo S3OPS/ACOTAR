@@ -156,7 +156,8 @@ echo "Test 6: Verifying documentation..."
 doc_files=(
     "README.md"
     "LORE.md"
-    "DEVELOPMENT.md"
+    "SETUP.md"
+    "THE_ONE_RING.md"
 )
 
 all_docs_exist=true
