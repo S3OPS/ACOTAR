@@ -71,6 +71,7 @@ namespace ACOTAR
         // Modular systems
         private CharacterStats _stats;
         private AbilitySystem _abilitySystem;
+        private CharacterProgression _progression;  // NEW: Progression system
 
         // Property accessors for stats (maintains compatibility)
         public int health { get { return _stats.health; } set { _stats.health = value; } }
@@ -87,6 +88,7 @@ namespace ACOTAR
         public Court courtAllegiance { get { return allegiance; } set { allegiance = value; } }
         public CharacterStats stats { get { return _stats; } }
         public AbilitySystem abilitySystem { get { return _abilitySystem; } }
+        public CharacterProgression progression { get { return _progression; } }  // NEW: Access to progression
 
         public Character(string name, CharacterClass charClass, Court court)
         {
@@ -100,6 +102,7 @@ namespace ACOTAR
             _stats = new CharacterStats();
             _stats.InitializeForClass(charClass);
             _abilitySystem = new AbilitySystem(charClass);
+            _progression = new CharacterProgression();  // NEW: Initialize progression
             
             GameEvents.TriggerCharacterCreated(this);
         }
