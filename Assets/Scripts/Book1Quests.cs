@@ -250,6 +250,86 @@ namespace ACOTAR
             hewn.objectives.Add("Understand the duality of the Night Court");
             hewn.experienceReward = 350;
             quests[hewn.questId] = hewn;
+
+            // NEW ENHANCED SIDE QUESTS FOR BASE GAME
+            
+            // The Spring Gardens
+            Quest gardens = new Quest(
+                "side_010_book1",
+                "The Gardens of Spring",
+                "Explore the beautiful gardens of the Spring Court manor and discover hidden secrets.",
+                QuestType.SideQuest
+            );
+            gardens.objectives.Add("Explore all sections of the manor gardens");
+            gardens.objectives.Add("Find the ancient rose bush");
+            gardens.objectives.Add("Learn the history of the Spring Court from the garden keeper");
+            gardens.experienceReward = 175;
+            quests[gardens.questId] = gardens;
+
+            // Lucien's Trust
+            Quest lucienQuest = new Quest(
+                "side_011_book1",
+                "Fire and Friendship",
+                "Earn Lucien's trust and learn about his mysterious past.",
+                QuestType.CompanionQuest
+            );
+            lucienQuest.objectives.Add("Spend time with Lucien");
+            lucienQuest.objectives.Add("Help him with court duties");
+            lucienQuest.objectives.Add("Learn about his history with the Autumn Court");
+            lucienQuest.experienceReward = 225;
+            quests[lucienQuest.questId] = lucienQuest;
+
+            // The Lesser Fae
+            Quest lesserFae = new Quest(
+                "side_012_book1",
+                "Voices of the Forgotten",
+                "The Lesser Fae of the Spring Court have stories to tell.",
+                QuestType.SideQuest
+            );
+            lesserFae.objectives.Add("Meet with the Lesser Fae servants");
+            lesserFae.objectives.Add("Learn about their lives under the curse");
+            lesserFae.objectives.Add("Help them with their daily struggles");
+            lesserFae.experienceReward = 150;
+            quests[lesserFae.questId] = lesserFae;
+
+            // The Wall's Secrets
+            Quest wallSecrets = new Quest(
+                "side_013_book1",
+                "The Wall Between Worlds",
+                "Investigate the magical barrier that separates the mortal and Fae realms.",
+                QuestType.ExplorationQuest
+            );
+            wallSecrets.objectives.Add("Study the Wall from both sides");
+            wallSecrets.objectives.Add("Learn about its creation");
+            wallSecrets.objectives.Add("Discover hidden passages");
+            wallSecrets.experienceReward = 200;
+            quests[wallSecrets.questId] = wallSecrets;
+
+            // The Hunter's Legacy
+            Quest hunterLegacy = new Quest(
+                "side_014_book1",
+                "Hunter's Heritage",
+                "Reflect on your mortal life and the skills that kept you alive.",
+                QuestType.SideQuest
+            );
+            hunterLegacy.objectives.Add("Practice your archery skills");
+            hunterLegacy.objectives.Add("Track wild game in the Spring lands");
+            hunterLegacy.objectives.Add("Prove your hunting prowess to the Fae");
+            hunterLegacy.experienceReward = 175;
+            quests[hunterLegacy.questId] = hunterLegacy;
+
+            // Under the Mountain - Survival
+            Quest utmSurvival = new Quest(
+                "side_015_book1",
+                "Survival Under Stone",
+                "Learn to navigate the treacherous politics and dangers Under the Mountain.",
+                QuestType.SideQuest
+            );
+            utmSurvival.objectives.Add("Identify allies among the prisoners");
+            utmSurvival.objectives.Add("Avoid Amarantha's attention when possible");
+            utmSurvival.objectives.Add("Find sources of food and rest");
+            utmSurvival.experienceReward = 250;
+            quests[utmSurvival.questId] = utmSurvival;
         }
 
         /// <summary>

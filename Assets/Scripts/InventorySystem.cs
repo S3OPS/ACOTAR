@@ -178,6 +178,72 @@ namespace ACOTAR
                 ItemRarity.Rare
             ) { strengthBonus = 20 });
 
+            // NEW BASE GAME WEAPONS
+            AddItemToDatabase(new Item(
+                "weapon_spring_blade",
+                "Spring Court Sword",
+                "An elegant blade forged in the Spring Court, decorated with rose motifs",
+                ItemType.Weapon,
+                ItemRarity.Uncommon
+            ) { strengthBonus = 12, agilityBonus = 5 });
+
+            AddItemToDatabase(new Item(
+                "weapon_hunters_bow",
+                "Hunter's Longbow",
+                "Your trusty bow from your days hunting in the mortal lands",
+                ItemType.Weapon,
+                ItemRarity.Common
+            ) { strengthBonus = 8, agilityBonus = 8 });
+
+            AddItemToDatabase(new Item(
+                "weapon_fae_spear",
+                "Enchanted Fae Spear",
+                "A spear imbued with ancient Fae magic",
+                ItemType.Weapon,
+                ItemRarity.Epic
+            ) { strengthBonus = 25, magicPowerBonus = 10 });
+
+            AddItemToDatabase(new Item(
+                "weapon_shadow_dagger",
+                "Dagger of Shadows",
+                "A mysterious blade that seems to absorb light itself",
+                ItemType.Weapon,
+                ItemRarity.Legendary
+            ) { strengthBonus = 30, agilityBonus = 15, magicPowerBonus = 10 });
+
+            // NEW BASE GAME ARMOR
+            AddItemToDatabase(new Item(
+                "armor_spring_leather",
+                "Spring Court Leathers",
+                "Light leather armor in Spring Court colors",
+                ItemType.Armor,
+                ItemRarity.Common
+            ) { healthBonus = 25, agilityBonus = 5 });
+
+            AddItemToDatabase(new Item(
+                "armor_fae_cloak",
+                "Enchanted Fae Cloak",
+                "A cloak woven with protective magic",
+                ItemType.Armor,
+                ItemRarity.Rare
+            ) { healthBonus = 40, magicPowerBonus = 15 });
+
+            AddItemToDatabase(new Item(
+                "armor_high_fae_plate",
+                "High Fae Battle Armor",
+                "Ornate armor fit for a High Fae warrior",
+                ItemType.Armor,
+                ItemRarity.Epic
+            ) { healthBonus = 75, strengthBonus = 10 });
+
+            AddItemToDatabase(new Item(
+                "armor_night_silk",
+                "Night Court Silk Armor",
+                "Lightweight but incredibly strong armor from the Night Court",
+                ItemType.Armor,
+                ItemRarity.Legendary
+            ) { healthBonus = 100, agilityBonus = 20, magicPowerBonus = 20 });
+
             // Consumables
             AddItemToDatabase(new Item(
                 "potion_healing",
@@ -194,6 +260,47 @@ namespace ACOTAR
                 ItemType.Consumable,
                 ItemRarity.Uncommon
             ) { magicPowerBonus = 20 });
+
+            // NEW BASE GAME CONSUMABLES
+            AddItemToDatabase(new Item(
+                "potion_greater_healing",
+                "Greater Healing Potion",
+                "Restores 100 health points - powerful Fae remedy",
+                ItemType.Consumable,
+                ItemRarity.Rare
+            ) { healthBonus = 100 });
+
+            AddItemToDatabase(new Item(
+                "potion_stamina",
+                "Stamina Draught",
+                "Restores energy and increases agility temporarily",
+                ItemType.Consumable,
+                ItemRarity.Common
+            ) { agilityBonus = 10 });
+
+            AddItemToDatabase(new Item(
+                "potion_strength",
+                "Potion of the Bear",
+                "Grants temporary strength boost",
+                ItemType.Consumable,
+                ItemRarity.Uncommon
+            ) { strengthBonus = 15 });
+
+            AddItemToDatabase(new Item(
+                "food_fae_bread",
+                "Fae Bread",
+                "Delicious and nourishing bread from the Spring Court kitchens",
+                ItemType.Consumable,
+                ItemRarity.Common
+            ) { healthBonus = 25 });
+
+            AddItemToDatabase(new Item(
+                "food_starlight_wine",
+                "Starlight Wine",
+                "A rare wine from the Night Court that enhances magic",
+                ItemType.Consumable,
+                ItemRarity.Rare
+            ) { magicPowerBonus = 25 });
 
             // Quest Items
             AddItemToDatabase(new Item(
@@ -220,6 +327,47 @@ namespace ACOTAR
                 ItemType.Magical,
                 ItemRarity.Epic
             ) { magicPowerBonus = 15 });
+
+            // NEW BASE GAME MAGICAL ITEMS
+            AddItemToDatabase(new Item(
+                "magical_ash_warding",
+                "Ash Wood Charm",
+                "A protective charm made from ash wood, wards against Fae magic",
+                ItemType.Magical,
+                ItemRarity.Uncommon
+            ) { magicPowerBonus = 10 });
+
+            AddItemToDatabase(new Item(
+                "magical_spring_blessing",
+                "Spring Court Blessing",
+                "A magical token blessed by the Spring Court, enhances vitality",
+                ItemType.Magical,
+                ItemRarity.Rare
+            ) { healthBonus = 50, magicPowerBonus = 20 });
+
+            AddItemToDatabase(new Item(
+                "magical_suriel_vision",
+                "Suriel's Eye Amulet",
+                "Grants glimpses of possible futures",
+                ItemType.Magical,
+                ItemRarity.Epic
+            ) { magicPowerBonus = 30 });
+
+            AddItemToDatabase(new Item(
+                "magical_rhysand_gift",
+                "Star-blessed Pendant",
+                "A gift from the High Lord of Night, channels starlight magic",
+                ItemType.Magical,
+                ItemRarity.Legendary
+            ) { magicPowerBonus = 40, healthBonus = 30 });
+
+            AddItemToDatabase(new Item(
+                "magical_paint_set",
+                "Enchanted Paint Set",
+                "Your painting supplies, now imbued with a touch of Fae magic",
+                ItemType.Magical,
+                ItemRarity.Uncommon
+            ) { magicPowerBonus = 5 });
 
             // Crafting Materials
             AddCraftingMaterials();

@@ -479,6 +479,92 @@ namespace ACOTAR
             vassa.objectives.Add("Offer to help break her curse");
             vassa.experienceReward = 350;
             quests[vassa.questId] = vassa;
+
+            // NEW ENHANCED DLC 2 SIDE QUESTS
+            
+            // Day Court Knowledge
+            Quest dayCourtLibrary = new Quest(
+                "side_022_book3",
+                "Halls of Enlightenment",
+                "Explore the vast libraries and knowledge repositories of the Day Court.",
+                QuestType.ExplorationQuest
+            );
+            dayCourtLibrary.objectives.Add("Visit the Day Court's Grand Library");
+            dayCourtLibrary.objectives.Add("Research ancient war strategies");
+            dayCourtLibrary.objectives.Add("Gain Helion's favor through scholarly pursuits");
+            dayCourtLibrary.experienceReward = 300;
+            dayCourtLibrary.isDLCContent = true;
+            quests[dayCourtLibrary.questId] = dayCourtLibrary;
+
+            // Winter Court
+            Quest winterAlliance = new Quest(
+                "side_023_book3",
+                "Ice and Honor",
+                "Secure the Winter Court's alliance and learn about Kallias and Viviane's love story.",
+                QuestType.CourtQuest
+            );
+            winterAlliance.objectives.Add("Journey to the Winter Court");
+            winterAlliance.objectives.Add("Hear Viviane and Kallias's story");
+            winterAlliance.objectives.Add("Strengthen the alliance");
+            winterAlliance.experienceReward = 325;
+            winterAlliance.isDLCContent = true;
+            quests[winterAlliance.questId] = winterAlliance;
+
+            // Autumn Court Politics
+            Quest autumnPolitics = new Quest(
+                "side_024_book3",
+                "Flames of Ambition",
+                "Navigate the deadly politics of the Autumn Court and Eris's hidden agenda.",
+                QuestType.CourtQuest
+            );
+            autumnPolitics.objectives.Add("Attend an Autumn Court gathering");
+            autumnPolitics.objectives.Add("Uncover Eris's true loyalties");
+            autumnPolitics.objectives.Add("Deal with Beron's hostility");
+            autumnPolitics.experienceReward = 375;
+            autumnPolitics.isDLCContent = true;
+            quests[autumnPolitics.questId] = autumnPolitics;
+
+            // The Prison
+            Quest prisonExploration = new Quest(
+                "side_025_book3",
+                "The Prison Beneath the Mountain",
+                "Explore the Night Court's ancient prison and its terrifying inmates.",
+                QuestType.ExplorationQuest
+            );
+            prisonExploration.objectives.Add("Descend into the Prison");
+            prisonExploration.objectives.Add("Learn about the ancient prisoners");
+            prisonExploration.objectives.Add("Free Bryaxis and the Bone Carver");
+            prisonExploration.experienceReward = 400;
+            prisonExploration.isDLCContent = true;
+            quests[prisonExploration.questId] = prisonExploration;
+
+            // Mor and Viviane
+            Quest morViviane = new Quest(
+                "side_026_book3",
+                "Queens of Ice and Truth",
+                "Witness the friendship between Mor and Viviane grow.",
+                QuestType.CompanionQuest
+            );
+            morViviane.objectives.Add("Bring Mor to the Winter Court");
+            morViviane.objectives.Add("Watch the two powerful females bond");
+            morViviane.objectives.Add("Strengthen inter-court relationships");
+            morViviane.experienceReward = 275;
+            morViviane.isDLCContent = true;
+            quests[morViviane.questId] = morViviane;
+
+            // The Cauldron Quest
+            Quest cauldronQuest = new Quest(
+                "side_027_book3",
+                "Chasing the Cauldron",
+                "Track the Cauldron's movements and prevent Hybern from using it.",
+                QuestType.MainStory
+            );
+            cauldronQuest.objectives.Add("Gather intelligence on the Cauldron's location");
+            cauldronQuest.objectives.Add("Form a strike team");
+            cauldronQuest.objectives.Add("Attempt to steal or destroy it");
+            cauldronQuest.experienceReward = 500;
+            cauldronQuest.isDLCContent = true;
+            quests[cauldronQuest.questId] = cauldronQuest;
         }
 
         /// <summary>
