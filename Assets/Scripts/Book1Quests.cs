@@ -29,6 +29,11 @@ namespace ACOTAR
             trial1.objectives.Add("Prove your worth to Amarantha");
             trial1.experienceReward = 400;
             trial1.nextQuestId = "main_007";
+            // Optional challenge objectives (v2.3.1)
+            trial1.optionalObjectives.Add("Complete the trial without taking damage");
+            trial1.optionalObjectives.Add("Defeat the Wyrm in under 10 turns");
+            trial1.bonusExperienceReward = 100;
+            trial1.bonusGoldReward = 50;
             quests[trial1.questId] = trial1;
 
             // Between Trials: Healing and Rhysand
@@ -57,6 +62,11 @@ namespace ACOTAR
             trial2.objectives.Add("Survive the Naga's poison");
             trial2.experienceReward = 450;
             trial2.nextQuestId = "main_009";
+            // Optional challenge objectives (v2.3.1)
+            trial2.optionalObjectives.Add("Defeat the Naga without using healing items");
+            trial2.optionalObjectives.Add("Take less than 50 damage during the fight");
+            trial2.bonusExperienceReward = 125;
+            trial2.bonusGoldReward = 75;
             quests[trial2.questId] = trial2;
 
             // Between Trials: Clare Beddor
@@ -85,6 +95,11 @@ namespace ACOTAR
             trial3.objectives.Add("Discover the truth behind the masks");
             trial3.experienceReward = 500;
             trial3.nextQuestId = "main_011";
+            // Optional challenge objectives (v2.3.1)
+            trial3.optionalObjectives.Add("Solve the riddle before making your choice");
+            trial3.optionalObjectives.Add("Show mercy and compassion despite the circumstances");
+            trial3.bonusExperienceReward = 150;
+            trial3.bonusGoldReward = 100;
             quests[trial3.questId] = trial3;
 
             // The Riddle
@@ -99,6 +114,11 @@ namespace ACOTAR
             riddle.objectives.Add("Pay the ultimate price");
             riddle.experienceReward = 600;
             riddle.nextQuestId = "main_012";
+            // Optional challenge objectives (v2.3.1)
+            riddle.optionalObjectives.Add("Answer the riddle correctly on first attempt");
+            riddle.optionalObjectives.Add("Maintain dignity and courage before Amarantha");
+            riddle.bonusExperienceReward = 200;
+            riddle.bonusGoldReward = 150;
             quests[riddle.questId] = riddle;
 
             // Breaking the Curse

@@ -140,6 +140,14 @@ namespace ACOTAR
             public const float HARD_DROP_CHANCE = 0.70f;
             public const float ELITE_DROP_CHANCE = 0.85f;
             public const float BOSS_DROP_CHANCE = 1.0f;  // 100%
+            
+            // Book 1 Boss Scaling (v2.3.1) - Make story bosses progressively harder
+            // Standard bosses use BOSS_MULTIPLIERS above
+            // Named story bosses get additional scaling
+            // Format: [HP multiplier, Damage multiplier, XP multiplier, Gold multiplier]
+            public static readonly float[] MIDDENGARD_WYRM_MULTIPLIERS = { 3.0f, 2.0f, 5.0f, 3.0f };  // First trial - standard boss
+            public static readonly float[] NAGA_MULTIPLIERS = { 3.2f, 2.1f, 5.0f, 3.0f };  // Second trial - slightly harder
+            public static readonly float[] AMARANTHA_MULTIPLIERS = { 4.0f, 2.5f, 6.0f, 4.0f };  // Final boss - significantly harder
         }
 
         #endregion
@@ -154,6 +162,10 @@ namespace ACOTAR
             // Level up requirements
             public const int BASE_XP_PER_LEVEL = 100;
             public const float XP_LEVEL_MULTIPLIER = 1.15f;  // 15% increase per level
+            
+            // Early game progression smoothing (v2.3.1)
+            public const float EARLY_GAME_XP_SCALING = 1.2f;  // Levels 1-3 require 20% more XP
+            public const int EARLY_GAME_LEVEL_THRESHOLD = 3;
 
             // Stat growth per level
             public const int HEALTH_PER_LEVEL = 10;
