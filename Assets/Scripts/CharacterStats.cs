@@ -109,6 +109,7 @@ namespace ACOTAR
         /// <summary>
         /// Add experience and handle level ups
         /// Returns true if leveled up
+        /// Improved with early game pacing (v2.3.1)
         /// </summary>
         public bool GainExperience(int xp)
         {
@@ -117,13 +118,13 @@ namespace ACOTAR
             experience += xp;
             bool didLevelUp = false;
             
-            int requiredXP = level * GameConfig.BASE_XP_PER_LEVEL;
+            int requiredXP = GetXPRequiredForNextLevel();
             while (experience >= requiredXP)
             {
                 experience -= requiredXP;
                 LevelUp();
                 didLevelUp = true;
-                requiredXP = level * GameConfig.BASE_XP_PER_LEVEL;
+                requiredXP = GetXPRequiredForNextLevel();
             }
             
             return didLevelUp;
@@ -143,11 +144,21 @@ namespace ACOTAR
         }
 
         /// <summary>
-        /// Get XP required for next level
+        /// Get XP required for next level with improved progression curve
+        /// Early levels (1-3) require more XP for better pacing (v2.3.1)
         /// </summary>
         public int GetXPRequiredForNextLevel()
         {
-            return level * GameConfig.BASE_XP_PER_LEVEL;
+            int baseXP = (int)(BalanceConfig.Progression.BASE_XP_PER_LEVEL * 
+                               Math.Pow(BalanceConfig.Progression.XP_LEVEL_MULTIPLIER, level - 1));
+            
+            // Apply early game scaling for better pacing
+            if (level <= BalanceConfig.Progression.EARLY_GAME_LEVEL_THRESHOLD)
+            {
+                baseXP = (int)(baseXP * BalanceConfig.Progression.EARLY_GAME_XP_SCALING);
+            }
+            
+            return baseXP;
         }
     }
 }

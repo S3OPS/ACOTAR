@@ -274,6 +274,131 @@ namespace ACOTAR
                 "• Play time and location\n\n" +
                 "TIP: Save often, especially before tough battles!");
 
+            // Book 1 Specific Content
+            AddHelpTopic("Book 1 Overview", "Book 1: Thorns and Roses",
+                "A Court of Thorns and Roses - Base Game\n\n" +
+                "Your Journey:\n" +
+                "• Start as Feyre, a human hunter in the mortal lands\n" +
+                "• Travel to the Spring Court after killing a Fae\n" +
+                "• Meet Tamlin and Lucien, learn about the curse\n" +
+                "• Face Amarantha's trials Under the Mountain\n" +
+                "• Break the curse and transform into High Fae\n\n" +
+                "Key Story Arcs:\n" +
+                "1. Human Lands (Level 1-2)\n" +
+                "2. Spring Court (Level 3-5)\n" +
+                "3. Under the Mountain (Level 6-9)\n" +
+                "4. Aftermath (Level 10)\n\n" +
+                "Total XP Available: ~6,250\n" +
+                "Expected Completion: 10-15 hours");
+
+            AddHelpTopic("The Three Trials", "Book 1: Thorns and Roses",
+                "Amarantha's Challenges:\n\n" +
+                "Trial 1: The Middengard Wyrm\n" +
+                "• Face a deadly worm in a flooded chamber\n" +
+                "• Tip: Use agility to dodge, focus on critical hits\n" +
+                "• Reward: 400 XP\n\n" +
+                "Trial 2: The Naga\n" +
+                "• Answer riddles or fight the poisonous Naga\n" +
+                "• Tip: If you can't read, prepare for combat\n" +
+                "• Reward: 450 XP\n\n" +
+                "Trial 3: Hearts of Stone\n" +
+                "• Make an impossible choice\n" +
+                "• Tip: Think about what's truly in your heart\n" +
+                "• Reward: 500 XP\n\n" +
+                "Final Challenge: The Riddle\n" +
+                "• Answer correctly to break the curse\n" +
+                "• Reward: 600 XP + transformation");
+
+            AddHelpTopic("Difficulty Modes", "Game Management",
+                "Choose Your Challenge:\n\n" +
+                "STORY MODE (Easy)\n" +
+                "• 50% damage taken\n" +
+                "• 150% damage dealt\n" +
+                "• 150% XP and gold rewards\n" +
+                "• Perfect for experiencing the story\n\n" +
+                "NORMAL MODE (Balanced)\n" +
+                "• 100% damage (standard)\n" +
+                "• 100% rewards\n" +
+                "• Recommended for first playthrough\n\n" +
+                "HARD MODE (Challenge)\n" +
+                "• 125% damage taken\n" +
+                "• 90% damage dealt\n" +
+                "• 125% XP and gold rewards\n" +
+                "• For experienced players\n\n" +
+                "NIGHTMARE MODE (Brutal)\n" +
+                "• 150% damage taken\n" +
+                "• 75% damage dealt\n" +
+                "• 150% XP and gold rewards\n" +
+                "• Extreme challenge, deaths are punishing\n\n" +
+                "TIP: Start on Normal, adjust in settings if needed!");
+
+            AddHelpTopic("Combat Strategy", "Combat",
+                "Winning Battles:\n\n" +
+                "Basic Strategy:\n" +
+                "• Use Attack for consistent physical damage\n" +
+                "• Save Magic for tough enemies or healing\n" +
+                "• Defend when low on health to buy time\n" +
+                "• Use items strategically (potions, buffs)\n\n" +
+                "Advanced Tips:\n" +
+                "• Critical hits (15% chance) deal 2x damage\n" +
+                "• High Agility = better dodge chance (up to 75%)\n" +
+                "• Defend reduces damage by 50% for one turn\n" +
+                "• Flee chance based on Agility vs enemy level\n\n" +
+                "Boss Battles:\n" +
+                "• Always save before major fights\n" +
+                "• Stock up on healing potions\n" +
+                "• Bring companions for support\n" +
+                "• Learn enemy patterns and exploit weaknesses\n\n" +
+                "Party Combat:\n" +
+                "• Companions fight automatically based on role\n" +
+                "• Tank companions protect the party\n" +
+                "• DPS companions deal high damage\n" +
+                "• Support companions heal and buff\n" +
+                "• Loyalty affects effectiveness (80-120%)");
+
+            AddHelpTopic("Progression Tips", "Character System",
+                "Leveling Efficiently:\n\n" +
+                "Early Game (Levels 1-3):\n" +
+                "• Complete all side quests for extra XP\n" +
+                "• Don't skip combat encounters\n" +
+                "• Learn to use Defend action effectively\n" +
+                "• Save gold for better equipment\n\n" +
+                "Mid Game (Levels 4-7):\n" +
+                "• Build reputation with Spring Court\n" +
+                "• Unlock crafting for better gear\n" +
+                "• Focus on companion relationships\n" +
+                "• Prepare for Under the Mountain\n\n" +
+                "Late Game (Levels 8-10):\n" +
+                "• Master all combat actions\n" +
+                "• Complete trial challenges\n" +
+                "• Max out key abilities\n" +
+                "• Prepare for transformation\n\n" +
+                "Stat Priorities:\n" +
+                "• Warriors: Strength > Health > Agility\n" +
+                "• Mages: Magic > Agility > Health\n" +
+                "• Balanced: Health > Strength = Magic");
+
+            AddHelpTopic("Spring Court Guide", "Book 1: Thorns and Roses",
+                "Life at the Manor:\n\n" +
+                "Key Locations:\n" +
+                "• Spring Court Manor - Your home in Prythian\n" +
+                "• Gardens - Peaceful exploration area\n" +
+                "• Training Grounds - Practice combat\n" +
+                "• The Wall - Border to human lands\n\n" +
+                "Important NPCs:\n" +
+                "• Tamlin - High Lord of Spring, cursed beast\n" +
+                "• Lucien - Emissary, becomes your friend\n" +
+                "• Alis - Servant who helps you adjust\n\n" +
+                "Activities:\n" +
+                "• Complete quests to build relationships\n" +
+                "• Learn about the curse affecting the court\n" +
+                "• Prepare for Calanmai (Fire Night)\n" +
+                "• Discover the truth about Amarantha\n\n" +
+                "Reputation:\n" +
+                "• Gain Spring Court reputation through quests\n" +
+                "• Higher reputation = better prices at shops\n" +
+                "• Unlocks unique dialogue and story options");
+
             PopulateHelpTopicList();
         }
 

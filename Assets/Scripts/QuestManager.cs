@@ -20,6 +20,11 @@ namespace ACOTAR
         public int experienceReward;
         public string nextQuestId;
         public bool isDLCContent;  // NEW: Marks quest as DLC content
+        
+        // v2.3.1: Optional challenge objectives for replayability
+        public List<string> optionalObjectives;
+        public int bonusExperienceReward;  // Bonus XP for completing optional objectives
+        public int bonusGoldReward;  // Bonus gold for completing optional objectives
 
         public Quest(string id, string title, string desc, QuestType type)
         {
@@ -31,6 +36,9 @@ namespace ACOTAR
             this.isActive = false;
             this.objectives = new List<string>();
             this.isDLCContent = false;
+            this.optionalObjectives = new List<string>();
+            this.bonusExperienceReward = 0;
+            this.bonusGoldReward = 0;
         }
     }
 
