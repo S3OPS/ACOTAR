@@ -399,16 +399,70 @@ namespace ACOTAR
         }
 
         /// <summary>
-        /// Sort inventory
+        /// Sort inventory based on dropdown selection
         /// </summary>
         private void OnSortClicked()
         {
             if (inventorySystem == null)
                 return;
 
-            // TODO: Implement sorting logic based on dropdown selection
-            Debug.Log("Sorting inventory");
+            // Get sort option from dropdown
+            int sortOption = sortDropdown != null ? sortDropdown.value : 0;
             
+            // Sort the inventory items
+            List<InventoryItem> sortedItems = inventorySystem.GetAllItems();
+            
+            switch (sortOption)
+            {
+                case 0: // Name (A-Z)
+                    sortedItems.Sort((a, b) => string.Compare(a.name, b.name, StringComparison.Ordinal));
+                    Debug.Log("Sorted inventory by Name (A-Z)");
+                    break;
+                    
+                case 1: // Type
+                    sortedItems.Sort((a, b) => 
+                    {
+                        int typeCompare = a.itemType.CompareTo(b.itemType);
+                        return typeCompare != 0 ? typeCompare : string.Compare(a.name, b.name, StringComparison.Ordinal);
+                    });
+                    Debug.Log("Sorted inventory by Type");
+                    break;
+                    
+                case 2: // Rarity
+                    sortedItems.Sort((a, b) => 
+                    {
+                        // Sort by rarity descending (Legendary first, Common last)
+                        int rarityCompare = b.rarity.CompareTo(a.rarity);
+                        return rarityCompare != 0 ? rarityCompare : string.Compare(a.name, b.name, StringComparison.Ordinal);
+                    });
+                    Debug.Log("Sorted inventory by Rarity (highest first)");
+                    break;
+                    
+                case 3: // Value
+                    sortedItems.Sort((a, b) => 
+                    {
+                        int valueCompare = b.value.CompareTo(a.value);
+                        return valueCompare != 0 ? valueCompare : string.Compare(a.name, b.name, StringComparison.Ordinal);
+                    });
+                    Debug.Log("Sorted inventory by Value (highest first)");
+                    break;
+                    
+                case 4: // Power
+                    sortedItems.Sort((a, b) => 
+                    {
+                        int powerCompare = b.power.CompareTo(a.power);
+                        return powerCompare != 0 ? powerCompare : string.Compare(a.name, b.name, StringComparison.Ordinal);
+                    });
+                    Debug.Log("Sorted inventory by Power (highest first)");
+                    break;
+                    
+                default:
+                    Debug.LogWarning("Unknown sort option: " + sortOption);
+                    break;
+            }
+            
+            // Update inventory system with sorted order and refresh display
+            inventorySystem.SetSortedOrder(sortedItems);
             RefreshInventory(inventorySystem);
         }
 

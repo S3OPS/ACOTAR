@@ -56,6 +56,12 @@ namespace ACOTAR
         public GameObject actionButtonsPanel;
         public Text turnIndicatorText;
 
+        [Header("Notification System")]
+        public GameObject notificationPanel;
+        public Text notificationText;
+        private Queue<string> notificationQueue = new Queue<string>();
+        private bool isShowingNotification = false;
+
         private Dictionary<string, GameObject> activePanels;
         private bool isGamePaused;
 
@@ -398,19 +404,74 @@ namespace ACOTAR
         }
 
         /// <summary>
-        /// Display a notification message
+        /// Display a notification message with queue system
         /// </summary>
         public void ShowNotification(string message, float duration = 3f)
         {
             Debug.Log($"Notification: {message}");
-            // TODO: Implement notification popup
-            StartCoroutine(ShowNotificationCoroutine(message, duration));
+            
+            // Add notification to queue
+            notificationQueue.Enqueue(message);
+            
+            // Start showing notifications if not already showing
+            if (!isShowingNotification)
+            {
+                StartCoroutine(ShowNotificationCoroutine(duration));
+            }
         }
 
-        private System.Collections.IEnumerator ShowNotificationCoroutine(string message, float duration)
+        private System.Collections.IEnumerator ShowNotificationCoroutine(float duration)
         {
-            // Placeholder - would show a temporary notification
-            yield return new WaitForSeconds(duration);
+            isShowingNotification = true;
+            
+            while (notificationQueue.Count > 0)
+            {
+                string message = notificationQueue.Dequeue();
+                
+                // If notification panel exists, use it
+                if (notificationPanel != null && notificationText != null)
+                {
+                    notificationText.text = message;
+                    notificationPanel.SetActive(true);
+                    
+                    // Get or add CanvasGroup for fading
+                    CanvasGroup canvasGroup = notificationPanel.GetComponent<CanvasGroup>();
+                    if (canvasGroup == null)
+                    {
+                        canvasGroup = notificationPanel.AddComponent<CanvasGroup>();
+                    }
+                    
+                    // Fade in
+                    float fadeTime = 0.3f;
+                    for (float t = 0; t < fadeTime; t += Time.deltaTime)
+                    {
+                        canvasGroup.alpha = t / fadeTime;
+                        yield return null;
+                    }
+                    canvasGroup.alpha = 1f;
+                    
+                    // Wait for display duration
+                    yield return new WaitForSeconds(duration);
+                    
+                    // Fade out
+                    for (float t = 0; t < fadeTime; t += Time.deltaTime)
+                    {
+                        canvasGroup.alpha = 1f - (t / fadeTime);
+                        yield return null;
+                    }
+                    canvasGroup.alpha = 0f;
+                    
+                    notificationPanel.SetActive(false);
+                }
+                else
+                {
+                    // Fallback: just log and wait
+                    Debug.LogWarning("Notification panel not configured in UIManager");
+                    yield return new WaitForSeconds(duration);
+                }
+            }
+            
+            isShowingNotification = false;
         }
     }
 }

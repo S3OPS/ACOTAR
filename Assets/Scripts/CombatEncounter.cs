@@ -28,6 +28,11 @@ namespace ACOTAR
         public int turnNumber;
         public int currentEnemyIndex;
 
+        // Reward tracking
+        public int totalExperienceReward { get; private set; }
+        public int totalGoldReward { get; private set; }
+        public List<string> totalLootDrops { get; private set; }
+
         private List<string> combatLog;
 
         /// <summary>
@@ -41,6 +46,9 @@ namespace ACOTAR
             this.turnNumber = 0;
             this.currentEnemyIndex = 0;
             this.combatLog = new List<string>();
+            this.totalLootDrops = new List<string>();
+            this.totalExperienceReward = 0;
+            this.totalGoldReward = 0;
         }
 
         /// <summary>
@@ -376,23 +384,30 @@ namespace ACOTAR
             // Trigger victory visual effects
             TriggerVictoryEffects();
 
-            // Grant experience
-            int totalXP = 0;
-            List<string> allLoot = new List<string>();
+            // Calculate and grant rewards
+            totalExperienceReward = 0;
+            totalGoldReward = 0;
+            totalLootDrops.Clear();
 
             foreach (Enemy enemy in enemies)
             {
-                totalXP += enemy.experienceReward;
+                totalExperienceReward += enemy.experienceReward;
+                totalGoldReward += enemy.goldReward;
                 List<string> loot = enemy.DropLoot();
-                allLoot.AddRange(loot);
+                totalLootDrops.AddRange(loot);
             }
 
-            player.GainExperience(totalXP);
-            LogMessage($"Gained {totalXP} experience!");
-
-            if (allLoot.Count > 0)
+            player.GainExperience(totalExperienceReward);
+            LogMessage($"Gained {totalExperienceReward} experience!");
+            
+            if (totalGoldReward > 0)
             {
-                LogMessage($"Loot dropped: {string.Join(", ", allLoot)}");
+                LogMessage($"Gained {totalGoldReward} gold!");
+            }
+
+            if (totalLootDrops.Count > 0)
+            {
+                LogMessage($"Loot dropped: {string.Join(", ", totalLootDrops)}");
             }
 
             GameEvents.TriggerCombatEnded(player, enemies, true);
