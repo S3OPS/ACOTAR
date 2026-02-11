@@ -224,7 +224,7 @@ Bonus Rewards (Optional):
    - Updated `DisplayObjectives()`
    - Bonus reward display logic
 
-**Total**: 232 new lines, 6 files modified
+**Total**: 652 new lines, 6 deletions, 8 files modified
 
 ---
 
