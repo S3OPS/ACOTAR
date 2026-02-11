@@ -86,6 +86,9 @@ namespace ACOTAR
             
             // Magical Item Recipes
             AddMagicalRecipes();
+            
+            // Food Recipes (Cooking Fire)
+            AddFoodRecipes();
         }
 
         /// <summary>
@@ -252,6 +255,161 @@ namespace ACOTAR
             amulet.requiredLevel = 4;
             amulet.craftingTime = 35;
             recipes[amulet.recipeId] = amulet;
+        }
+
+        /// <summary>
+        /// Add food crafting recipes (Cooking Fire)
+        /// </summary>
+        private void AddFoodRecipes()
+        {
+            // Fae Bread
+            CraftingRecipe faeBread = new CraftingRecipe(
+                "cook_fae_bread",
+                "Bake Fae Bread",
+                "food_fae_bread",
+                2
+            );
+            faeBread.AddMaterial("crafting_wheat", 3);
+            faeBread.AddMaterial("crafting_honey", 1);
+            faeBread.requiredStation = CraftingStationType.CookingFire;
+            faeBread.requiredLevel = 1;
+            faeBread.craftingTime = 10;
+            recipes[faeBread.recipeId] = faeBread;
+
+            // Roasted Meat
+            CraftingRecipe roastedMeat = new CraftingRecipe(
+                "cook_roasted_meat",
+                "Cook Roasted Meat",
+                "food_roasted_meat",
+                1
+            );
+            roastedMeat.AddMaterial("crafting_raw_meat", 1);
+            roastedMeat.AddMaterial("crafting_herbs", 1);
+            roastedMeat.requiredStation = CraftingStationType.CookingFire;
+            roastedMeat.requiredLevel = 1;
+            roastedMeat.craftingTime = 8;
+            recipes[roastedMeat.recipeId] = roastedMeat;
+
+            // Vegetable Stew
+            CraftingRecipe vegStew = new CraftingRecipe(
+                "cook_vegetable_stew",
+                "Prepare Vegetable Stew",
+                "food_vegetable_stew",
+                1
+            );
+            vegStew.AddMaterial("crafting_vegetables", 3);
+            vegStew.AddMaterial("crafting_water", 1);
+            vegStew.AddMaterial("crafting_herbs", 1);
+            vegStew.requiredStation = CraftingStationType.CookingFire;
+            vegStew.requiredLevel = 2;
+            vegStew.craftingTime = 12;
+            recipes[vegStew.recipeId] = vegStew;
+
+            // Honey Cakes
+            CraftingRecipe honeyCakes = new CraftingRecipe(
+                "cook_honey_cakes",
+                "Bake Honey Cakes",
+                "food_honey_cakes",
+                3
+            );
+            honeyCakes.AddMaterial("crafting_wheat", 2);
+            honeyCakes.AddMaterial("crafting_honey", 2);
+            honeyCakes.AddMaterial("crafting_butter", 1);
+            honeyCakes.requiredStation = CraftingStationType.CookingFire;
+            honeyCakes.requiredLevel = 2;
+            honeyCakes.craftingTime = 15;
+            recipes[honeyCakes.recipeId] = honeyCakes;
+
+            // Herbal Tea
+            CraftingRecipe herbalTea = new CraftingRecipe(
+                "cook_herbal_tea",
+                "Brew Herbal Tea",
+                "food_herbal_tea",
+                1
+            );
+            herbalTea.AddMaterial("crafting_herbs", 2);
+            herbalTea.AddMaterial("crafting_water", 1);
+            herbalTea.requiredStation = CraftingStationType.CookingFire;
+            herbalTea.requiredLevel = 1;
+            herbalTea.craftingTime = 5;
+            recipes[herbalTea.recipeId] = herbalTea;
+
+            // Fae Wine
+            CraftingRecipe faeWine = new CraftingRecipe(
+                "cook_fae_wine",
+                "Ferment Fae Wine",
+                "food_starlight_wine",
+                1
+            );
+            faeWine.AddMaterial("crafting_grapes", 5);
+            faeWine.AddMaterial("crafting_sugar", 2);
+            faeWine.AddMaterial("crafting_moonwater", 1);
+            faeWine.requiredStation = CraftingStationType.CookingFire;
+            faeWine.requiredLevel = 3;
+            faeWine.craftingTime = 20;
+            recipes[faeWine.recipeId] = faeWine;
+
+            // Forest Mushroom Soup
+            CraftingRecipe mushroomSoup = new CraftingRecipe(
+                "cook_mushroom_soup",
+                "Cook Mushroom Soup",
+                "food_mushroom_soup",
+                1
+            );
+            mushroomSoup.AddMaterial("crafting_mushrooms", 4);
+            mushroomSoup.AddMaterial("crafting_water", 1);
+            mushroomSoup.AddMaterial("crafting_herbs", 2);
+            mushroomSoup.requiredStation = CraftingStationType.CookingFire;
+            mushroomSoup.requiredLevel = 2;
+            mushroomSoup.craftingTime = 10;
+            recipes[mushroomSoup.recipeId] = mushroomSoup;
+
+            // Strength Stew (Buff Food)
+            CraftingRecipe strengthStew = new CraftingRecipe(
+                "cook_strength_stew",
+                "Prepare Strength Stew",
+                "food_strength_stew",
+                1
+            );
+            strengthStew.AddMaterial("crafting_raw_meat", 2);
+            strengthStew.AddMaterial("crafting_vegetables", 2);
+            strengthStew.AddMaterial("crafting_power_herb", 1);
+            strengthStew.requiredStation = CraftingStationType.CookingFire;
+            strengthStew.requiredLevel = 4;
+            strengthStew.craftingTime = 18;
+            recipes[strengthStew.recipeId] = strengthStew;
+
+            // Mage's Delight (Magic Buff Food)
+            CraftingRecipe magesDelight = new CraftingRecipe(
+                "cook_mages_delight",
+                "Prepare Mage's Delight",
+                "food_mages_delight",
+                1
+            );
+            magesDelight.AddMaterial("crafting_mushrooms", 3);
+            magesDelight.AddMaterial("crafting_moonwater", 1);
+            magesDelight.AddMaterial("crafting_magic_herb", 2);
+            magesDelight.requiredStation = CraftingStationType.CookingFire;
+            magesDelight.requiredLevel = 4;
+            magesDelight.craftingTime = 18;
+            recipes[magesDelight.recipeId] = magesDelight;
+
+            // Traveler's Rations
+            CraftingRecipe rations = new CraftingRecipe(
+                "cook_travelers_rations",
+                "Pack Traveler's Rations",
+                "food_travelers_rations",
+                3
+            );
+            rations.AddMaterial("food_fae_bread", 1);
+            rations.AddMaterial("crafting_dried_meat", 1);
+            rations.AddMaterial("crafting_nuts", 1);
+            rations.requiredStation = CraftingStationType.CookingFire;
+            rations.requiredLevel = 1;
+            rations.craftingTime = 5;
+            recipes[rations.recipeId] = rations;
+
+            Debug.Log("Initialized 10 cooking recipes");
         }
 
         /// <summary>
