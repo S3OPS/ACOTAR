@@ -1,6 +1,6 @@
 # ACOTAR Fantasy RPG
 
-**Version 2.1.0** | **Book 1 Release-Ready with Enhanced Features** ✨
+**Version 2.3.0** | **Economy, Party Combat & Cooking Systems** ✨
 
 A lore-accurate Fantasy RPG based on Sarah J. Maas's *A Court of Thorns and Roses* series, built with Unity and Docker.
 
@@ -54,7 +54,66 @@ Experience the epic conclusion to the trilogy:
 
 ## 🎮 Features
 
-### 🆕 Enhanced Features (v2.1.0)
+### 🆕 New in v2.3.0 - Economy & Party Combat
+- **Shop/Merchant Trading System**:
+  - 7 merchants across Prythian with unique inventories
+  - Merchant types: General Goods, Weaponsmith, Armorer, Enchanter, Alchemist, Provisions, Curiosities
+  - Reputation-based pricing (10-50% discounts based on court standing)
+  - Buy and sell items with dynamic pricing
+  - Court-specific merchant access requirements
+  
+- **Full Party Combat**:
+  - Companions actively fight alongside player in battles
+  - Role-based AI: Tank (protect party), DPS (high damage), Support (healing), Balanced
+  - Loyalty affects companion combat effectiveness (±20%)
+  - Smart targeting: Tanks focus on strongest enemies, DPS eliminates weak targets
+  - Party survives if any member remains alive
+  
+- **Cooking & Food Buff System**:
+  - 10 cooking recipes at Cooking Fire station
+  - Time-based food buffs: Health/Mana regeneration, Stat boosts
+  - Basic foods: Fae Bread, Roasted Meat, Vegetable Stew, Honey Cakes, Herbal Tea
+  - Premium foods: Strength Stew, Mage's Delight, Mushroom Soup, Fae Wine
+  - Buff stacking and refresh mechanics
+  - Buffs persist over time (30-120 seconds)
+
+### 🎨 Enhanced Features (v2.2.0)
+- **Advanced Inventory System**: 
+  - Smart sorting by Name, Type, Rarity, Value, and Power
+  - Item tooltips with rarity-colored names and detailed stats
+  - Mouse-following tooltips with screen-edge detection
+  
+- **Magic Ability Management**:
+  - Cooldown system for all 16 magic types (prevents ability spam)
+  - Mana cost system with strategic resource management
+  - Real-time cooldown tracking and visual indicators
+  
+- **Status Effect Visualization**:
+  - Visual icons for all 14 status effect types
+  - Color-coded buffs (green) and debuffs (red)
+  - Tooltips showing effect duration and details
+  
+- **Automatic Title Awarding**:
+  - Smart title system that awards based on story events
+  - 25 titles with automatic quest and combat triggers
+  - UI notifications when titles are earned
+  
+- **Reputation System UI**:
+  - Visual progress bars for all seven courts
+  - Detailed benefits and penalties display
+  - Court-specific colors and reputation tracking
+  
+- **Enhanced Notifications**:
+  - Queue-based notification system with smooth fade effects
+  - Multiple notifications with graceful transitions
+  - Non-intrusive popup messages
+  
+- **Combat Improvements**:
+  - Actual reward display (XP, gold, loot) instead of placeholders
+  - Optimized combat log with StringBuilder performance
+  - Better reward tracking and presentation
+
+### 🎮 Core Features (v2.1.0)
 - **Companion Special Abilities**: Each of the 9 companions has unique special moves
   - Rhysand: Mind Shatter (Daemati attack), Darkness Shroud (party protection)
   - Cassian: Siphon Blast (massive damage), War Cry (party strength buff)
@@ -487,15 +546,16 @@ This is a fan project based on the ACOTAR series. Contributions are welcome!
 
 ## 📊 Project Statistics
 
-### Base Game (Book 1) - Enhanced v2.1.0
+### Base Game (Book 1) - Enhanced v2.2.0
 - **Quests**: 26+ main and side quests (6 new quests added)
 - **Story Arcs**: 4 complete arcs
 - **XP Available**: ~6,250 XP
 - **Locations**: 4 (Human Lands, The Wall, Spring Court Manor, Under the Mountain)
 - **Key Characters**: 5 (Tamlin, Lucien, Rhysand, Amarantha, Alis)
-- **NEW: Equipment**: 14+ new items (weapons, armor, consumables, magical items)
-- **NEW: Companion Abilities**: 18 special moves across 9 companions
-- **NEW: Character Titles**: 13 unlockable titles for Book 1
+- **Equipment**: 14+ new items (weapons, armor, consumables, magical items)
+- **Companion Abilities**: 18 special moves across 9 companions
+- **Character Titles**: 13 unlockable titles for Book 1
+- **NEW: UI Systems**: Advanced inventory sorting, tooltips, notifications
 
 ### DLC 1: Mist and Fury (Book 2) - Enhanced
 - **Quests**: 37 quests (6 new quests added)
@@ -503,7 +563,7 @@ This is a fan project based on the ACOTAR series. Contributions are welcome!
 - **XP Available**: 11,350 XP
 - **New Locations**: 8
 - **New Characters**: 8
-- **NEW: Team Combos**: 5 powerful combo attacks
+- **Team Combos**: 5 powerful combo attacks
 
 ### DLC 2: Wings and Ruin (Book 3) - Enhanced
 - **Quests**: 36 quests (6 new quests added)
@@ -511,29 +571,33 @@ This is a fan project based on the ACOTAR series. Contributions are welcome!
 - **XP Available**: 12,900 XP
 - **New Locations**: 6
 - **New Characters**: 10
-- **NEW: Enhanced Abilities**: Valkyrie powers and advanced combos
+- **Enhanced Abilities**: Valkyrie powers and advanced combos
 
-### Total (with all DLC) - v2.1.0 Enhanced
-- **Total Lines of Code**: 22,000+
-- **Game Systems**: 41 complete systems (3 new: Companion Abilities, Character Progression, Enhanced Items)
-- **UI Panels**: 10 complete panels
+### Total (with all DLC) - v2.3.0 Complete Edition
+- **Total Lines of Code**: 30,000+
+- **Game Systems**: 51 complete systems (NEW v2.3: Shop/Merchants, Party Combat, Food Buffs)
+- **UI Panels**: 12 complete panels (NEW: Shop UI)
 - **Character Classes**: 6 classes
-- **Magic Types**: 16 abilities
-- **Status Effects**: 14 buff/debuff types
+- **Magic Types**: 16 abilities with cooldown management
+- **Status Effects**: 14 buff/debuff types with visual indicators
+- **Food Buffs**: 6 buff types (Health/Mana Regen, Str/Mag/Agi/Def Boosts)
 - **Elements**: 8 elemental types with interactions
 - **Difficulty Levels**: 4 (Story, Normal, Hard, Nightmare)
 - **Currency Types**: 3 (Gold, Fae Crystals, Court Tokens)
 - **Locations**: 20+ unique places
-- **Quests**: 99 main and side quests (18 new quests added)
+- **Merchants**: 7 merchants with court-specific inventories
+- **Quests**: 99 main and side quests
 - **Enemies**: 8 creature types
-- **Companions**: 9 legendary characters with special abilities
+- **Companions**: 9 legendary characters with combat AI
 - **Companion Special Moves**: 18 unique abilities
+- **Companion Combat Roles**: 4 AI behaviors (Tank, DPS, Support, Balanced)
 - **Team Combos**: 9 powerful team attacks
-- **Character Titles**: 25 unlockable progression titles
+- **Character Titles**: 25 unlockable progression titles with auto-awarding
 - **Skill Categories**: 6 mastery tracks with 6 progression levels each
-- **Equipment Items**: 50+ weapons, armor, consumables, and magical items (14+ new)
-- **Crafting Recipes**: 15+ items
-- **Crafting Materials**: 20+ materials
+- **Equipment Items**: 50+ weapons, armor, consumables, and magical items
+- **Crafting Recipes**: 25+ items (NEW: 10 cooking recipes)
+- **Crafting Stations**: 5 (Workbench, Forge, Alchemy, Enchanting, Cooking Fire)
+- **Crafting Materials**: 30+ materials
 - **Save Slots**: 5 with auto-save
 - **Story Arcs**: 10 defined arcs
 - **Total Quest XP**: 30,500 XP available

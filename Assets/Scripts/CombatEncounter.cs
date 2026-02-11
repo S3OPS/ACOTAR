@@ -23,24 +23,36 @@ namespace ACOTAR
     public class CombatEncounter
     {
         public Character player;
+        public List<Companion> activeCompanions; // Party members fighting alongside player
         public List<Enemy> enemies;
         public EncounterState state;
         public int turnNumber;
         public int currentEnemyIndex;
+        public int currentCompanionIndex; // For companion turn order
+
+        // Reward tracking
+        public int totalExperienceReward { get; private set; }
+        public int totalGoldReward { get; private set; }
+        public List<string> totalLootDrops { get; private set; }
 
         private List<string> combatLog;
 
         /// <summary>
-        /// Initialize a new combat encounter
+        /// Initialize a new combat encounter with optional companions
         /// </summary>
-        public CombatEncounter(Character player, List<Enemy> enemies)
+        public CombatEncounter(Character player, List<Enemy> enemies, List<Companion> companions = null)
         {
             this.player = player;
+            this.activeCompanions = companions ?? new List<Companion>();
             this.enemies = enemies;
             this.state = EncounterState.NotStarted;
             this.turnNumber = 0;
             this.currentEnemyIndex = 0;
+            this.currentCompanionIndex = 0;
             this.combatLog = new List<string>();
+            this.totalLootDrops = new List<string>();
+            this.totalExperienceReward = 0;
+            this.totalGoldReward = 0;
         }
 
         /// <summary>
@@ -52,6 +64,12 @@ namespace ACOTAR
             turnNumber = 1;
             LogMessage("=== Combat Encounter Started ===");
             LogMessage($"Enemies: {GetEnemyListString()}");
+            
+            if (activeCompanions.Count > 0)
+            {
+                LogMessage($"Party: {player.name} + {GetCompanionListString()}");
+            }
+            
             GameEvents.TriggerCombatStarted(player, enemies);
         }
 
@@ -172,9 +190,225 @@ namespace ACOTAR
                 return;
             }
 
+            // Execute companion turns if there are active companions
+            if (activeCompanions.Count > 0)
+            {
+                ExecuteCompanionTurns();
+                
+                if (CheckVictory())
+                {
+                    HandleVictory();
+                    return;
+                }
+            }
+
             state = EncounterState.EnemyTurn;
             currentEnemyIndex = 0;
             ExecuteEnemyTurns();
+        }
+
+        /// <summary>
+        /// Execute all companion turns
+        /// </summary>
+        private void ExecuteCompanionTurns()
+        {
+            LogMessage("\n=== Companion Actions ===");
+            
+            foreach (Companion companion in activeCompanions)
+            {
+                if (companion.IsAlive())
+                {
+                    ExecuteCompanionAI(companion);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Execute AI behavior for a companion
+        /// </summary>
+        private void ExecuteCompanionAI(Companion companion)
+        {
+            if (enemies.Count == 0)
+                return;
+
+            // Choose target based on companion role
+            Enemy target = SelectCompanionTarget(companion);
+            if (target == null || !target.IsAlive())
+                return;
+
+            // Loyalty affects damage
+            float loyaltyMultiplier = companion.GetLoyaltyBonus();
+
+            // Choose action based on role
+            switch (companion.role)
+            {
+                case CompanionRole.Tank:
+                    ExecuteTankAction(companion, target, loyaltyMultiplier);
+                    break;
+                case CompanionRole.DPS:
+                    ExecuteDPSAction(companion, target, loyaltyMultiplier);
+                    break;
+                case CompanionRole.Support:
+                    ExecuteSupportAction(companion, loyaltyMultiplier);
+                    break;
+                default:
+                    ExecuteBalancedCompanionAction(companion, target, loyaltyMultiplier);
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Select target for companion based on role
+        /// </summary>
+        private Enemy SelectCompanionTarget(Companion companion)
+        {
+            if (enemies.Count == 0)
+                return null;
+
+            switch (companion.role)
+            {
+                case CompanionRole.Tank:
+                    // Tanks target strongest enemy to protect party
+                    Enemy strongestEnemy = enemies[0];
+                    foreach (Enemy enemy in enemies)
+                    {
+                        if (enemy.IsAlive() && enemy.strength > strongestEnemy.strength)
+                        {
+                            strongestEnemy = enemy;
+                        }
+                    }
+                    return strongestEnemy;
+
+                case CompanionRole.DPS:
+                    // DPS targets weakest enemy to eliminate quickly
+                    Enemy weakestEnemy = null;
+                    foreach (Enemy enemy in enemies)
+                    {
+                        if (enemy.IsAlive())
+                        {
+                            if (weakestEnemy == null || enemy.health < weakestEnemy.health)
+                            {
+                                weakestEnemy = enemy;
+                            }
+                        }
+                    }
+                    return weakestEnemy;
+
+                default:
+                    // Default: target first alive enemy
+                    foreach (Enemy enemy in enemies)
+                    {
+                        if (enemy.IsAlive())
+                            return enemy;
+                    }
+                    return null;
+            }
+        }
+
+        /// <summary>
+        /// Tank action - protect and taunt
+        /// </summary>
+        private void ExecuteTankAction(Companion companion, Enemy target, float loyaltyMultiplier)
+        {
+            CombatResult result = CombatSystem.CalculatePhysicalAttack(companion, target);
+            int damage = Mathf.RoundToInt(result.damage * loyaltyMultiplier);
+            target.TakeDamage(damage);
+            LogMessage($"{companion.name} (Tank) attacks {target.name} for {damage} damage!");
+            
+            CheckEnemyDefeated(target);
+        }
+
+        /// <summary>
+        /// DPS action - maximum damage
+        /// </summary>
+        private void ExecuteDPSAction(Companion companion, Enemy target, float loyaltyMultiplier)
+        {
+            // Try to use abilities if available
+            if (companion.abilities.KnownAbilities.Count > 0 && Random.value < 0.6f)
+            {
+                MagicType ability = companion.abilities.KnownAbilities[0];
+                CombatResult result = CombatSystem.CalculateMagicAttack(companion, target, ability);
+                int damage = Mathf.RoundToInt(result.damage * loyaltyMultiplier * 1.2f); // DPS bonus
+                target.TakeDamage(damage);
+                LogMessage($"{companion.name} (DPS) uses {ability} on {target.name} for {damage} damage!");
+            }
+            else
+            {
+                CombatResult result = CombatSystem.CalculatePhysicalAttack(companion, target);
+                int damage = Mathf.RoundToInt(result.damage * loyaltyMultiplier * 1.1f); // DPS bonus
+                target.TakeDamage(damage);
+                LogMessage($"{companion.name} (DPS) attacks {target.name} for {damage} damage!");
+            }
+            
+            CheckEnemyDefeated(target);
+        }
+
+        /// <summary>
+        /// Support action - heal or buff
+        /// </summary>
+        private void ExecuteSupportAction(Companion companion, float loyaltyMultiplier)
+        {
+            // Check if anyone needs healing
+            Character healTarget = null;
+            float lowestHealthPercent = 1f;
+
+            // Check player health
+            if (player.stats.health < player.stats.maxHealth * 0.7f)
+            {
+                float healthPercent = (float)player.stats.health / player.stats.maxHealth;
+                if (healthPercent < lowestHealthPercent)
+                {
+                    healTarget = player;
+                    lowestHealthPercent = healthPercent;
+                }
+            }
+
+            // Check companion health
+            foreach (Companion ally in activeCompanions)
+            {
+                if (ally != companion && ally.stats.health < ally.stats.maxHealth * 0.7f)
+                {
+                    float healthPercent = (float)ally.stats.health / ally.stats.maxHealth;
+                    if (healthPercent < lowestHealthPercent)
+                    {
+                        healTarget = ally;
+                        lowestHealthPercent = healthPercent;
+                    }
+                }
+            }
+
+            if (healTarget != null)
+            {
+                int healAmount = Mathf.RoundToInt(companion.stats.magicPower * loyaltyMultiplier);
+                healTarget.Heal(healAmount);
+                LogMessage($"{companion.name} (Support) heals {healTarget.name} for {healAmount} HP!");
+            }
+            else
+            {
+                // No one needs healing, attack weakest enemy
+                Enemy target = SelectCompanionTarget(companion);
+                if (target != null && target.IsAlive())
+                {
+                    CombatResult result = CombatSystem.CalculatePhysicalAttack(companion, target);
+                    int damage = Mathf.RoundToInt(result.damage * loyaltyMultiplier);
+                    target.TakeDamage(damage);
+                    LogMessage($"{companion.name} (Support) attacks {target.name} for {damage} damage!");
+                    CheckEnemyDefeated(target);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Balanced companion action
+        /// </summary>
+        private void ExecuteBalancedCompanionAction(Companion companion, Enemy target, float loyaltyMultiplier)
+        {
+            CombatResult result = CombatSystem.CalculatePhysicalAttack(companion, target);
+            int damage = Mathf.RoundToInt(result.damage * loyaltyMultiplier);
+            target.TakeDamage(damage);
+            LogMessage($"{companion.name} attacks {target.name} for {damage} damage!");
+            
+            CheckEnemyDefeated(target);
         }
 
         /// <summary>
@@ -340,10 +574,25 @@ namespace ACOTAR
 
         /// <summary>
         /// Check if player is defeated (public accessor)
+        /// Party is defeated if both player AND all companions are down
         /// </summary>
         public bool CheckDefeat()
         {
-            return !player.IsAlive();
+            // If player is alive, party is not defeated
+            if (player.IsAlive())
+                return false;
+
+            // If player is down, check if any companions are still fighting
+            foreach (Companion companion in activeCompanions)
+            {
+                if (companion.IsAlive())
+                {
+                    return false; // At least one companion can still fight
+                }
+            }
+
+            // Everyone is down
+            return true;
         }
 
         /// <summary>
@@ -376,23 +625,30 @@ namespace ACOTAR
             // Trigger victory visual effects
             TriggerVictoryEffects();
 
-            // Grant experience
-            int totalXP = 0;
-            List<string> allLoot = new List<string>();
+            // Calculate and grant rewards
+            totalExperienceReward = 0;
+            totalGoldReward = 0;
+            totalLootDrops.Clear();
 
             foreach (Enemy enemy in enemies)
             {
-                totalXP += enemy.experienceReward;
+                totalExperienceReward += enemy.experienceReward;
+                totalGoldReward += enemy.goldReward;
                 List<string> loot = enemy.DropLoot();
-                allLoot.AddRange(loot);
+                totalLootDrops.AddRange(loot);
             }
 
-            player.GainExperience(totalXP);
-            LogMessage($"Gained {totalXP} experience!");
-
-            if (allLoot.Count > 0)
+            player.GainExperience(totalExperienceReward);
+            LogMessage($"Gained {totalExperienceReward} experience!");
+            
+            if (totalGoldReward > 0)
             {
-                LogMessage($"Loot dropped: {string.Join(", ", allLoot)}");
+                LogMessage($"Gained {totalGoldReward} gold!");
+            }
+
+            if (totalLootDrops.Count > 0)
+            {
+                LogMessage($"Loot dropped: {string.Join(", ", totalLootDrops)}");
             }
 
             GameEvents.TriggerCombatEnded(player, enemies, true);
@@ -438,6 +694,19 @@ namespace ACOTAR
             foreach (Enemy enemy in enemies)
             {
                 names.Add(enemy.name);
+            }
+            return string.Join(", ", names);
+        }
+
+        /// <summary>
+        /// Get companion list as string
+        /// </summary>
+        private string GetCompanionListString()
+        {
+            List<string> names = new List<string>();
+            foreach (Companion companion in activeCompanions)
+            {
+                names.Add(companion.name);
             }
             return string.Join(", ", names);
         }

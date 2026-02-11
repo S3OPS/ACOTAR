@@ -627,6 +627,32 @@ namespace ACOTAR
         }
 
         /// <summary>
+        /// Set inventory order based on sorted items list
+        /// Used by UI sorting functionality
+        /// </summary>
+        public void SetSortedOrder(List<InventoryItem> sortedItems)
+        {
+            if (sortedItems == null || sortedItems.Count == 0)
+                return;
+
+            // Create a new sorted inventory list
+            var sortedInventory = new List<InventorySlot>();
+            
+            foreach (var sortedItem in sortedItems)
+            {
+                // Find the corresponding slot in current inventory
+                var slot = FindSlot(sortedItem.itemId);
+                if (slot != null)
+                {
+                    sortedInventory.Add(slot);
+                }
+            }
+            
+            // Replace current inventory with sorted version
+            inventory = sortedInventory;
+        }
+
+        /// <summary>
         /// Get total inventory slot count
         /// </summary>
         public int GetItemCount()

@@ -541,11 +541,19 @@ namespace ACOTAR
 
             if (victoryRewardsText != null && currentEncounter != null)
             {
-                // Display rewards
+                // Display actual rewards from combat encounter
                 string rewards = "Victory!\n\nRewards:\n";
-                // TODO: Get actual rewards from encounter
-                rewards += "Experience: ???\n";
-                rewards += "Gold: ???\n";
+                rewards += $"Experience: {currentEncounter.totalExperienceReward} XP\n";
+                rewards += $"Gold: {currentEncounter.totalGoldReward}\n";
+                
+                if (currentEncounter.totalLootDrops.Count > 0)
+                {
+                    rewards += $"\nLoot:\n";
+                    foreach (string loot in currentEncounter.totalLootDrops)
+                    {
+                        rewards += $"- {loot}\n";
+                    }
+                }
                 
                 victoryRewardsText.text = rewards;
             }

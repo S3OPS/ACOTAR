@@ -32,6 +32,14 @@ namespace ACOTAR
         public static event Action<Character, List<Enemy>> OnCombatStarted;
         public static event Action<Character, List<Enemy>, bool> OnCombatEnded;
 
+        // Commerce Events
+        public static event Action<string, int, string> OnItemPurchased; // itemId, price, merchantName
+        public static event Action<string, int, string> OnItemSold; // itemId, price, merchantName
+
+        // Companion Events
+        public static event Action<string> OnCompanionRecruited; // companionName
+        public static event Action<string, string> OnLocationDiscovered; // locationName, courtName
+
         // Trigger character created event
         public static void TriggerCharacterCreated(Character character)
         {
@@ -102,6 +110,30 @@ namespace ACOTAR
         public static void TriggerCombatEnded(Character player, List<Enemy> enemies, bool victory)
         {
             OnCombatEnded?.Invoke(player, enemies, victory);
+        }
+
+        // Trigger item purchased event
+        public static void TriggerItemPurchased(string itemId, int price, string merchantName)
+        {
+            OnItemPurchased?.Invoke(itemId, price, merchantName);
+        }
+
+        // Trigger item sold event
+        public static void TriggerItemSold(string itemId, int price, string merchantName)
+        {
+            OnItemSold?.Invoke(itemId, price, merchantName);
+        }
+
+        // Trigger companion recruited event
+        public static void TriggerCompanionRecruited(string companionName)
+        {
+            OnCompanionRecruited?.Invoke(companionName);
+        }
+
+        // Trigger location discovered event  
+        public static void TriggerLocationDiscovered(string locationName, string courtName)
+        {
+            OnLocationDiscovered?.Invoke(locationName, courtName);
         }
     }
 }
