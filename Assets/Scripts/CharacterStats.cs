@@ -149,11 +149,14 @@ namespace ACOTAR
         /// </summary>
         public int GetXPRequiredForNextLevel()
         {
+            // Ensure level is at least 1 to avoid Math.Pow edge cases
+            int effectiveLevel = Math.Max(1, level);
+            
             int baseXP = (int)(BalanceConfig.Progression.BASE_XP_PER_LEVEL * 
-                               Math.Pow(BalanceConfig.Progression.XP_LEVEL_MULTIPLIER, level - 1));
+                               Math.Pow(BalanceConfig.Progression.XP_LEVEL_MULTIPLIER, effectiveLevel - 1));
             
             // Apply early game scaling for better pacing
-            if (level <= BalanceConfig.Progression.EARLY_GAME_LEVEL_THRESHOLD)
+            if (effectiveLevel <= BalanceConfig.Progression.EARLY_GAME_LEVEL_THRESHOLD)
             {
                 baseXP = (int)(baseXP * BalanceConfig.Progression.EARLY_GAME_XP_SCALING);
             }

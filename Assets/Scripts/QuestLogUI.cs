@@ -11,6 +11,9 @@ namespace ACOTAR
     /// </summary>
     public class QuestLogUI : MonoBehaviour
     {
+        // v2.3.1: UI color constants
+        private static readonly Color OPTIONAL_OBJECTIVE_COLOR = new Color(1f, 0.8f, 0f); // Gold
+        
         [Header("Quest List")]
         public GameObject questListContainer;
         public GameObject questListItemPrefab;
@@ -382,7 +385,7 @@ namespace ACOTAR
                     {
                         separatorText.text = "\n--- Optional Challenges ---";
                         separatorText.fontStyle = FontStyle.Bold;
-                        separatorText.color = new Color(1f, 0.8f, 0f); // Gold color
+                        separatorText.color = OPTIONAL_OBJECTIVE_COLOR;
                     }
                     Button separatorButton = separatorItem.GetComponent<Button>();
                     if (separatorButton != null) separatorButton.interactable = false;
@@ -399,7 +402,7 @@ namespace ACOTAR
                         if (objectiveText != null)
                         {
                             objectiveText.text = $"★ {quest.optionalObjectives[i]}";
-                            objectiveText.color = new Color(1f, 0.8f, 0f); // Gold color for optional
+                            objectiveText.color = OPTIONAL_OBJECTIVE_COLOR;
                         }
                     }
                 }
