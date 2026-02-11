@@ -120,8 +120,6 @@ namespace ACOTAR
             riddle.bonusExperienceReward = 200;
             riddle.bonusGoldReward = 150;
             quests[riddle.questId] = riddle;
-            riddle.nextQuestId = "main_012";
-            quests[riddle.questId] = riddle;
 
             // Breaking the Curse
             Quest curse = new Quest(
