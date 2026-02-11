@@ -1,6 +1,6 @@
 # ACOTAR Fantasy RPG
 
-**Version 2.3.0** | **Economy, Party Combat & Cooking Systems** ✨
+**Version 2.3.1** | **Base Game Enhancements: Tutorials, Balance & Challenges** ✨
 
 A lore-accurate Fantasy RPG based on Sarah J. Maas's *A Court of Thorns and Roses* series, built with Unity and Docker.
 
@@ -24,6 +24,9 @@ Experience Feyre's complete journey in the first book:
 - **NEW: Enhanced Equipment**: 14+ new weapons, armor, and magical items
 - **NEW: Companion Abilities**: Special moves and team combos
 - **NEW: Character Progression**: Unlock titles, master skills, track achievements
+- **NEW v2.3.1: Optional Challenge Objectives**: Test your skills for bonus rewards
+- **NEW v2.3.1: Enhanced Tutorials**: 6 Book 1-focused help topics
+- **NEW v2.3.1: Progressive Boss Difficulty**: Amarantha is 33% tougher than trial bosses
 
 ### 📦 DLC 1: A Court of Mist and Fury (Book 2)
 *Requires base game*
@@ -53,6 +56,30 @@ Experience the epic conclusion to the trilogy:
 - **NEW: Valkyrie Abilities**: Unlock Nesta's ultimate powers
 
 ## 🎮 Features
+
+### 🆕 New in v2.3.1 - Base Game Enhancements
+- **Enhanced Tutorial System**:
+  - 6 new Book 1-focused help topics
+  - Detailed trial strategies and boss tactics
+  - Exact difficulty mode multipliers explained
+  - Combat strategy guide with party management tips
+  - Level-specific progression guidance (early/mid/late game)
+  - Spring Court location and NPC guide
+  
+- **Optional Challenge Objectives**:
+  - Add replayability to major Book 1 quests
+  - Bonus XP and Gold for completing challenges
+  - Trial 1: No damage + Speed clear (+100 XP, +50 Gold)
+  - Trial 2: No healing + Low damage (+125 XP, +75 Gold)
+  - Trial 3: Solve riddle + Show mercy (+150 XP, +100 Gold)
+  - Final Riddle: First attempt + Courage (+200 XP, +150 Gold)
+  - Clear UI display with gold star markers
+  
+- **Improved Progression Balance**:
+  - Early game XP curve smoothed (levels 1-3 require 20% more XP)
+  - Progressive boss difficulty: Amarantha is 33% tougher than trial bosses
+  - Better engagement through gradual power growth
+  - Named boss scaling: Wyrm → Naga → Amarantha
 
 ### 🆕 New in v2.3.0 - Economy & Party Combat
 - **Shop/Merchant Trading System**:
