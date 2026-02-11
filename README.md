@@ -1,6 +1,6 @@
 # ACOTAR Fantasy RPG
 
-**Version 2.0.0** | **Book 1 Release-Ready** ✨
+**Version 2.1.0** | **Book 1 Release-Ready with Enhanced Features** ✨
 
 A lore-accurate Fantasy RPG based on Sarah J. Maas's *A Court of Thorns and Roses* series, built with Unity and Docker.
 
@@ -17,35 +17,79 @@ Experience Feyre's complete journey in the first book:
 - **Complete Story Arc**: From mortal hunter to High Fae
 - **The Three Trials**: Face the Middengard Wyrm, solve riddles, and make impossible choices
 - **Under the Mountain**: Confront Amarantha and break the curse
-- **20+ Quests**: Main story and side quests
+- **26+ Quests**: Main story and enhanced side quests
 - **4 Story Arcs**: Human Lands, Spring Court, Under the Mountain, Aftermath
 - **Key Characters**: Tamlin, Lucien, Rhysand, Amarantha, Alis
 - **Locations**: Human Lands, The Wall, Spring Court Manor, Under the Mountain
+- **NEW: Enhanced Equipment**: 14+ new weapons, armor, and magical items
+- **NEW: Companion Abilities**: Special moves and team combos
+- **NEW: Character Progression**: Unlock titles, master skills, track achievements
 
 ### 📦 DLC 1: A Court of Mist and Fury (Book 2)
 *Requires base game*
 
 Continue Feyre's story in the Night Court:
-- **31 New Quests**: Night Court discovery, training, Summer Court heist, Hybern confrontation
+- **37+ New Quests**: Night Court discovery, training, Summer Court heist, Hybern confrontation
 - **3 Story Arcs**: Night Court, War Preparations, Hybern
 - **The Inner Circle**: Meet Cassian, Azriel, Mor, and Amren
 - **New Locations**: Velaris, House of Wind, Hewn City, Illyrian Mountains, Summer Court, Adriata, Hybern
 - **Become High Lady**: The first in Prythian history
 - **11,350 XP available**
+- **NEW: Enhanced Side Quests**: Explore Velaris, Library, and more
+- **NEW: Inner Circle Abilities**: Unlock powerful companion team combos
 
 ### 📦 DLC 2: A Court of Wings and Ruin (Book 3)
 *Requires base game + DLC 1*
 
 Experience the epic conclusion to the trilogy:
-- **30 New Quests**: Spy missions, alliance building, final war
+- **36+ New Quests**: Spy missions, alliance building, final war
 - **3 Story Arcs**: Alliance, War, Resolution
 - **Unite the Courts**: Forge alliances with all seven High Lords
 - **New Locations**: Dawn Court, Day Court, The Battlefield, The Prison
 - **New Characters**: Thesan, Helion, Kallias, Viviane, Beron, Eris, Vassa
 - **Epic Final Battle**: Defeat the King of Hybern and save Prythian
 - **12,900 XP available**
+- **NEW: Enhanced Court Quests**: Deep dive into each court's culture
+- **NEW: Valkyrie Abilities**: Unlock Nesta's ultimate powers
 
 ## 🎮 Features
+
+### 🆕 Enhanced Features (v2.1.0)
+- **Companion Special Abilities**: Each of the 9 companions has unique special moves
+  - Rhysand: Mind Shatter (Daemati attack), Darkness Shroud (party protection)
+  - Cassian: Siphon Blast (massive damage), War Cry (party strength buff)
+  - Azriel: Shadow Strike (stealth critical), Truth Teller (legendary dagger)
+  - Mor: Truth Burst (area magic), Court of Dreams (party buff)
+  - Amren: Ancient Wrath (powerful magic), Time Stop (stun all)
+  - Lucien: Spell Cleaver (break enemy magic), Fire Burst (area damage)
+  - Tamlin: Beast Form (transform), Natural Healing (self-heal)
+  - Nesta: Silver Flames (death magic), Valkyrie Strike (sword attack)
+  - Elain: Prophetic Vision (reveal weaknesses), Garden Blessing (heal over time)
+
+- **Team Combo Attacks**: 9 powerful combo moves requiring specific party combinations
+  - Court of Dreams Assault (Rhysand + Cassian + Azriel)
+  - Illyrian Legion Strike (All Illyrians)
+  - Queens of the Night (Mor + Amren + Nesta)
+  - Archeron Fury (Sisters + Feyre)
+  - Mating Bond Surge (Rhysand + Feyre)
+  - And 4 more unique combinations!
+
+- **Character Progression System**: Track your journey with meaningful rewards
+  - 25 Unlockable Titles (Curse Breaker, High Lady, Savior of Prythian, etc.)
+  - 6 Skill Mastery Categories (Combat, Magic, Stealth, Diplomacy, Crafting, Exploration)
+  - Progressive Skill Levels (Novice → Apprentice → Adept → Expert → Master → Grand Master)
+  - Comprehensive Statistics Tracking (quests, enemies, crafts, deaths, playtime)
+
+- **Enhanced Equipment System**: 14+ new items across all rarity tiers
+  - New Weapons: Spring Court Sword, Hunter's Longbow, Enchanted Fae Spear, Dagger of Shadows
+  - New Armor: Spring Leathers, Fae Cloak, High Fae Battle Armor, Night Court Silk
+  - New Consumables: Greater Healing Potions, Stamina Draughts, Fae Bread, Starlight Wine
+  - New Magical Items: Ash Wood Charm, Spring Blessing, Suriel's Eye Amulet, Star-blessed Pendant
+
+- **Expanded Quest Content**: 18 additional side quests across all content
+  - Base Game: 6 new quests (Gardens of Spring, Fire and Friendship, Hunter's Heritage, etc.)
+  - DLC 1: 6 new quests (Rainbow of Velaris, Ten Thousand Steps, Library Below, etc.)
+  - DLC 2: 6 new quests (Day Court Library, Winter Alliance, Prison exploration, etc.)
 
 ### Lore-Accurate Content
 - **Seven High Fae Courts**: Spring, Summer, Autumn, Winter, Night, Dawn, and Day
@@ -419,9 +463,10 @@ This is a fan project based on the ACOTAR series. Contributions are welcome!
 - ✅ **Phase 8**: Base Game Quality & Polish (Complete)
 - ✅ **Phase 9**: Audio & Atmosphere (Complete)
 - ✅ **Phase 10**: Book 1 Final Polish (Complete)
+- ✅ **Phase 11**: Enhanced Features & DLC Updates (Complete - v2.1.0)
 
-**Core Development**: 10/10 Phases Complete ✅  
-**Status**: Book 1 Release-Ready
+**Core Development**: 11/11 Phases Complete ✅  
+**Status**: Book 1 Release-Ready with Enhanced Features
 
 ### Areas for Contribution
 - Audio asset creation (music, SFX, ambient sounds)
@@ -442,30 +487,35 @@ This is a fan project based on the ACOTAR series. Contributions are welcome!
 
 ## 📊 Project Statistics
 
-### Base Game (Book 1)
-- **Quests**: 20+ main and side quests
+### Base Game (Book 1) - Enhanced v2.1.0
+- **Quests**: 26+ main and side quests (6 new quests added)
 - **Story Arcs**: 4 complete arcs
 - **XP Available**: ~6,250 XP
 - **Locations**: 4 (Human Lands, The Wall, Spring Court Manor, Under the Mountain)
 - **Key Characters**: 5 (Tamlin, Lucien, Rhysand, Amarantha, Alis)
+- **NEW: Equipment**: 14+ new items (weapons, armor, consumables, magical items)
+- **NEW: Companion Abilities**: 18 special moves across 9 companions
+- **NEW: Character Titles**: 13 unlockable titles for Book 1
 
-### DLC 1: Mist and Fury (Book 2)
-- **Quests**: 31 quests
+### DLC 1: Mist and Fury (Book 2) - Enhanced
+- **Quests**: 37 quests (6 new quests added)
 - **Story Arcs**: 3 arcs
 - **XP Available**: 11,350 XP
 - **New Locations**: 8
 - **New Characters**: 8
+- **NEW: Team Combos**: 5 powerful combo attacks
 
-### DLC 2: Wings and Ruin (Book 3)
-- **Quests**: 30 quests
+### DLC 2: Wings and Ruin (Book 3) - Enhanced
+- **Quests**: 36 quests (6 new quests added)
 - **Story Arcs**: 3 arcs
 - **XP Available**: 12,900 XP
 - **New Locations**: 6
 - **New Characters**: 10
+- **NEW: Enhanced Abilities**: Valkyrie powers and advanced combos
 
-### Total (with all DLC)
-- **Total Lines of Code**: 20,000+
-- **Game Systems**: 38 complete systems
+### Total (with all DLC) - v2.1.0 Enhanced
+- **Total Lines of Code**: 22,000+
+- **Game Systems**: 41 complete systems (3 new: Companion Abilities, Character Progression, Enhanced Items)
 - **UI Panels**: 10 complete panels
 - **Character Classes**: 6 classes
 - **Magic Types**: 16 abilities
@@ -474,9 +524,14 @@ This is a fan project based on the ACOTAR series. Contributions are welcome!
 - **Difficulty Levels**: 4 (Story, Normal, Hard, Nightmare)
 - **Currency Types**: 3 (Gold, Fae Crystals, Court Tokens)
 - **Locations**: 20+ unique places
-- **Quests**: 81 main and side quests
+- **Quests**: 99 main and side quests (18 new quests added)
 - **Enemies**: 8 creature types
-- **Companions**: 9 legendary characters
+- **Companions**: 9 legendary characters with special abilities
+- **Companion Special Moves**: 18 unique abilities
+- **Team Combos**: 9 powerful team attacks
+- **Character Titles**: 25 unlockable progression titles
+- **Skill Categories**: 6 mastery tracks with 6 progression levels each
+- **Equipment Items**: 50+ weapons, armor, consumables, and magical items (14+ new)
 - **Crafting Recipes**: 15+ items
 - **Crafting Materials**: 20+ materials
 - **Save Slots**: 5 with auto-save

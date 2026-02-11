@@ -481,6 +481,92 @@ namespace ACOTAR
             amrenQuest.objectives.Add("Understand her sacrifice");
             amrenQuest.experienceReward = 350;
             quests[amrenQuest.questId] = amrenQuest;
+
+            // NEW ENHANCED DLC 1 SIDE QUESTS
+            
+            // Velaris Exploration
+            Quest velarisExplore = new Quest(
+                "side_016_book2",
+                "Rainbow of Velaris",
+                "Explore the Rainbow district of Velaris and meet the artists and craftspeople.",
+                QuestType.ExplorationQuest
+            );
+            velarisExplore.objectives.Add("Visit the art galleries");
+            velarisExplore.objectives.Add("Meet the local artisans");
+            velarisExplore.objectives.Add("Commission a painting");
+            velarisExplore.experienceReward = 200;
+            velarisExplore.isDLCContent = true;
+            quests[velarisExplore.questId] = velarisExplore;
+
+            // House of Wind
+            Quest houseOfWind = new Quest(
+                "side_017_book2",
+                "The Ten Thousand Steps",
+                "Master the climb to the House of Wind and discover its secrets.",
+                QuestType.SideQuest
+            );
+            houseOfWind.objectives.Add("Climb all ten thousand steps");
+            houseOfWind.objectives.Add("Explore the House of Wind");
+            houseOfWind.objectives.Add("Learn to winnow to save time");
+            houseOfWind.experienceReward = 225;
+            houseOfWind.isDLCContent = true;
+            quests[houseOfWind.questId] = houseOfWind;
+
+            // Cassian Training Advanced
+            Quest cassianAdvanced = new Quest(
+                "side_018_book2",
+                "Wings of War",
+                "Undergo advanced combat training with Cassian and the Illyrians.",
+                QuestType.CompanionQuest
+            );
+            cassianAdvanced.objectives.Add("Learn Illyrian battle techniques");
+            cassianAdvanced.objectives.Add("Spar with experienced warriors");
+            cassianAdvanced.objectives.Add("Earn the respect of the legions");
+            cassianAdvanced.experienceReward = 300;
+            cassianAdvanced.isDLCContent = true;
+            quests[cassianAdvanced.questId] = cassianAdvanced;
+
+            // Library of Velaris
+            Quest library = new Quest(
+                "side_019_book2",
+                "The Library Below",
+                "Discover the vast library beneath the House of Wind and its priestesses.",
+                QuestType.ExplorationQuest
+            );
+            library.objectives.Add("Explore the library levels");
+            library.objectives.Add("Meet the priestess scholars");
+            library.objectives.Add("Research ancient magical texts");
+            library.experienceReward = 250;
+            library.isDLCContent = true;
+            quests[library.questId] = library;
+
+            // Night Court Politics
+            Quest politics = new Quest(
+                "side_020_book2",
+                "Court of Dreams",
+                "Learn to navigate the complex politics of the Night Court's two faces.",
+                QuestType.CourtQuest
+            );
+            politics.objectives.Add("Attend a Court of Dreams gathering");
+            politics.objectives.Add("Balance Velaris and Hewn City politics");
+            politics.objectives.Add("Understand Rhysand's dual role");
+            politics.experienceReward = 275;
+            politics.isDLCContent = true;
+            quests[politics.questId] = politics;
+
+            // Adriata Adventure
+            Quest adriata = new Quest(
+                "side_021_book2",
+                "By the Summer Sea",
+                "Explore Adriata, the jewel of the Summer Court, before the heist.",
+                QuestType.ExplorationQuest
+            );
+            adriata.objectives.Add("Tour the Summer Court capital");
+            adriata.objectives.Add("Visit the famous beaches");
+            adriata.objectives.Add("Sample Summer Court cuisine");
+            adriata.experienceReward = 200;
+            adriata.isDLCContent = true;
+            quests[adriata.questId] = adriata;
         }
 
         /// <summary>
