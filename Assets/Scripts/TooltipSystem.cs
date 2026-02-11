@@ -202,9 +202,9 @@ namespace ACOTAR
             stats.AppendLine($"Type: {item.itemType}");
             stats.AppendLine($"Rarity: {item.rarity}");
             
-            if (item.power > 0)
+            if (item.power != 0)
             {
-                stats.AppendLine($"Power: +{item.power}");
+                stats.AppendLine($"Power: {(item.power > 0 ? "+" : "")}{item.power}");
             }
             
             if (item.value > 0)

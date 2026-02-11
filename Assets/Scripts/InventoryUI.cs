@@ -415,7 +415,7 @@ namespace ACOTAR
             switch (sortOption)
             {
                 case 0: // Name (A-Z)
-                    sortedItems.Sort((a, b) => string.Compare(a.name, b.name, StringComparison.Ordinal));
+                    sortedItems.Sort((a, b) => string.Compare(a.name, b.name, StringComparison.OrdinalIgnoreCase));
                     Debug.Log("Sorted inventory by Name (A-Z)");
                     break;
                     
@@ -423,7 +423,7 @@ namespace ACOTAR
                     sortedItems.Sort((a, b) => 
                     {
                         int typeCompare = a.itemType.CompareTo(b.itemType);
-                        return typeCompare != 0 ? typeCompare : string.Compare(a.name, b.name, StringComparison.Ordinal);
+                        return typeCompare != 0 ? typeCompare : string.Compare(a.name, b.name, StringComparison.OrdinalIgnoreCase);
                     });
                     Debug.Log("Sorted inventory by Type");
                     break;
@@ -433,7 +433,7 @@ namespace ACOTAR
                     {
                         // Sort by rarity descending (Legendary first, Common last)
                         int rarityCompare = b.rarity.CompareTo(a.rarity);
-                        return rarityCompare != 0 ? rarityCompare : string.Compare(a.name, b.name, StringComparison.Ordinal);
+                        return rarityCompare != 0 ? rarityCompare : string.Compare(a.name, b.name, StringComparison.OrdinalIgnoreCase);
                     });
                     Debug.Log("Sorted inventory by Rarity (highest first)");
                     break;
@@ -442,7 +442,7 @@ namespace ACOTAR
                     sortedItems.Sort((a, b) => 
                     {
                         int valueCompare = b.value.CompareTo(a.value);
-                        return valueCompare != 0 ? valueCompare : string.Compare(a.name, b.name, StringComparison.Ordinal);
+                        return valueCompare != 0 ? valueCompare : string.Compare(a.name, b.name, StringComparison.OrdinalIgnoreCase);
                     });
                     Debug.Log("Sorted inventory by Value (highest first)");
                     break;
@@ -451,7 +451,7 @@ namespace ACOTAR
                     sortedItems.Sort((a, b) => 
                     {
                         int powerCompare = b.power.CompareTo(a.power);
-                        return powerCompare != 0 ? powerCompare : string.Compare(a.name, b.name, StringComparison.Ordinal);
+                        return powerCompare != 0 ? powerCompare : string.Compare(a.name, b.name, StringComparison.OrdinalIgnoreCase);
                     });
                     Debug.Log("Sorted inventory by Power (highest first)");
                     break;

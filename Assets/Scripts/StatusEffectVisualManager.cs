@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using System.Collections.Generic;
 
 namespace ACOTAR
@@ -218,11 +219,11 @@ namespace ACOTAR
     /// <summary>
     /// Component to handle tooltip display for status effect icons
     /// </summary>
-    public class StatusEffectTooltipTrigger : MonoBehaviour, UnityEngine.EventSystems.IPointerEnterHandler, UnityEngine.EventSystems.IPointerExitHandler
+    public class StatusEffectTooltipTrigger : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
         public StatusEffect statusEffect;
 
-        public void OnPointerEnter(UnityEngine.EventSystems.PointerEventData eventData)
+        public void OnPointerEnter(PointerEventData eventData)
         {
             if (statusEffect != null && TooltipSystem.Instance != null)
             {
@@ -241,7 +242,7 @@ namespace ACOTAR
             }
         }
 
-        public void OnPointerExit(UnityEngine.EventSystems.PointerEventData eventData)
+        public void OnPointerExit(PointerEventData eventData)
         {
             if (TooltipSystem.Instance != null)
             {

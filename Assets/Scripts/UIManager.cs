@@ -290,9 +290,9 @@ namespace ACOTAR
                     logBuilder.Clear();
                     for (int i = lines.Length - 10; i < lines.Length; i++)
                     {
-                        if (i > lines.Length - 10)
-                            logBuilder.AppendLine();
                         logBuilder.Append(lines[i]);
+                        if (i < lines.Length - 1)
+                            logBuilder.AppendLine();
                     }
                 }
                 
