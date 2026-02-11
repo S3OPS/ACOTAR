@@ -273,20 +273,30 @@ namespace ACOTAR
         }
 
         /// <summary>
-        /// Update combat log
+        /// Update combat log with optimized string handling
         /// </summary>
         public void UpdateCombatLog(string message)
         {
             if (combatLogText != null)
             {
-                combatLogText.text += message + "\n";
+                System.Text.StringBuilder logBuilder = new System.Text.StringBuilder(combatLogText.text);
+                logBuilder.AppendLine(message);
                 
-                // Limit log size
-                string[] lines = combatLogText.text.Split('\n');
+                // Limit log size to last 10 lines for performance
+                string fullLog = logBuilder.ToString();
+                string[] lines = fullLog.Split('\n');
                 if (lines.Length > 10)
                 {
-                    combatLogText.text = string.Join("\n", lines, lines.Length - 10, 10);
+                    logBuilder.Clear();
+                    for (int i = lines.Length - 10; i < lines.Length; i++)
+                    {
+                        if (i > lines.Length - 10)
+                            logBuilder.AppendLine();
+                        logBuilder.Append(lines[i]);
+                    }
                 }
+                
+                combatLogText.text = logBuilder.ToString();
             }
         }
 
