@@ -1,6 +1,6 @@
 # ACOTAR Fantasy RPG
 
-**Version 2.2.0** | **Enhanced with Advanced UI Systems** ✨
+**Version 2.3.0** | **Economy, Party Combat & Cooking Systems** ✨
 
 A lore-accurate Fantasy RPG based on Sarah J. Maas's *A Court of Thorns and Roses* series, built with Unity and Docker.
 
@@ -54,7 +54,30 @@ Experience the epic conclusion to the trilogy:
 
 ## 🎮 Features
 
-### 🆕 Enhanced Features (v2.2.0 - Latest Updates)
+### 🆕 New in v2.3.0 - Economy & Party Combat
+- **Shop/Merchant Trading System**:
+  - 7 merchants across Prythian with unique inventories
+  - Merchant types: General Goods, Weaponsmith, Armorer, Enchanter, Alchemist, Provisions, Curiosities
+  - Reputation-based pricing (10-50% discounts based on court standing)
+  - Buy and sell items with dynamic pricing
+  - Court-specific merchant access requirements
+  
+- **Full Party Combat**:
+  - Companions actively fight alongside player in battles
+  - Role-based AI: Tank (protect party), DPS (high damage), Support (healing), Balanced
+  - Loyalty affects companion combat effectiveness (±20%)
+  - Smart targeting: Tanks focus on strongest enemies, DPS eliminates weak targets
+  - Party survives if any member remains alive
+  
+- **Cooking & Food Buff System**:
+  - 10 cooking recipes at Cooking Fire station
+  - Time-based food buffs: Health/Mana regeneration, Stat boosts
+  - Basic foods: Fae Bread, Roasted Meat, Vegetable Stew, Honey Cakes, Herbal Tea
+  - Premium foods: Strength Stew, Mage's Delight, Mushroom Soup, Fae Wine
+  - Buff stacking and refresh mechanics
+  - Buffs persist over time (30-120 seconds)
+
+### 🎨 Enhanced Features (v2.2.0)
 - **Advanced Inventory System**: 
   - Smart sorting by Name, Type, Rarity, Value, and Power
   - Item tooltips with rarity-colored names and detailed stats
@@ -550,27 +573,31 @@ This is a fan project based on the ACOTAR series. Contributions are welcome!
 - **New Characters**: 10
 - **Enhanced Abilities**: Valkyrie powers and advanced combos
 
-### Total (with all DLC) - v2.2.0 Enhanced Edition
-- **Total Lines of Code**: 26,000+
-- **Game Systems**: 47 complete systems (NEW: Tooltips, Cooldowns, Status Visuals, Title Awards, Reputation UI, Notifications)
-- **UI Panels**: 11 complete panels (NEW: Reputation detailed view)
+### Total (with all DLC) - v2.3.0 Complete Edition
+- **Total Lines of Code**: 30,000+
+- **Game Systems**: 51 complete systems (NEW v2.3: Shop/Merchants, Party Combat, Food Buffs)
+- **UI Panels**: 12 complete panels (NEW: Shop UI)
 - **Character Classes**: 6 classes
 - **Magic Types**: 16 abilities with cooldown management
 - **Status Effects**: 14 buff/debuff types with visual indicators
+- **Food Buffs**: 6 buff types (Health/Mana Regen, Str/Mag/Agi/Def Boosts)
 - **Elements**: 8 elemental types with interactions
 - **Difficulty Levels**: 4 (Story, Normal, Hard, Nightmare)
 - **Currency Types**: 3 (Gold, Fae Crystals, Court Tokens)
 - **Locations**: 20+ unique places
-- **Quests**: 99 main and side quests (18 new quests added)
+- **Merchants**: 7 merchants with court-specific inventories
+- **Quests**: 99 main and side quests
 - **Enemies**: 8 creature types
-- **Companions**: 9 legendary characters with special abilities
+- **Companions**: 9 legendary characters with combat AI
 - **Companion Special Moves**: 18 unique abilities
+- **Companion Combat Roles**: 4 AI behaviors (Tank, DPS, Support, Balanced)
 - **Team Combos**: 9 powerful team attacks
 - **Character Titles**: 25 unlockable progression titles with auto-awarding
 - **Skill Categories**: 6 mastery tracks with 6 progression levels each
-- **Equipment Items**: 50+ weapons, armor, consumables, and magical items (14+ new)
-- **Crafting Recipes**: 15+ items
-- **Crafting Materials**: 20+ materials
+- **Equipment Items**: 50+ weapons, armor, consumables, and magical items
+- **Crafting Recipes**: 25+ items (NEW: 10 cooking recipes)
+- **Crafting Stations**: 5 (Workbench, Forge, Alchemy, Enchanting, Cooking Fire)
+- **Crafting Materials**: 30+ materials
 - **Save Slots**: 5 with auto-save
 - **Story Arcs**: 10 defined arcs
 - **Total Quest XP**: 30,500 XP available
