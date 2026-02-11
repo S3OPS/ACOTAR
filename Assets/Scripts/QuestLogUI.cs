@@ -317,6 +317,20 @@ namespace ACOTAR
                         rewards += $"  • {itemId}\n";
                     }
                 }
+                
+                // v2.3.1: Show optional objective bonus rewards
+                if (quest.optionalObjectives != null && quest.optionalObjectives.Count > 0)
+                {
+                    rewards += "\nBonus Rewards (Optional):\n";
+                    if (quest.bonusExperienceReward > 0)
+                    {
+                        rewards += $"- {quest.bonusExperienceReward} XP\n";
+                    }
+                    if (quest.bonusGoldReward > 0)
+                    {
+                        rewards += $"- {quest.bonusGoldReward} Gold\n";
+                    }
+                }
 
                 rewardsText.text = rewards;
             }
@@ -326,6 +340,7 @@ namespace ACOTAR
 
         /// <summary>
         /// Display quest objectives with checkboxes
+        /// Enhanced to show optional objectives (v2.3.1)
         /// </summary>
         private void DisplayObjectives(Quest quest)
         {
@@ -338,7 +353,7 @@ namespace ACOTAR
                 Destroy(child.gameObject);
             }
 
-            // Create objective items
+            // Create main objective items
             for (int i = 0; i < quest.objectives.Count; i++)
             {
                 if (objectivePrefab != null)
@@ -351,6 +366,41 @@ namespace ACOTAR
                         bool isComplete = i < quest.objectivesCompleted.Count && quest.objectivesCompleted[i];
                         string checkmark = isComplete ? "☑" : "☐";
                         objectiveText.text = $"{checkmark} {quest.objectives[i]}";
+                    }
+                }
+            }
+            
+            // v2.3.1: Display optional objectives if present
+            if (quest.optionalObjectives != null && quest.optionalObjectives.Count > 0)
+            {
+                // Add separator
+                if (objectivePrefab != null)
+                {
+                    GameObject separatorItem = Instantiate(objectivePrefab, objectivesContainer.transform);
+                    Text separatorText = separatorItem.GetComponentInChildren<Text>();
+                    if (separatorText != null)
+                    {
+                        separatorText.text = "\n--- Optional Challenges ---";
+                        separatorText.fontStyle = FontStyle.Bold;
+                        separatorText.color = new Color(1f, 0.8f, 0f); // Gold color
+                    }
+                    Button separatorButton = separatorItem.GetComponent<Button>();
+                    if (separatorButton != null) separatorButton.interactable = false;
+                }
+                
+                // Create optional objective items
+                for (int i = 0; i < quest.optionalObjectives.Count; i++)
+                {
+                    if (objectivePrefab != null)
+                    {
+                        GameObject objectiveItem = Instantiate(objectivePrefab, objectivesContainer.transform);
+                        
+                        Text objectiveText = objectiveItem.GetComponentInChildren<Text>();
+                        if (objectiveText != null)
+                        {
+                            objectiveText.text = $"★ {quest.optionalObjectives[i]}";
+                            objectiveText.color = new Color(1f, 0.8f, 0f); // Gold color for optional
+                        }
                     }
                 }
             }
