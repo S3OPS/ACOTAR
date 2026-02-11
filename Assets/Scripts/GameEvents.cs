@@ -38,7 +38,7 @@ namespace ACOTAR
 
         // Companion Events
         public static event Action<string> OnCompanionRecruited; // companionName
-        public static event Action<string> OnLocationDiscovered; // locationName, courtName
+        public static event Action<string, string> OnLocationDiscovered; // locationName, courtName
 
         // Trigger character created event
         public static void TriggerCharacterCreated(Character character)

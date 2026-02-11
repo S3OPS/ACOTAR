@@ -237,7 +237,7 @@ Loyalty 0-19:   -20% effectiveness
 2. **ShopUI.cs** - 530 lines
 3. **FoodBuffSystem.cs** - 350 lines
 
-**Enhanced Files** (2):
+**Enhanced Files** (3):
 1. **CombatEncounter.cs** - +257 lines (party combat)
 2. **CraftingSystem.cs** - +188 lines (cooking recipes)
 3. **GameEvents.cs** - +30 lines (commerce events)
