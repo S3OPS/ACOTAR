@@ -144,6 +144,7 @@ namespace ACOTAR
             // Book 1 Boss Scaling (v2.3.1) - Make story bosses progressively harder
             // Standard bosses use BOSS_MULTIPLIERS above
             // Named story bosses get additional scaling
+            // Format: [HP multiplier, Damage multiplier, XP multiplier, Gold multiplier]
             public static readonly float[] MIDDENGARD_WYRM_MULTIPLIERS = { 3.0f, 2.0f, 5.0f, 3.0f };  // First trial - standard boss
             public static readonly float[] NAGA_MULTIPLIERS = { 3.2f, 2.1f, 5.0f, 3.0f };  // Second trial - slightly harder
             public static readonly float[] AMARANTHA_MULTIPLIERS = { 4.0f, 2.5f, 6.0f, 4.0f };  // Final boss - significantly harder

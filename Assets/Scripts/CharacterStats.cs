@@ -150,6 +150,7 @@ namespace ACOTAR
         public int GetXPRequiredForNextLevel()
         {
             // Ensure level is at least 1 to avoid Math.Pow edge cases
+            // (negative exponents would produce fractional results)
             int effectiveLevel = Math.Max(1, level);
             
             int baseXP = (int)(BalanceConfig.Progression.BASE_XP_PER_LEVEL * 
