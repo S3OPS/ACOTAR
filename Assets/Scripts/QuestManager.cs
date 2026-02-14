@@ -25,6 +25,9 @@ namespace ACOTAR
         public List<string> optionalObjectives;
         public int bonusExperienceReward;  // Bonus XP for completing optional objectives
         public int bonusGoldReward;  // Bonus gold for completing optional objectives
+        
+        // v2.3.2: Combat preparation hints for boss fights
+        public string preparationHint;  // Strategic hint for challenging encounters
 
         public Quest(string id, string title, string desc, QuestType type)
         {
@@ -39,6 +42,7 @@ namespace ACOTAR
             this.optionalObjectives = new List<string>();
             this.bonusExperienceReward = 0;
             this.bonusGoldReward = 0;
+            this.preparationHint = "";  // v2.3.2
         }
     }
 

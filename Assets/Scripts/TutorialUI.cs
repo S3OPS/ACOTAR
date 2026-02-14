@@ -356,6 +356,29 @@ namespace ACOTAR
                 "• Support companions heal and buff\n" +
                 "• Loyalty affects effectiveness (80-120%)");
 
+            AddHelpTopic("Status Effects", "Combat",
+                "Understanding Status Effects (v2.3.2):\n\n" +
+                "OFFENSIVE EFFECTS:\n" +
+                "• Burning - Damage over time from fire\n" +
+                "• Frozen - Reduced movement and attack speed\n" +
+                "• Poisoned - Continuous HP drain\n" +
+                "• Stunned - Skip next turn\n" +
+                "• Weakened - Reduced damage output (-30%)\n\n" +
+                "DEFENSIVE EFFECTS:\n" +
+                "• Shielded - Absorbs damage before HP\n" +
+                "• Blessed - Increased defense (+20%)\n" +
+                "• Fortified - Immunity to status effects\n\n" +
+                "SPECIAL EFFECTS:\n" +
+                "• Cursed - All stats reduced by Amarantha\n" +
+                "• Empowered - Increased all stats during full moon\n" +
+                "• Regenerating - HP recovery over time\n\n" +
+                "Strategy Tips:\n" +
+                "• Cleanse negative effects with healing magic\n" +
+                "• Stack buffs before boss battles\n" +
+                "• Burning damage ignores armor\n" +
+                "• Status effects last 2-5 turns typically\n" +
+                "• Some enemies immune to certain effects");
+
             AddHelpTopic("Progression Tips", "Character System",
                 "Leveling Efficiently:\n\n" +
                 "Early Game (Levels 1-3):\n" +

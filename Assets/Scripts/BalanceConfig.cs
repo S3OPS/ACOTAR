@@ -10,8 +10,8 @@ namespace ACOTAR
     public static class BalanceConfig
     {
         // Version tracking
-        public const string BALANCE_VERSION = "2.0.0";
-        public const string LAST_UPDATED = "2026-01-29";
+        public const string BALANCE_VERSION = "2.3.2";
+        public const string LAST_UPDATED = "2026-02-14";
 
         #region Combat Balance
 
@@ -51,6 +51,11 @@ namespace ACOTAR
             // Turn-based
             public const int MAX_COMBAT_TURNS = 50;  // Prevent infinite battles
             public const float INITIATIVE_AGILITY_WEIGHT = 1.5f;
+            
+            // Combo System (v2.3.2)
+            public const float COMBO_DAMAGE_BONUS_PER_HIT = 0.10f;  // 10% bonus per consecutive hit
+            public const int COMBO_MAX_HITS = 5;  // Maximum combo multiplier (50% bonus at 5 hits)
+            public const int COMBO_DODGE_TOLERANCE = 1;  // Combo survives 1 dodge before resetting
         }
 
         #endregion
@@ -82,7 +87,7 @@ namespace ACOTAR
 
             // Human (Weak Start, High Growth)
             public const int HUMAN_HEALTH = 80;
-            public const int HUMAN_MAGIC = 0;
+            public const int HUMAN_MAGIC = 20;  // v2.3.2: Increased from 0 to enable basic abilities
             public const int HUMAN_STRENGTH = 50;
             public const int HUMAN_AGILITY = 60;
             public const float HUMAN_GROWTH_MULTIPLIER = 1.3f;  // 30% bonus growth
@@ -94,7 +99,7 @@ namespace ACOTAR
             public const int ATTOR_AGILITY = 110;
 
             // Suriel (Pure Caster)
-            public const int SURIEL_HEALTH = 70;
+            public const int SURIEL_HEALTH = 100;  // v2.3.2: Increased from 70 for better survivability
             public const int SURIEL_MAGIC = 150;
             public const int SURIEL_STRENGTH = 30;
             public const int SURIEL_AGILITY = 40;
@@ -141,13 +146,41 @@ namespace ACOTAR
             public const float ELITE_DROP_CHANCE = 0.85f;
             public const float BOSS_DROP_CHANCE = 1.0f;  // 100%
             
-            // Book 1 Boss Scaling (v2.3.1) - Make story bosses progressively harder
+            // Book 1 Boss Scaling (v2.3.2) - Make story bosses progressively harder
             // Standard bosses use BOSS_MULTIPLIERS above
-            // Named story bosses get additional scaling
+            // Named story bosses get additional scaling based on difficulty mode
             // Format: [HP multiplier, Damage multiplier, XP multiplier, Gold multiplier]
-            public static readonly float[] MIDDENGARD_WYRM_MULTIPLIERS = { 3.0f, 2.0f, 5.0f, 3.0f };  // First trial - standard boss
-            public static readonly float[] NAGA_MULTIPLIERS = { 3.2f, 2.1f, 5.0f, 3.0f };  // Second trial - slightly harder
-            public static readonly float[] AMARANTHA_MULTIPLIERS = { 4.0f, 2.5f, 6.0f, 4.0f };  // Final boss - significantly harder
+            
+            // Middengard Wyrm - First Trial Boss (Level 6-7)
+            public static readonly float[] MIDDENGARD_WYRM_MULTIPLIERS = { 3.0f, 2.0f, 5.0f, 3.0f };  // Standard boss
+            
+            // Naga - Second Trial Boss (Level 7-8)
+            public static readonly float[] NAGA_MULTIPLIERS = { 3.2f, 2.1f, 5.0f, 3.0f };  // Slightly harder (+7%)
+            
+            // Amarantha - Final Boss (Level 9-10)
+            // Base values for Normal mode
+            public static readonly float[] AMARANTHA_MULTIPLIERS = { 4.0f, 2.5f, 6.0f, 4.0f };  // Significantly harder (+33%)
+            
+            /// <summary>
+            /// Get Amarantha boss multipliers adjusted for difficulty mode (v2.3.2)
+            /// Makes final boss appropriately challenging for each difficulty
+            /// </summary>
+            public static float[] GetAmaranthaBossMultipliers(DifficultyLevel difficulty)
+            {
+                switch (difficulty)
+                {
+                    case DifficultyLevel.Story:
+                        return new float[] { 2.5f, 1.5f, 6.0f, 4.0f };  // Easier final boss for story mode
+                    case DifficultyLevel.Normal:
+                        return AMARANTHA_MULTIPLIERS;  // Standard challenge
+                    case DifficultyLevel.Hard:
+                        return new float[] { 5.0f, 3.0f, 7.0f, 5.0f };  // Tougher for hard mode
+                    case DifficultyLevel.Nightmare:
+                        return new float[] { 6.0f, 3.5f, 8.0f, 6.0f };  // Ultimate challenge
+                    default:
+                        return AMARANTHA_MULTIPLIERS;
+                }
+            }
         }
 
         #endregion
@@ -163,9 +196,10 @@ namespace ACOTAR
             public const int BASE_XP_PER_LEVEL = 100;
             public const float XP_LEVEL_MULTIPLIER = 1.15f;  // 15% increase per level
             
-            // Early game progression smoothing (v2.3.1)
-            public const float EARLY_GAME_XP_SCALING = 1.2f;  // Levels 1-3 require 20% more XP
-            public const int EARLY_GAME_LEVEL_THRESHOLD = 3;
+            // Early game progression smoothing (v2.3.2 - revised)
+            // Changed from 1.2f to 0.7f to REDUCE early grind and improve new player experience
+            public const float EARLY_GAME_XP_SCALING = 0.7f;  // Levels 1-5 require 30% LESS XP
+            public const int EARLY_GAME_LEVEL_THRESHOLD = 5;  // Extended to cover more early content
 
             // Stat growth per level
             public const int HEALTH_PER_LEVEL = 10;
@@ -184,6 +218,14 @@ namespace ACOTAR
             public const int EXPECTED_LEVEL_FIRST_TRIAL = 6;
             public const int EXPECTED_LEVEL_FINAL_TRIAL = 9;
             public const int EXPECTED_LEVEL_AMARANTHA = 10;
+            
+            // Story Milestone XP Bonuses (v2.3.2)
+            // Reward players for reaching major story points
+            public const int MILESTONE_CALANMAI_XP = 150;
+            public const int MILESTONE_UNDER_MOUNTAIN_XP = 200;
+            public const int MILESTONE_FIRST_TRIAL_XP = 250;
+            public const int MILESTONE_FINAL_TRIAL_XP = 300;
+            public const int MILESTONE_BREAK_CURSE_XP = 500;
         }
 
         #endregion
