@@ -1,6 +1,6 @@
 # ACOTAR Fantasy RPG
 
-**Version 2.3.1** | **Base Game Enhancements: Tutorials, Balance & Challenges** ✨
+**Version 2.3.2** | **Base Game Quality: Improved Progression & Class Balance** ✨
 
 A lore-accurate Fantasy RPG based on Sarah J. Maas's *A Court of Thorns and Roses* series, built with Unity and Docker.
 
@@ -27,6 +27,11 @@ Experience Feyre's complete journey in the first book:
 - **NEW v2.3.1: Optional Challenge Objectives**: Test your skills for bonus rewards
 - **NEW v2.3.1: Enhanced Tutorials**: 6 Book 1-focused help topics
 - **NEW v2.3.1: Progressive Boss Difficulty**: Amarantha is 33% tougher than trial bosses
+- **NEW v2.3.2: Improved Early Game**: 30% faster progression through levels 1-5
+- **NEW v2.3.2: Class Balance**: Human class starts with magic, Suriel has better survivability
+- **NEW v2.3.2: Boss Difficulty Scaling**: Amarantha adjusts to your difficulty mode
+- **NEW v2.3.2: Combat Preparation Hints**: Strategic guidance before boss fights
+- **NEW v2.3.2: Status Effects Guide**: New tutorial topic explaining all effects
 
 ### 📦 DLC 1: A Court of Mist and Fury (Book 2)
 *Requires base game*
@@ -56,6 +61,48 @@ Experience the epic conclusion to the trilogy:
 - **NEW: Valkyrie Abilities**: Unlock Nesta's ultimate powers
 
 ## 🎮 Features
+
+### 🆕 New in v2.3.2 - Base Game Quality Improvements
+- **Improved Early Game Progression**:
+  - Early levels (1-5) now require 30% LESS XP (down from 20% MORE)
+  - Reduces early game grind by approximately 2-3 hours
+  - Smoother leveling curve encourages exploration
+  - Better pacing for new players
+  
+- **Class Balance Improvements**:
+  - **Human Class**: Now starts with 20 magic (was 0) to enable basic abilities
+  - **Suriel Class**: Health increased to 100 (was 70) for better survivability
+  - Both underpowered classes now viable for all playstyles
+  
+- **Difficulty-Aware Boss Scaling**:
+  - Amarantha boss fight now scales with difficulty mode
+  - Story Mode: Easier final boss for story-focused players
+  - Normal Mode: Standard challenge (4.0x HP, 2.5x damage)
+  - Hard Mode: Increased challenge (5.0x HP, 3.0x damage)
+  - Nightmare Mode: Ultimate test (6.0x HP, 3.5x damage)
+  
+- **Combat System Enhancements**:
+  - Combo system values now clearly defined (10% per hit, max 5 hits = 50% bonus)
+  - Combo survives one dodge instead of resetting immediately
+  - Milestone XP bonuses for reaching story checkpoints
+  
+- **Enhanced Tutorial System**:
+  - New "Status Effects" help topic with complete effect guide
+  - Explains Burning, Frozen, Poisoned, Stunned, Weakened effects
+  - Covers defensive buffs and special effects
+  - Strategic tips for using and countering effects
+  
+- **Combat Preparation System**:
+  - Boss quests now include strategic hints
+  - Enemy type, level range, and tactical tips displayed
+  - Helps players prepare for major encounters
+  - Shows recommended abilities and strategies
+  
+- **Improved Quest System**:
+  - DLC content now properly gated until purchased
+  - Base game players only see Book 1 content
+  - Cleaner quest log without spoilers
+  - Better content organization
 
 ### 🆕 New in v2.3.1 - Base Game Enhancements
 - **Enhanced Tutorial System**:

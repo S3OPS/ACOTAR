@@ -34,6 +34,8 @@ namespace ACOTAR
             trial1.optionalObjectives.Add("Defeat the Wyrm in under 10 turns");
             trial1.bonusExperienceReward = 100;
             trial1.bonusGoldReward = 50;
+            // v2.3.2: Combat preparation hint
+            trial1.preparationHint = "⚔️ BOSS FIGHT AHEAD\nEnemy: Middengard Wyrm (Water Beast)\nLevel: 6-7 | Type: Physical\nTips: High HP, uses physical attacks. Bring healing potions. Defend when low on health.";
             quests[trial1.questId] = trial1;
 
             // Between Trials: Healing and Rhysand
@@ -67,6 +69,8 @@ namespace ACOTAR
             trial2.optionalObjectives.Add("Take less than 50 damage during the fight");
             trial2.bonusExperienceReward = 125;
             trial2.bonusGoldReward = 75;
+            // v2.3.2: Combat preparation hint
+            trial2.preparationHint = "⚔️ BOSS FIGHT AHEAD\nEnemy: Naga (Poison Serpent)\nLevel: 7-8 | Type: Poison/Magic\nTips: Uses poison attacks. Stock up on antidotes. High agility helps dodge. Magic weakness: Fire.";
             quests[trial2.questId] = trial2;
 
             // Between Trials: Clare Beddor
@@ -100,6 +104,8 @@ namespace ACOTAR
             trial3.optionalObjectives.Add("Show mercy and compassion despite the circumstances");
             trial3.bonusExperienceReward = 150;
             trial3.bonusGoldReward = 100;
+            // v2.3.2: Combat preparation hint
+            trial3.preparationHint = "⚔️ MORAL CHALLENGE\nTrial: Hearts of Stone\nLevel: 8-9 | Type: Decision-based\nTips: This trial tests your heart, not combat skills. Think carefully. Trust your instincts.";
             quests[trial3.questId] = trial3;
 
             // The Riddle
@@ -119,6 +125,8 @@ namespace ACOTAR
             riddle.optionalObjectives.Add("Maintain dignity and courage before Amarantha");
             riddle.bonusExperienceReward = 200;
             riddle.bonusGoldReward = 150;
+            // v2.3.2: Combat preparation hint
+            riddle.preparationHint = "⚔️ FINAL CHALLENGE\nChallenge: Amarantha's Riddle\nLevel: 9-10 | Type: Intelligence\nTips: What is the answer to everything? What motivated all your choices? The answer is in your heart.";
             quests[riddle.questId] = riddle;
 
             // Breaking the Curse
@@ -135,6 +143,8 @@ namespace ACOTAR
             curse.objectives.Add("Free Prythian from the curse");
             curse.experienceReward = 1500;
             curse.nextQuestId = "main_013";
+            // v2.3.2: Combat preparation hint
+            curse.preparationHint = "⚔️ ULTIMATE BOSS FIGHT\nEnemy: Amarantha (High Queen)\nLevel: 10 | Type: All Magic Types\nTips: Most powerful enemy in Book 1. Use all buffs. Companions recommended. Difficulty-scaled challenge.";
             quests[curse.questId] = curse;
 
             // Return to Spring Court
