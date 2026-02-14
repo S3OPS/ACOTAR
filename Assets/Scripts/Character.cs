@@ -105,6 +105,7 @@ namespace ACOTAR
             _stats.InitializeForClass(charClass);
             _abilitySystem = new AbilitySystem(charClass);
             _progression = new CharacterProgression();  // NEW: Initialize progression
+            _progression.SetCharacter(this);  // v2.3.3: Set character reference
             _manaSystem = new ManaSystem();  // v2.3.3: NEW - Initialize mana
             _manaSystem.Initialize(_stats.magicPower, _stats.level);
             
