@@ -215,5 +215,15 @@ namespace ACOTAR
             var bonuses = GameManager.Instance.inventory.GetEquipmentBonuses();
             _stats.UpdateEquipmentBonuses(bonuses.health, bonuses.magicPower, bonuses.strength, bonuses.agility);
         }
+
+        /// <summary>
+        /// Cleanup method to prevent memory leaks (v2.3.3: NEW)
+        /// Should be called when character is destroyed
+        /// </summary>
+        public void Cleanup()
+        {
+            // Unsubscribe from events to prevent memory leaks
+            GameEvents.OnEquipmentChanged -= UpdateEquipmentBonuses;
+        }
     }
 }

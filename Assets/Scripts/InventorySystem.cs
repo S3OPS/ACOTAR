@@ -741,11 +741,19 @@ namespace ACOTAR
         }
 
         /// <summary>
+        /// Check if GameManager and player are available (v2.3.3: Helper method)
+        /// </summary>
+        private bool IsGameManagerAvailable()
+        {
+            return GameManager.Instance != null && GameManager.Instance.player != null;
+        }
+
+        /// <summary>
         /// Apply item effects to player character (v2.3.3: Now actually applies effects)
         /// </summary>
         private void ApplyItemEffects(Item item)
         {
-            if (GameManager.Instance == null || GameManager.Instance.player == null)
+            if (!IsGameManagerAvailable())
             {
                 Debug.LogWarning("Cannot apply item effects: GameManager or player not found");
                 return;
