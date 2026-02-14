@@ -156,6 +156,7 @@ namespace ACOTAR
 
         /// <summary>
         /// Calculate magic attack damage with elemental system integration
+        /// v2.3.3: Enhanced with mana cost system
         /// </summary>
         public static CombatResult CalculateMagicAttack(Character attacker, Character defender, MagicType magicType, bool isPlayerAttack = true)
         {
@@ -168,6 +169,18 @@ namespace ACOTAR
             if (!attacker.HasAbility(magicType))
             {
                 return new CombatResult(0, DamageType.Magical, $"{attacker.name} doesn't know {magicType}!");
+            }
+
+            // v2.3.3: Check and consume mana
+            int manaCost = ManaSystem.GetManaCost(magicType);
+            if (!attacker.manaSystem.HasEnoughMana(manaCost))
+            {
+                return new CombatResult(0, DamageType.Magical, $"{attacker.name} doesn't have enough mana! Need {manaCost}, have {attacker.manaSystem.CurrentMana}");
+            }
+
+            if (!attacker.manaSystem.TryConsumeMana(manaCost))
+            {
+                return new CombatResult(0, DamageType.Magical, $"{attacker.name} failed to consume mana!");
             }
 
             // Base damage from magic power (v2.3.3: Use effective magic power)

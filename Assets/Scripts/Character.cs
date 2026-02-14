@@ -72,6 +72,7 @@ namespace ACOTAR
         private CharacterStats _stats;
         private AbilitySystem _abilitySystem;
         private CharacterProgression _progression;  // NEW: Progression system
+        private ManaSystem _manaSystem;  // v2.3.3: NEW - Mana management
 
         // Property accessors for stats (maintains compatibility)
         public int health { get { return _stats.health; } set { _stats.health = value; } }
@@ -89,6 +90,7 @@ namespace ACOTAR
         public CharacterStats stats { get { return _stats; } }
         public AbilitySystem abilitySystem { get { return _abilitySystem; } }
         public CharacterProgression progression { get { return _progression; } }  // NEW: Access to progression
+        public ManaSystem manaSystem { get { return _manaSystem; } }  // v2.3.3: NEW - Mana access
 
         public Character(string name, CharacterClass charClass, Court court)
         {
@@ -103,6 +105,8 @@ namespace ACOTAR
             _stats.InitializeForClass(charClass);
             _abilitySystem = new AbilitySystem(charClass);
             _progression = new CharacterProgression();  // NEW: Initialize progression
+            _manaSystem = new ManaSystem();  // v2.3.3: NEW - Initialize mana
+            _manaSystem.Initialize(_stats.magicPower, _stats.level);
             
             // Subscribe to equipment changes (v2.3.3: NEW)
             GameEvents.OnEquipmentChanged += UpdateEquipmentBonuses;
@@ -173,6 +177,11 @@ namespace ACOTAR
             int oldLevel = _stats.level;
             if (_stats.GainExperience(xp))
             {
+                // Update mana system on level up (v2.3.3: NEW)
+                _manaSystem.UpdateMaxMana(_stats.magicPower);
+                _manaSystem.UpdateManaRegen(_stats.level);
+                _manaSystem.RestoreToMax(); // Full mana on level up
+                
                 GameEvents.TriggerCharacterLevelUp(this, _stats.level);
                 
                 // Trigger level up visual effect
