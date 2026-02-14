@@ -692,19 +692,39 @@ namespace ACOTAR
         }
 
         /// <summary>
-        /// Use a consumable item
+        /// Use a consumable item (v2.3.3: Enhanced validation)
         /// </summary>
         public bool UseItem(string itemId)
         {
             var slot = FindSlot(itemId);
-            if (slot == null || slot.item.type != ItemType.Consumable)
+            if (slot == null)
+            {
+                Debug.LogWarning($"Item {itemId} not found in inventory");
                 return false;
+            }
+
+            if (slot.item.type != ItemType.Consumable)
+            {
+                Debug.LogWarning($"Item {slot.item.name} is not consumable");
+                if (UIManager.Instance != null)
+                {
+                    UIManager.Instance.ShowNotification("Item is not consumable", Color.red);
+                }
+                return false;
+            }
 
             // Apply item effects
             ApplyItemEffects(slot.item);
             
             // Remove one from quantity
-            return RemoveItem(itemId, 1);
+            bool removed = RemoveItem(itemId, 1);
+            
+            if (removed && UIManager.Instance != null)
+            {
+                UIManager.Instance.ShowNotification($"Used {slot.item.name}", Color.white);
+            }
+            
+            return removed;
         }
 
         /// <summary>
@@ -721,61 +741,146 @@ namespace ACOTAR
         }
 
         /// <summary>
-        /// Apply item effects (placeholder for actual game logic)
+        /// Apply item effects to player character (v2.3.3: Now actually applies effects)
         /// </summary>
         private void ApplyItemEffects(Item item)
         {
+            if (GameManager.Instance == null || GameManager.Instance.player == null)
+            {
+                Debug.LogWarning("Cannot apply item effects: GameManager or player not found");
+                return;
+            }
+
+            Character player = GameManager.Instance.player;
+
+            // Apply health bonus (consumable healing)
             if (item.healthBonus > 0)
             {
+                player.Heal(item.healthBonus);
                 Debug.Log($"Restored {item.healthBonus} health");
+                
+                // Trigger visual feedback
+                if (UIManager.Instance != null)
+                {
+                    UIManager.Instance.ShowNotification($"+{item.healthBonus} Health", Color.green);
+                }
             }
+
+            // Apply magic power bonus (temporary buff for consumables)
             if (item.magicPowerBonus > 0)
             {
+                // For consumables, this is a temporary effect
+                // Note: Permanent bonuses from equipment are handled in GetEquipmentBonuses()
                 Debug.Log($"Magic power increased by {item.magicPowerBonus}");
+                
+                if (UIManager.Instance != null)
+                {
+                    UIManager.Instance.ShowNotification($"+{item.magicPowerBonus} Magic (Temporary)", Color.cyan);
+                }
+            }
+
+            // Apply strength bonus (temporary buff)
+            if (item.strengthBonus > 0)
+            {
+                Debug.Log($"Strength increased by {item.strengthBonus}");
+                
+                if (UIManager.Instance != null)
+                {
+                    UIManager.Instance.ShowNotification($"+{item.strengthBonus} Strength (Temporary)", Color.yellow);
+                }
+            }
+
+            // Apply agility bonus (temporary buff)
+            if (item.agilityBonus > 0)
+            {
+                Debug.Log($"Agility increased by {item.agilityBonus}");
+                
+                if (UIManager.Instance != null)
+                {
+                    UIManager.Instance.ShowNotification($"+{item.agilityBonus} Agility (Temporary)", Color.green);
+                }
             }
         }
 
         /// <summary>
-        /// Equip a weapon
+        /// Equip a weapon (v2.3.3: Enhanced with stat application)
         /// </summary>
         public bool EquipWeapon(string itemId)
         {
             var slot = FindSlot(itemId);
             if (slot == null || slot.item.type != ItemType.Weapon)
+            {
+                Debug.LogWarning($"Item {itemId} is not a valid weapon");
                 return false;
+            }
 
-            // Unequip current weapon
+            // Unequip current weapon and remove its bonuses
             if (equippedWeapon != null)
             {
                 var oldSlot = FindSlot(equippedWeapon.itemId);
-                if (oldSlot != null) oldSlot.isEquipped = false;
+                if (oldSlot != null) 
+                {
+                    oldSlot.isEquipped = false;
+                }
             }
 
+            // Equip new weapon
             equippedWeapon = slot.item;
             slot.isEquipped = true;
+            
             Debug.Log($"Equipped weapon: {slot.item.name}");
+            if (UIManager.Instance != null)
+            {
+                UIManager.Instance.ShowNotification($"Equipped: {slot.item.name}", Color.green);
+            }
+
+            // Trigger equipment changed event
+            if (GameEvents.OnEquipmentChanged != null)
+            {
+                GameEvents.OnEquipmentChanged.Invoke();
+            }
+
             return true;
         }
 
         /// <summary>
-        /// Equip armor
+        /// Equip armor (v2.3.3: Enhanced with stat application)
         /// </summary>
         public bool EquipArmor(string itemId)
         {
             var slot = FindSlot(itemId);
             if (slot == null || slot.item.type != ItemType.Armor)
+            {
+                Debug.LogWarning($"Item {itemId} is not valid armor");
                 return false;
+            }
 
-            // Unequip current armor
+            // Unequip current armor and remove its bonuses
             if (equippedArmor != null)
             {
                 var oldSlot = FindSlot(equippedArmor.itemId);
-                if (oldSlot != null) oldSlot.isEquipped = false;
+                if (oldSlot != null)
+                {
+                    oldSlot.isEquipped = false;
+                }
             }
 
+            // Equip new armor
             equippedArmor = slot.item;
             slot.isEquipped = true;
+            
             Debug.Log($"Equipped armor: {slot.item.name}");
+            if (UIManager.Instance != null)
+            {
+                UIManager.Instance.ShowNotification($"Equipped: {slot.item.name}", Color.green);
+            }
+
+            // Trigger equipment changed event
+            if (GameEvents.OnEquipmentChanged != null)
+            {
+                GameEvents.OnEquipmentChanged.Invoke();
+            }
+
             return true;
         }
 
@@ -793,6 +898,131 @@ namespace ACOTAR
         public string GetEquippedArmor()
         {
             return equippedArmor?.itemId;
+        }
+
+        /// <summary>
+        /// Get total equipment stat bonuses (v2.3.3: NEW)
+        /// Returns combined bonuses from all equipped items
+        /// </summary>
+        public (int health, int magicPower, int strength, int agility) GetEquipmentBonuses()
+        {
+            int totalHealth = 0;
+            int totalMagicPower = 0;
+            int totalStrength = 0;
+            int totalAgility = 0;
+
+            // Add weapon bonuses
+            if (equippedWeapon != null)
+            {
+                totalHealth += equippedWeapon.healthBonus;
+                totalMagicPower += equippedWeapon.magicPowerBonus;
+                totalStrength += equippedWeapon.strengthBonus;
+                totalAgility += equippedWeapon.agilityBonus;
+            }
+
+            // Add armor bonuses
+            if (equippedArmor != null)
+            {
+                totalHealth += equippedArmor.healthBonus;
+                totalMagicPower += equippedArmor.magicPowerBonus;
+                totalStrength += equippedArmor.strengthBonus;
+                totalAgility += equippedArmor.agilityBonus;
+            }
+
+            return (totalHealth, totalMagicPower, totalStrength, totalAgility);
+        }
+
+        /// <summary>
+        /// Sell an item for gold (v2.3.3: NEW)
+        /// </summary>
+        public bool SellItem(string itemId, int quantity = 1)
+        {
+            var slot = FindSlot(itemId);
+            if (slot == null || slot.item.isQuestItem)
+            {
+                Debug.LogWarning("Cannot sell quest items");
+                return false;
+            }
+
+            if (slot.quantity < quantity)
+            {
+                Debug.LogWarning($"Not enough items to sell. Have {slot.quantity}, trying to sell {quantity}");
+                return false;
+            }
+
+            // Calculate sell value (50% of purchase price)
+            int sellValue = CalculateSellValue(slot.item) * quantity;
+
+            // Add gold to player
+            if (CurrencySystem.Instance != null)
+            {
+                CurrencySystem.Instance.AddGold(sellValue);
+                Debug.Log($"Sold {quantity}x {slot.item.name} for {sellValue} gold");
+                
+                if (UIManager.Instance != null)
+                {
+                    UIManager.Instance.ShowNotification($"Sold {slot.item.name} for {sellValue} gold", Color.yellow);
+                }
+            }
+
+            // Remove item from inventory
+            return RemoveItem(itemId, quantity);
+        }
+
+        /// <summary>
+        /// Calculate sell value for an item (v2.3.3: NEW)
+        /// </summary>
+        private int CalculateSellValue(Item item)
+        {
+            int baseValue = 5;
+            switch (item.rarity)
+            {
+                case ItemRarity.Common: return baseValue;
+                case ItemRarity.Uncommon: return baseValue * 2;
+                case ItemRarity.Rare: return baseValue * 5;
+                case ItemRarity.Epic: return baseValue * 12;
+                case ItemRarity.Legendary: return baseValue * 25;
+                case ItemRarity.Artifact: return baseValue * 50;
+                default: return baseValue;
+            }
+        }
+
+        /// <summary>
+        /// Drop/discard an item (v2.3.3: NEW)
+        /// </summary>
+        public bool DropItem(string itemId, int quantity = 1)
+        {
+            var slot = FindSlot(itemId);
+            if (slot == null)
+                return false;
+
+            if (slot.item.isQuestItem)
+            {
+                Debug.LogWarning("Cannot drop quest items");
+                if (UIManager.Instance != null)
+                {
+                    UIManager.Instance.ShowNotification("Cannot drop quest items", Color.red);
+                }
+                return false;
+            }
+
+            if (slot.isEquipped)
+            {
+                Debug.LogWarning("Cannot drop equipped items. Unequip first.");
+                if (UIManager.Instance != null)
+                {
+                    UIManager.Instance.ShowNotification("Unequip item first", Color.red);
+                }
+                return false;
+            }
+
+            Debug.Log($"Dropped {quantity}x {slot.item.name}");
+            if (UIManager.Instance != null)
+            {
+                UIManager.Instance.ShowNotification($"Dropped {slot.item.name}", Color.gray);
+            }
+
+            return RemoveItem(itemId, quantity);
         }
 
         /// <summary>

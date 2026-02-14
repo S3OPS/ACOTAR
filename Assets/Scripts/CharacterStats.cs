@@ -5,10 +5,12 @@ namespace ACOTAR
     /// <summary>
     /// Encapsulates character statistics and stat-related operations
     /// Separated for better modularity and testability
+    /// v2.3.3: Enhanced with equipment bonus support
     /// </summary>
     [Serializable]
     public class CharacterStats
     {
+        // Base stats (without equipment)
         public int health;
         public int maxHealth;
         public int magicPower;
@@ -17,12 +19,23 @@ namespace ACOTAR
         public int experience;
         public int level;
 
+        // Equipment bonuses (v2.3.3: NEW)
+        private int equipmentHealthBonus = 0;
+        private int equipmentMagicBonus = 0;
+        private int equipmentStrengthBonus = 0;
+        private int equipmentAgilityBonus = 0;
+
         // Property accessors for UI compatibility
         public int CurrentHealth { get { return health; } set { health = value; } }
-        public int MaxHealth { get { return maxHealth; } set { maxHealth = value; } }
-        public int MaxMagicPower { get { return magicPower; } }
+        public int MaxHealth { get { return maxHealth + equipmentHealthBonus; } set { maxHealth = value; } }
+        public int MaxMagicPower { get { return magicPower + equipmentMagicBonus; } }
         public int Level { get { return level; } set { level = value; } }
         public int Experience { get { return experience; } set { experience = value; } }
+        
+        // Effective stats including equipment (v2.3.3: NEW)
+        public int EffectiveStrength { get { return strength + equipmentStrengthBonus; } }
+        public int EffectiveAgility { get { return agility + equipmentAgilityBonus; } }
+        public int EffectiveMagicPower { get { return magicPower + equipmentMagicBonus; } }
 
         public CharacterStats()
         {
@@ -163,6 +176,25 @@ namespace ACOTAR
             }
             
             return baseXP;
+        }
+
+        /// <summary>
+        /// Update equipment bonuses from inventory system (v2.3.3: NEW)
+        /// </summary>
+        public void UpdateEquipmentBonuses(int healthBonus, int magicBonus, int strengthBonus, int agilityBonus)
+        {
+            equipmentHealthBonus = healthBonus;
+            equipmentMagicBonus = magicBonus;
+            equipmentStrengthBonus = strengthBonus;
+            equipmentAgilityBonus = agilityBonus;
+        }
+
+        /// <summary>
+        /// Get equipment bonuses (v2.3.3: NEW)
+        /// </summary>
+        public (int health, int magic, int strength, int agility) GetEquipmentBonuses()
+        {
+            return (equipmentHealthBonus, equipmentMagicBonus, equipmentStrengthBonus, equipmentAgilityBonus);
         }
     }
 }

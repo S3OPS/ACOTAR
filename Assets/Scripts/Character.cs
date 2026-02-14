@@ -104,6 +104,9 @@ namespace ACOTAR
             _abilitySystem = new AbilitySystem(charClass);
             _progression = new CharacterProgression();  // NEW: Initialize progression
             
+            // Subscribe to equipment changes (v2.3.3: NEW)
+            GameEvents.OnEquipmentChanged += UpdateEquipmentBonuses;
+            
             GameEvents.TriggerCharacterCreated(this);
         }
 
@@ -186,6 +189,21 @@ namespace ACOTAR
         public int GetXPRequiredForNextLevel()
         {
             return _stats.GetXPRequiredForNextLevel();
+        }
+
+        /// <summary>
+        /// Update equipment bonuses from inventory (v2.3.3: NEW)
+        /// Should be called whenever equipment changes
+        /// </summary>
+        public void UpdateEquipmentBonuses()
+        {
+            if (GameManager.Instance == null || GameManager.Instance.inventory == null)
+            {
+                return;
+            }
+
+            var bonuses = GameManager.Instance.inventory.GetEquipmentBonuses();
+            _stats.UpdateEquipmentBonuses(bonuses.health, bonuses.magicPower, bonuses.strength, bonuses.agility);
         }
     }
 }
