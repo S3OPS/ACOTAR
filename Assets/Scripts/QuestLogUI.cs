@@ -167,6 +167,25 @@ namespace ACOTAR
             // Filter quests
             List<Quest> filteredQuests = allQuests.Where(q => 
             {
+                // v2.3.2: Hide DLC content if not owned
+                if (q.isDLCContent)
+                {
+                    // Check if DLC is owned via DLCManager
+                    if (DLCManager.Instance != null)
+                    {
+                        var dlcPackage = DLCManager.Instance.GetQuestDLCPackage(q.questId);
+                        if (dlcPackage.HasValue && !DLCManager.Instance.IsDLCOwned(dlcPackage.Value))
+                        {
+                            return false; // Hide quest if DLC not owned
+                        }
+                    }
+                    else
+                    {
+                        // If DLCManager not available, hide all DLC content
+                        return false;
+                    }
+                }
+                
                 // Status filter
                 bool statusMatch = false;
                 if (showActive && q.questStatus == QuestStatus.InProgress)
@@ -289,7 +308,15 @@ namespace ACOTAR
             // Quest description
             if (questDescriptionText != null)
             {
-                questDescriptionText.text = quest.description;
+                string descriptionText = quest.description;
+                
+                // v2.3.2: Add combat preparation hint if present
+                if (!string.IsNullOrEmpty(quest.preparationHint))
+                {
+                    descriptionText += "\n\n" + quest.preparationHint;
+                }
+                
+                questDescriptionText.text = descriptionText;
             }
 
             // Quest status
