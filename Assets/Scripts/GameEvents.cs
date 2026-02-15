@@ -165,5 +165,14 @@ namespace ACOTAR
         {
             OnGameOver?.Invoke();
         }
+
+        // Keybinding Events (v2.5.1: NEW)
+        public static event Action<KeybindingSystem.GameAction> OnKeybindingAction;
+        
+        // Trigger keybinding action event (v2.5.1: NEW)
+        public static void TriggerKeybindingAction(KeybindingSystem.GameAction action)
+        {
+            OnKeybindingAction?.Invoke(action);
+        }
     }
 }

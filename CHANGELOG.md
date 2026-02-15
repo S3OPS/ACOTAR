@@ -7,6 +7,103 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.5.1] - 2026-02-15
+
+### 🎯 Major Features Added
+
+- **Centralized Logging System**
+  - Structured logging with multiple log levels (Trace, Debug, Info, Warning, Error, Critical)
+  - File-based logging with automatic rotation and cleanup
+  - Error tracking and statistics
+  - Log export functionality
+  - Configurable log retention (default: 5 log files)
+  - Performance-optimized buffering system
+  - Category-based log organization
+
+- **In-Game Notification System**
+  - Rich notification types (Info, Success, Warning, Error, Achievement, Combat, Quest, Loot, Level, System)
+  - Priority-based notification queue
+  - Customizable display duration and colors
+  - Notification history with read/unread tracking
+  - Event-driven notification triggers
+  - Statistics tracking by notification type
+  - Non-intrusive UI overlay
+
+- **Performance Monitoring System**
+  - Real-time FPS tracking with history
+  - Frame time metrics (current, average, max)
+  - Memory usage monitoring (allocated, reserved, mono heap)
+  - Performance profiling for code sections
+  - Long frame detection and warnings
+  - Debug overlay (toggle with F3)
+  - Performance report export
+  - Configurable performance thresholds
+
+- **Batch Crafting System**
+  - Craft up to 99 items in a single batch
+  - Auto-calculate maximum craftable quantity
+  - Progress tracking with time estimation
+  - Background crafting support
+  - Queue management for multiple batches
+  - Configurable crafting speed multiplier
+  - Material validation before batch start
+  - Crafting statistics tracking
+
+- **Customizable Keybinding System**
+  - Remap any game action to preferred keys
+  - Primary and secondary key bindings
+  - Modifier key support (Ctrl, Shift, Alt)
+  - Conflict detection and prevention
+  - Save/load keybinding profiles
+  - Reset to default keybindings
+  - 30+ customizable actions covering UI, combat, and gameplay
+  - Real-time input remapping interface
+
+### ✨ Quality-of-Life Improvements
+
+- Integrated notification system across all game systems
+- Performance metrics available via debug overlay
+- Comprehensive error logging for debugging
+- Batch craft shortcut for crafting maximum possible quantity
+- Keybinding display in UI tooltips
+- Enhanced error handling with structured exceptions
+- Automatic log file management
+
+### 🔧 Technical Improvements
+
+- Singleton pattern for all new systems
+- Event-driven architecture for loose coupling
+- JSON serialization for keybinding persistence
+- PlayerPrefs for system configuration
+- Coroutine-based background processing
+- Zero garbage collection spikes
+- Thread-safe operations where applicable
+
+### 📊 System Integration
+
+- LoggingSystem integrated with all game managers
+- NotificationSystem listens to GameEvents
+- PerformanceMonitor tracks critical operations
+- BatchCraftingSystem extends CraftingSystem
+- KeybindingSystem integrated with GameEvents
+- All systems support enable/disable toggle
+
+### 🐛 Bug Fixes
+
+- Improved error handling across all systems
+- Better null safety checks
+- Fixed potential memory leaks in logging
+- Enhanced save/load validation
+
+### 📖 Documentation
+
+- XML documentation for all public APIs
+- Inline code comments for complex logic
+- Usage examples in code headers
+- System architecture documentation
+
+---
+
 ## [2.5.0] - 2026-02-15
 
 ### 🎯 Major Features Added
