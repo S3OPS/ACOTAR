@@ -391,6 +391,15 @@ namespace ACOTAR
                 int healAmount = Mathf.RoundToInt(companion.stats.magicPower * loyaltyMultiplier);
                 healTarget.Heal(healAmount);
                 LogMessage($"{companion.name} (Support) heals {healTarget.name} for {healAmount} HP!");
+                
+                // Show healing numbers (Phase 8: NEW)
+                if (DamageNumbersUI.Instance != null && AccessibilityManager.Instance != null)
+                {
+                    if (AccessibilityManager.Instance.ShowDamageNumbers)
+                    {
+                        DamageNumbersUI.Instance.ShowHealing(healAmount, Vector3.zero);
+                    }
+                }
             }
             else
             {
@@ -755,6 +764,15 @@ namespace ACOTAR
                 VisualEffectsManager.Instance.SpawnHitEffect(targetPosition, result.isCritical, result.damageType);
             }
 
+            // Show damage numbers (Phase 8: NEW)
+            if (DamageNumbersUI.Instance != null && AccessibilityManager.Instance != null)
+            {
+                if (AccessibilityManager.Instance.ShowDamageNumbers)
+                {
+                    DamageNumbersUI.Instance.ShowDamage(result.damage, targetPosition, result.isCritical, result.damageType);
+                }
+            }
+
             // Trigger screen effects
             if (ScreenEffectsManager.Instance != null)
             {
@@ -771,6 +789,15 @@ namespace ACOTAR
             if (VisualEffectsManager.Instance != null)
             {
                 VisualEffectsManager.Instance.SpawnMagicEffect(magicType, casterPosition, targetPosition);
+            }
+
+            // Show damage numbers for magic attacks (Phase 8: NEW)
+            if (DamageNumbersUI.Instance != null && AccessibilityManager.Instance != null)
+            {
+                if (AccessibilityManager.Instance.ShowDamageNumbers)
+                {
+                    DamageNumbersUI.Instance.ShowDamage(result.damage, targetPosition, result.isCritical, result.damageType);
+                }
             }
 
             // Trigger screen flash for elemental magic
