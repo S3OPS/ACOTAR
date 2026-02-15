@@ -39,6 +39,9 @@ namespace ACOTAR
         // Equipment Events (v2.3.3: NEW)
         public static event Action OnEquipmentChanged;
 
+        // Accessibility Events (Phase 8: NEW)
+        public static event Action OnAccessibilityChanged;
+
         // Companion Events
         public static event Action<string> OnCompanionRecruited; // companionName
         public static event Action<string, string> OnLocationDiscovered; // locationName, courtName
@@ -137,6 +140,12 @@ namespace ACOTAR
         public static void TriggerLocationDiscovered(string locationName, string courtName)
         {
             OnLocationDiscovered?.Invoke(locationName, courtName);
+        }
+
+        // Trigger accessibility changed event (Phase 8: NEW)
+        public static void TriggerAccessibilityChanged()
+        {
+            OnAccessibilityChanged?.Invoke();
         }
     }
 }

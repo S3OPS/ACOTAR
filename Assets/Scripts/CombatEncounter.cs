@@ -146,6 +146,15 @@ namespace ACOTAR
 
             // Calculate flee chance based on strongest enemy
             Enemy strongestEnemy = GetStrongestEnemy();
+            if (strongestEnemy == null)
+            {
+                // No enemies left, flee automatically succeeds
+                LogMessage($"{player.name} fled from combat!");
+                state = EncounterState.Fled;
+                GameEvents.TriggerCombatEnded(player, enemies, false);
+                return true;
+            }
+            
             bool success = CombatSystem.AttemptFlee(player, strongestEnemy);
 
             if (success)
@@ -674,10 +683,15 @@ namespace ACOTAR
         /// </summary>
         private Enemy GetStrongestEnemy()
         {
+            if (enemies == null || enemies.Count == 0)
+            {
+                return null;
+            }
+
             Enemy strongest = enemies[0];
             foreach (Enemy enemy in enemies)
             {
-                if (enemy.IsAlive() && enemy.strength > strongest.strength)
+                if (enemy != null && enemy.IsAlive() && enemy.strength > strongest.strength)
                 {
                     strongest = enemy;
                 }
