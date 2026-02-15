@@ -317,7 +317,8 @@ public class DynamicDifficultySystem : MonoBehaviour
         
         if (enabled)
         {
-            Debug.Log($"Ironman Mode enabled with {lives} life(lives)");
+            string livesText = lives == 1 ? "life" : "lives";
+            Debug.Log($"Ironman Mode enabled with {lives} {livesText}");
         }
         else
         {
@@ -354,7 +355,8 @@ public class DynamicDifficultySystem : MonoBehaviour
         }
         else
         {
-            Debug.Log($"Ironman Mode: {livesRemaining} life(lives) remaining");
+            string livesText = livesRemaining == 1 ? "life" : "lives";
+            Debug.Log($"Ironman Mode: {livesRemaining} {livesText} remaining");
             return true;
         }
     }
