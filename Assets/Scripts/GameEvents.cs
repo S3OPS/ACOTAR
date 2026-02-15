@@ -36,6 +36,9 @@ namespace ACOTAR
         public static event Action<string, int, string> OnItemPurchased; // itemId, price, merchantName
         public static event Action<string, int, string> OnItemSold; // itemId, price, merchantName
 
+        // Equipment Events (v2.3.3: NEW)
+        public static event Action OnEquipmentChanged;
+
         // Companion Events
         public static event Action<string> OnCompanionRecruited; // companionName
         public static event Action<string, string> OnLocationDiscovered; // locationName, courtName

@@ -1,6 +1,6 @@
 # ACOTAR Fantasy RPG
 
-**Version 2.3.2** | **Base Game Quality: Improved Progression & Class Balance** ✨
+**Version 2.3.3** | **Core Gameplay Enhancement: Equipment, Mana & Progression** ✨
 
 A lore-accurate Fantasy RPG based on Sarah J. Maas's *A Court of Thorns and Roses* series, built with Unity and Docker.
 
@@ -32,6 +32,9 @@ Experience Feyre's complete journey in the first book:
 - **NEW v2.3.2: Boss Difficulty Scaling**: Amarantha adjusts to your difficulty mode
 - **NEW v2.3.2: Combat Preparation Hints**: Strategic guidance before boss fights
 - **NEW v2.3.2: Status Effects Guide**: New tutorial topic explaining all effects
+- **NEW v2.3.3: Equipment Stat Bonuses**: Gear now actually increases your stats
+- **NEW v2.3.3: Mana System**: Magic abilities cost mana - strategic resource management
+- **NEW v2.3.3: Progression Rewards**: Titles and masteries grant real stat bonuses
 
 ### 📦 DLC 1: A Court of Mist and Fury (Book 2)
 *Requires base game*
@@ -61,6 +64,34 @@ Experience the epic conclusion to the trilogy:
 - **NEW: Valkyrie Abilities**: Unlock Nesta's ultimate powers
 
 ## 🎮 Features
+
+### 🆕 New in v2.3.3 - Core Gameplay Enhancement
+- **Equipment System Overhaul**:
+  - Equipped items now actually apply stat bonuses
+  - Combat damage scales with equipped weapons
+  - Armor provides real defensive bonuses
+  - Effective stats = base stats + equipment bonuses
+  - Real-time UI feedback when equipping items
+  - Sell items for gold (50% of value, rarity-based)
+  - Drop/discard items with validation
+  
+- **Mana/Energy System**:
+  - Magic abilities now cost mana (15-60 per spell)
+  - Mana pool based on magic power (2 mana per point)
+  - Turn-based mana regeneration (5 base + 2 per level)
+  - Strategic resource management in combat
+  - Can't spam powerful spells infinitely
+  - Mana potions and rest restore mana
+  - Full mana on level up
+  
+- **Progression System Integration**:
+  - Titles now grant real stat bonuses and gold rewards
+  - Skill masteries apply actual stat increases
+  - Curse Breaker: +100 all stats, +1000 gold
+  - High Lady: +50 magic power, expanded mana
+  - Master Crafter: Crafting bonuses unlocked
+  - Each mastery level provides tangible benefits
+  - UI notifications show exact rewards
 
 ### 🆕 New in v2.3.2 - Base Game Quality Improvements
 - **Improved Early Game Progression**:

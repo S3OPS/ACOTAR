@@ -10,7 +10,7 @@ namespace ACOTAR
     public static class BalanceConfig
     {
         // Version tracking
-        public const string BALANCE_VERSION = "2.3.2";
+        public const string BALANCE_VERSION = "2.3.3";
         public const string LAST_UPDATED = "2026-02-14";
 
         #region Combat Balance

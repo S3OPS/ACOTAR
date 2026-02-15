@@ -72,10 +72,14 @@ namespace ACOTAR
     /// <summary>
     /// Enhanced character progression system
     /// Tracks titles, skill mastery, and provides milestone rewards
+    /// v2.3.3: Now actually applies stat bonuses to character
     /// </summary>
     [System.Serializable]
     public class CharacterProgression
     {
+        // Reference to the character (v2.3.3: NEW)
+        private Character _character;
+
         // Current titles earned
         public List<CharacterTitle> earnedTitles;
         public CharacterTitle activeTitle;
@@ -119,6 +123,15 @@ namespace ACOTAR
             deaths = 0;
             companionsRecruited = 0;
             dialoguesCompleted = 0;
+        }
+
+        /// <summary>
+        /// Set character reference (v2.3.3: NEW)
+        /// Must be called after character creation
+        /// </summary>
+        public void SetCharacter(Character character)
+        {
+            _character = character;
         }
 
         /// <summary>
@@ -233,50 +246,191 @@ namespace ACOTAR
         }
 
         /// <summary>
-        /// Apply bonuses for earning a title
+        /// Apply bonuses for earning a title (v2.3.3: Now actually applies bonuses!)
         /// </summary>
         private void ApplyTitleBonus(CharacterTitle title)
         {
-            // Titles could grant stat bonuses, gold, items, etc.
+            if (_character == null)
+            {
+                Debug.LogWarning("Cannot apply title bonus: Character reference not set");
+                return;
+            }
+
+            // Apply actual stat bonuses and rewards
             switch (title)
             {
                 case CharacterTitle.CurseBreaker:
-                    Debug.Log("+100 bonus to all stats!");
+                    // Major achievement - significant bonuses
+                    _character.stats.strength += 100;
+                    _character.stats.agility += 100;
+                    _character.stats.magicPower += 100;
+                    _character.stats.maxHealth += 100;
+                    _character.health = _character.maxHealth; // Heal to full
+                    
+                    if (CurrencySystem.Instance != null)
+                    {
+                        CurrencySystem.Instance.AddGold(1000);
+                    }
+                    
+                    Debug.Log("+100 to all stats!");
                     Debug.Log("+1000 Gold reward!");
+                    
+                    if (UIManager.Instance != null)
+                    {
+                        UIManager.Instance.ShowNotification("Title Earned: Curse Breaker!\n+100 All Stats, +1000 Gold", Color.yellow);
+                    }
                     break;
+
                 case CharacterTitle.HighLadyOfNight:
+                    _character.stats.magicPower += 50;
+                    _character.manaSystem.UpdateMaxMana(_character.stats.magicPower);
+                    
                     Debug.Log("+50 Magic Power!");
                     Debug.Log("Unlocked: High Lady abilities!");
+                    
+                    if (UIManager.Instance != null)
+                    {
+                        UIManager.Instance.ShowNotification("Title Earned: High Lady of Night!\n+50 Magic Power", Color.cyan);
+                    }
                     break;
+
                 case CharacterTitle.MasterCrafter:
+                    // Crafting bonuses are passive, tracked by this title
                     Debug.Log("Crafting costs reduced by 25%!");
                     Debug.Log("Crafting speed increased by 50%!");
+                    
+                    if (UIManager.Instance != null)
+                    {
+                        UIManager.Instance.ShowNotification("Title Earned: Master Crafter!\nCrafting bonuses unlocked", Color.green);
+                    }
+                    break;
+
+                case CharacterTitle.HighFae:
+                    _character.stats.maxHealth += 50;
+                    _character.stats.magicPower += 30;
+                    _character.health = _character.maxHealth;
+                    
+                    Debug.Log("+50 Max Health, +30 Magic Power!");
+                    
+                    if (UIManager.Instance != null)
+                    {
+                        UIManager.Instance.ShowNotification("Transformed into High Fae!\n+50 HP, +30 Magic", Color.magenta);
+                    }
+                    break;
+
+                case CharacterTitle.SaviorOfPrythian:
+                    // Ultimate achievement
+                    _character.stats.strength += 150;
+                    _character.stats.agility += 150;
+                    _character.stats.magicPower += 150;
+                    _character.stats.maxHealth += 150;
+                    
+                    if (CurrencySystem.Instance != null)
+                    {
+                        CurrencySystem.Instance.AddGold(5000);
+                    }
+                    
+                    Debug.Log("+150 to all stats!");
+                    Debug.Log("+5000 Gold reward!");
+                    break;
+
+                case CharacterTitle.CompanionOfLegends:
+                    _character.stats.strength += 25;
+                    _character.stats.agility += 25;
+                    
+                    Debug.Log("+25 Strength and Agility!");
+                    break;
+
+                default:
+                    // Minor titles grant smaller bonuses
+                    _character.stats.strength += 10;
+                    _character.stats.agility += 10;
+                    Debug.Log("+10 Strength and Agility!");
                     break;
             }
         }
 
         /// <summary>
-        /// Apply bonuses for skill mastery level up
+        /// Apply bonuses for skill mastery level up (v2.3.3: Now actually applies bonuses!)
         /// </summary>
         private void ApplyMasteryBonus(SkillCategory skill, SkillMastery mastery)
         {
+            if (_character == null)
+            {
+                Debug.LogWarning("Cannot apply mastery bonus: Character reference not set");
+                return;
+            }
+
             int bonus = GetMasteryBonus(mastery);
             
             switch (skill)
             {
                 case SkillCategory.Combat:
+                    _character.stats.strength += bonus;
+                    _character.stats.agility += bonus;
                     Debug.Log($"+{bonus} Strength and Agility!");
+                    
+                    if (UIManager.Instance != null)
+                    {
+                        UIManager.Instance.ShowNotification($"Combat Mastery Up!\n+{bonus} Strength & Agility", Color.red);
+                    }
                     break;
+
                 case SkillCategory.Magic:
+                    _character.stats.magicPower += bonus;
+                    _character.manaSystem.UpdateMaxMana(_character.stats.magicPower);
                     Debug.Log($"+{bonus} Magic Power!");
+                    
+                    if (UIManager.Instance != null)
+                    {
+                        UIManager.Instance.ShowNotification($"Magic Mastery Up!\n+{bonus} Magic Power", Color.cyan);
+                    }
                     break;
+
+                case SkillCategory.Stealth:
+                    _character.stats.agility += bonus * 2; // Stealth heavily benefits agility
+                    Debug.Log($"+{bonus * 2} Agility!");
+                    
+                    if (UIManager.Instance != null)
+                    {
+                        UIManager.Instance.ShowNotification($"Stealth Mastery Up!\n+{bonus * 2} Agility", Color.gray);
+                    }
+                    break;
+
                 case SkillCategory.Diplomacy:
+                    // Diplomacy provides passive bonuses (shop prices, dialogue options)
                     Debug.Log($"Dialogue options improved!");
                     Debug.Log($"Shop prices reduced by {bonus * 2}%!");
+                    
+                    if (UIManager.Instance != null)
+                    {
+                        UIManager.Instance.ShowNotification($"Diplomacy Mastery Up!\n-{bonus * 2}% Shop Prices", Color.yellow);
+                    }
                     break;
+
                 case SkillCategory.Crafting:
+                    // Crafting provides passive bonuses
                     Debug.Log($"New recipes unlocked!");
                     Debug.Log($"Crafting success rate +{bonus * 5}%!");
+                    
+                    if (UIManager.Instance != null)
+                    {
+                        UIManager.Instance.ShowNotification($"Crafting Mastery Up!\n+{bonus * 5}% Success Rate", Color.green);
+                    }
+                    break;
+
+                case SkillCategory.Exploration:
+                    // Exploration grants small all-around bonuses
+                    int smallBonus = bonus / 2;
+                    _character.stats.strength += smallBonus;
+                    _character.stats.agility += smallBonus;
+                    _character.stats.magicPower += smallBonus;
+                    Debug.Log($"+{smallBonus} to all stats!");
+                    
+                    if (UIManager.Instance != null)
+                    {
+                        UIManager.Instance.ShowNotification($"Exploration Mastery Up!\n+{smallBonus} All Stats", Color.blue);
+                    }
                     break;
             }
         }

@@ -89,8 +89,8 @@ namespace ACOTAR
                 return new CombatResult(0, DamageType.Physical, "Invalid combat participants");
             }
 
-            // Base damage from strength
-            int baseDamage = attacker.strength;
+            // Base damage from strength (v2.3.3: Use effective strength with equipment)
+            int baseDamage = attacker.stats.EffectiveStrength;
 
             // Apply difficulty modifiers
             if (isPlayerAttack)
@@ -114,8 +114,8 @@ namespace ACOTAR
                 baseDamage = Mathf.RoundToInt(baseDamage * CRITICAL_HIT_MULTIPLIER);
             }
 
-            // Apply defender's agility for dodge chance
-            float dodgeChance = BASE_DODGE_CHANCE + (defender.agility * AGILITY_DODGE_FACTOR);
+            // Apply defender's agility for dodge chance (v2.3.3: Use effective agility)
+            float dodgeChance = BASE_DODGE_CHANCE + (defender.stats.EffectiveAgility * AGILITY_DODGE_FACTOR);
             bool dodged = Random.value < dodgeChance;
             if (dodged)
             {
@@ -156,6 +156,7 @@ namespace ACOTAR
 
         /// <summary>
         /// Calculate magic attack damage with elemental system integration
+        /// v2.3.3: Enhanced with mana cost system
         /// </summary>
         public static CombatResult CalculateMagicAttack(Character attacker, Character defender, MagicType magicType, bool isPlayerAttack = true)
         {
@@ -170,8 +171,20 @@ namespace ACOTAR
                 return new CombatResult(0, DamageType.Magical, $"{attacker.name} doesn't know {magicType}!");
             }
 
-            // Base damage from magic power
-            int baseDamage = attacker.magicPower;
+            // v2.3.3: Check and consume mana
+            int manaCost = ManaSystem.GetManaCost(magicType);
+            if (!attacker.manaSystem.HasEnoughMana(manaCost))
+            {
+                return new CombatResult(0, DamageType.Magical, $"{attacker.name} doesn't have enough mana! Need {manaCost}, have {attacker.manaSystem.CurrentMana}");
+            }
+
+            if (!attacker.manaSystem.TryConsumeMana(manaCost))
+            {
+                return new CombatResult(0, DamageType.Magical, $"{attacker.name} failed to consume mana!");
+            }
+
+            // Base damage from magic power (v2.3.3: Use effective magic power)
+            int baseDamage = attacker.stats.EffectiveMagicPower;
 
             // Apply difficulty modifiers
             if (isPlayerAttack)
