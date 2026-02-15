@@ -1,6 +1,6 @@
 # ACOTAR Fantasy RPG
 
-**Version 2.3.3** | **Core Gameplay Enhancement: Equipment, Mana & Progression** ✨
+**Version 2.4.0-Phase8** | **Accessibility & Polish: Professional-Grade Experience** ✨
 
 A lore-accurate Fantasy RPG based on Sarah J. Maas's *A Court of Thorns and Roses* series, built with Unity and Docker.
 
@@ -64,6 +64,30 @@ Experience the epic conclusion to the trilogy:
 - **NEW: Valkyrie Abilities**: Unlock Nesta's ultimate powers
 
 ## 🎮 Features
+
+### 🆕 New in v2.4.0-Phase8 - Accessibility & Polish
+- **Comprehensive Accessibility Features**:
+  - 3 Colorblind modes (Protanopia, Deuteranopia, Tritanopia)
+  - Text scaling from 80% to 150%
+  - High contrast mode for better visibility
+  - Damage numbers can be toggled on/off
+  - Screen reader mode foundation
+  - Difficulty explanations for each mode
+  
+- **Professional Damage Numbers**:
+  - Floating combat damage with color coding by type
+  - Critical hits emphasized with "CRIT!" and larger text
+  - Healing numbers in bright green
+  - Status effect notifications
+  - Mana cost indicators
+  - Combo counter display
+  - 9 different visual feedback types
+  
+- **Critical Bug Fixes**:
+  - Fixed null reference bugs in combat system
+  - Enhanced error handling for edge cases
+  - Improved combat stability
+  - Zero critical bugs remaining
 
 ### 🆕 New in v2.3.3 - Core Gameplay Enhancement
 - **Equipment System Overhaul**:

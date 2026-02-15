@@ -146,6 +146,15 @@ namespace ACOTAR
 
             // Calculate flee chance based on strongest enemy
             Enemy strongestEnemy = GetStrongestEnemy();
+            if (strongestEnemy == null)
+            {
+                // No enemies left, flee automatically succeeds
+                LogMessage($"{player.name} fled from combat!");
+                state = EncounterState.Fled;
+                GameEvents.TriggerCombatEnded(player, enemies, false);
+                return true;
+            }
+            
             bool success = CombatSystem.AttemptFlee(player, strongestEnemy);
 
             if (success)
@@ -382,6 +391,15 @@ namespace ACOTAR
                 int healAmount = Mathf.RoundToInt(companion.stats.magicPower * loyaltyMultiplier);
                 healTarget.Heal(healAmount);
                 LogMessage($"{companion.name} (Support) heals {healTarget.name} for {healAmount} HP!");
+                
+                // Show healing numbers (Phase 8: NEW)
+                if (DamageNumbersUI.Instance != null && AccessibilityManager.Instance != null)
+                {
+                    if (AccessibilityManager.Instance.ShowDamageNumbers)
+                    {
+                        DamageNumbersUI.Instance.ShowHealing(healAmount, Vector3.zero);
+                    }
+                }
             }
             else
             {
@@ -674,10 +692,15 @@ namespace ACOTAR
         /// </summary>
         private Enemy GetStrongestEnemy()
         {
+            if (enemies == null || enemies.Count == 0)
+            {
+                return null;
+            }
+
             Enemy strongest = enemies[0];
             foreach (Enemy enemy in enemies)
             {
-                if (enemy.IsAlive() && enemy.strength > strongest.strength)
+                if (enemy != null && enemy.IsAlive() && enemy.strength > strongest.strength)
                 {
                     strongest = enemy;
                 }
@@ -741,6 +764,15 @@ namespace ACOTAR
                 VisualEffectsManager.Instance.SpawnHitEffect(targetPosition, result.isCritical, result.damageType);
             }
 
+            // Show damage numbers (Phase 8: NEW)
+            if (DamageNumbersUI.Instance != null && AccessibilityManager.Instance != null)
+            {
+                if (AccessibilityManager.Instance.ShowDamageNumbers)
+                {
+                    DamageNumbersUI.Instance.ShowDamage(result.damage, targetPosition, result.isCritical, result.damageType);
+                }
+            }
+
             // Trigger screen effects
             if (ScreenEffectsManager.Instance != null)
             {
@@ -757,6 +789,15 @@ namespace ACOTAR
             if (VisualEffectsManager.Instance != null)
             {
                 VisualEffectsManager.Instance.SpawnMagicEffect(magicType, casterPosition, targetPosition);
+            }
+
+            // Show damage numbers for magic attacks (Phase 8: NEW)
+            if (DamageNumbersUI.Instance != null && AccessibilityManager.Instance != null)
+            {
+                if (AccessibilityManager.Instance.ShowDamageNumbers)
+                {
+                    DamageNumbersUI.Instance.ShowDamage(result.damage, targetPosition, result.isCritical, result.damageType);
+                }
             }
 
             // Trigger screen flash for elemental magic
