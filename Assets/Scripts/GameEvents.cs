@@ -42,6 +42,12 @@ namespace ACOTAR
         // Accessibility Events (Phase 8: NEW)
         public static event Action OnAccessibilityChanged;
 
+        // Difficulty Events (v2.5.0: NEW)
+        public static event Action OnDifficultyChanged;
+        
+        // Game State Events (v2.5.0: NEW)
+        public static event Action OnGameOver;
+
         // Companion Events
         public static event Action<string> OnCompanionRecruited; // companionName
         public static event Action<string, string> OnLocationDiscovered; // locationName, courtName
@@ -146,6 +152,18 @@ namespace ACOTAR
         public static void TriggerAccessibilityChanged()
         {
             OnAccessibilityChanged?.Invoke();
+        }
+
+        // Trigger difficulty changed event (v2.5.0: NEW)
+        public static void TriggerDifficultyChanged()
+        {
+            OnDifficultyChanged?.Invoke();
+        }
+
+        // Trigger game over event (v2.5.0: NEW)
+        public static void TriggerGameOver()
+        {
+            OnGameOver?.Invoke();
         }
     }
 }
