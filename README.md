@@ -1,6 +1,6 @@
 # ACOTAR Fantasy RPG
 
-**Version 2.4.0-Phase8** | **Accessibility & Polish: Professional-Grade Experience** ✨
+**Version 2.5.0** | **Enhanced Experience: Advanced Systems & Quality-of-Life** ✨
 
 A lore-accurate Fantasy RPG based on Sarah J. Maas's *A Court of Thorns and Roses* series, built with Unity and Docker.
 
@@ -64,6 +64,52 @@ Experience the epic conclusion to the trilogy:
 - **NEW: Valkyrie Abilities**: Unlock Nesta's ultimate powers
 
 ## 🎮 Features
+
+### 🆕 New in v2.5.0 - Advanced Systems & Quality-of-Life
+- **Advanced Statistics & Analytics Dashboard** 🆕:
+  - Comprehensive playtime tracking (total hours, session count, average session length)
+  - Detailed combat statistics (win/loss ratio, favorite abilities, total damage dealt)
+  - Exploration metrics (world completion %, locations discovered, travel count)
+  - Economic tracking (gold earned/spent, crafting efficiency, merchant interactions)
+  - Character comparisons and build analysis
+  - Exportable statistics for social sharing
+  - Beautiful dashboard UI with charts and graphs
+  
+- **Dynamic Difficulty Scaling System** 🆕:
+  - Adaptive difficulty that responds to player performance
+  - Real-time win/loss tracking with intelligent stat adjustment
+  - Fine-tuning sliders for custom difficulty (enemy HP%, damage%, XP%)
+  - Optional "Ironman Mode" with permadeath
+  - Difficulty profiles save per character
+  - Smart balancing prevents frustration while maintaining challenge
+  - Performance-based achievement tracking
+  
+- **Enhanced Save System** 🆕:
+  - Auto-save functionality with configurable intervals
+  - Save slot comparison UI (shows character level, playtime, progress %)
+  - Quick-save/quick-load keyboard shortcuts (F5/F9)
+  - Save file backup system (automatic backups of last 3 saves)
+  - Cloud save preparation (structure ready for Steam/platform integration)
+  - Save state validation with corruption detection
+  - Export/import save files for sharing builds
+  
+- **Interactive Tutorial System** 🆕:
+  - Practice mode for combat, crafting, and abilities
+  - Context-sensitive help that appears based on player actions
+  - Tutorial progress tracking with skip option for veterans
+  - Interactive demonstrations with real-time feedback
+  - "Hints" system that activates when player struggles
+  - Achievement for completing all tutorials
+  
+- **Quality-of-Life Improvements** 🆕:
+  - Batch crafting (craft multiple items at once)
+  - Quick-equip from inventory (right-click to equip)
+  - Item comparison tooltips (compare equipped vs. new items)
+  - Keybind customization for all actions
+  - Performance mode toggle (reduces visual effects for better FPS)
+  - Screenshot mode (hide UI with F12)
+  - Faster travel animation option
+  - Companion quick-commands (attack/defend/hold position)
 
 ### 🆕 New in v2.4.0-Phase8 - Accessibility & Polish
 - **Comprehensive Accessibility Features**:
