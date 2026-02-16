@@ -262,7 +262,7 @@ namespace ACOTAR
             allNPCs["Clotho"] = clotho;
 
             // Blacksmith at Dawn Court
-            var dawSmith = new ScheduledNPC("Thesan's Smith", CharacterClass.HighFae, Court.Dawn);
+            var dawnSmith = new ScheduledNPC("Thesan's Smith", CharacterClass.HighFae, Court.Dawn);
             dawnSmith.dailySchedule.Add(new ScheduleEntry(TimeOfDay.Morning, "Dawn Court - Forge", NPCActivity.Crafting, "Forging weapons"));
             dawnSmith.dailySchedule.Add(new ScheduleEntry(TimeOfDay.Afternoon, "Dawn Court - Forge", NPCActivity.Crafting, "Armor repairs"));
             dawnSmith.dailySchedule.Add(new ScheduleEntry(TimeOfDay.Evening, "Dawn Court - Market", NPCActivity.Shopping, "Buying materials"));
