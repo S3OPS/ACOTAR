@@ -234,17 +234,28 @@ namespace ACOTAR
     /// <summary>
     /// Manages the player's party of companions
     /// Handles recruitment, party composition, and companion interactions
+    /// v2.6.0: Enhanced with Party Synergy System
     /// </summary>
     public class CompanionManager : MonoBehaviour
     {
         private List<Companion> availableCompanions;
         private List<Companion> activeParty;
         private const int MAX_PARTY_SIZE = 3;
+        
+        // v2.6.0: NEW - Party Synergy System integration
+        private PartySynergySystem synergySystem;
+        
+        // Property accessors (v2.6.0: Following v2.5.x patterns)
+        public PartySynergySystem SynergySystem => synergySystem;
+        public bool IsInitialized => availableCompanions != null && activeParty != null && synergySystem != null;
+        public int PartySize => activeParty?.Count ?? 0;
+        public int RecruitedCount => availableCompanions?.FindAll(c => c.isRecruited).Count ?? 0;
 
         void Awake()
         {
             availableCompanions = new List<Companion>();
             activeParty = new List<Companion>();
+            synergySystem = new PartySynergySystem();  // v2.6.0: Initialize synergy system
             InitializeCompanions();
         }
 
@@ -284,6 +295,7 @@ namespace ACOTAR
 
         /// <summary>
         /// Add companion to active party
+        /// v2.6.0: Now updates synergy system when party composition changes
         /// </summary>
         public bool AddToParty(string companionName)
         {
@@ -298,6 +310,10 @@ namespace ACOTAR
             {
                 activeParty.Add(companion);
                 Debug.Log($"{companionName} has joined your party!");
+                
+                // v2.6.0: Update synergies when party changes
+                synergySystem.UpdateActiveSynergies(activeParty);
+                
                 return true;
             }
             return false;
@@ -305,6 +321,7 @@ namespace ACOTAR
 
         /// <summary>
         /// Remove companion from active party
+        /// v2.6.0: Now updates synergy system when party composition changes
         /// </summary>
         public bool RemoveFromParty(string companionName)
         {
@@ -313,6 +330,10 @@ namespace ACOTAR
             {
                 activeParty.Remove(companion);
                 Debug.Log($"{companionName} has left your party.");
+                
+                // v2.6.0: Update synergies when party changes
+                synergySystem.UpdateActiveSynergies(activeParty);
+                
                 return true;
             }
             return false;

@@ -439,5 +439,88 @@ namespace ACOTAR
         {
             return currentCombo;
         }
+
+        /// <summary>
+        /// Apply party synergy bonuses to combat result
+        /// v2.6.0: NEW - Integrates party synergy system with combat
+        /// </summary>
+        public static CombatResult ApplySynergyBonuses(CombatResult baseResult, Character attacker, PartySynergySystem synergySystem)
+        {
+            // Defensive check (v2.6.0)
+            if (baseResult == null || attacker == null || synergySystem == null || !synergySystem.IsInitialized)
+            {
+                return baseResult;
+            }
+
+            // Apply damage synergy bonus
+            float damageBonus = synergySystem.GetSynergyBonus(SynergyType.Damage);
+            if (damageBonus > 0)
+            {
+                int bonusDamage = Mathf.RoundToInt(baseResult.damage * damageBonus);
+                baseResult.damage += bonusDamage;
+                baseResult.description += $" [+{bonusDamage} Synergy Bonus!]";
+            }
+
+            // Apply critical rate synergy bonus
+            float critBonus = synergySystem.GetSynergyBonus(SynergyType.CriticalRate);
+            if (critBonus > 0 && !baseResult.isCritical)
+            {
+                // Chance to upgrade to critical based on synergy
+                if (Random.value < critBonus)
+                {
+                    baseResult.isCritical = true;
+                    int critDamage = Mathf.RoundToInt(baseResult.damage * 0.5f);
+                    baseResult.damage += critDamage;
+                    baseResult.description += " [Synergy CRITICAL!]";
+                }
+            }
+
+            // Apply magic power synergy bonus (for magic attacks)
+            if (baseResult.damageType == DamageType.Magical || 
+                baseResult.damageType == DamageType.Fire || 
+                baseResult.damageType == DamageType.Ice ||
+                baseResult.damageType == DamageType.Darkness ||
+                baseResult.damageType == DamageType.Light)
+            {
+                float magicBonus = synergySystem.GetSynergyBonus(SynergyType.MagicPower);
+                if (magicBonus > 0)
+                {
+                    int bonusMagicDamage = Mathf.RoundToInt(baseResult.damage * magicBonus);
+                    baseResult.damage += bonusMagicDamage;
+                    baseResult.description += $" [+{bonusMagicDamage} Magic Synergy!]";
+                }
+            }
+
+            return baseResult;
+        }
+
+        /// <summary>
+        /// Apply defensive synergy bonuses to reduce incoming damage
+        /// v2.6.0: NEW - Reduce damage based on defense synergies
+        /// </summary>
+        public static int ApplyDefensiveSynergy(int incomingDamage, PartySynergySystem synergySystem)
+        {
+            // Defensive check (v2.6.0)
+            if (synergySystem == null || !synergySystem.IsInitialized)
+            {
+                return incomingDamage;
+            }
+
+            float defenseBonus = synergySystem.GetSynergyBonus(SynergyType.Defense);
+            if (defenseBonus > 0)
+            {
+                int reduction = Mathf.RoundToInt(incomingDamage * defenseBonus);
+                int reducedDamage = Mathf.Max(0, incomingDamage - reduction);
+                
+                if (reduction > 0)
+                {
+                    Debug.Log($"Defense Synergy reduced damage by {reduction}!");
+                }
+                
+                return reducedDamage;
+            }
+
+            return incomingDamage;
+        }
     }
 }
