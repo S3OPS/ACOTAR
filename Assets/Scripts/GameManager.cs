@@ -29,6 +29,13 @@ namespace ACOTAR
         private CraftingSystem craftingSystem;
         private CurrencySystem currencySystem;
         private StatusEffectManager statusEffectManager;
+        
+        // Public property accessors for systems (v2.5.2: Added for cleaner access patterns)
+        public InventorySystem inventory => inventorySystem;
+        public ReputationSystem reputation => reputationSystem;
+        public CraftingSystem crafting => craftingSystem;
+        public CurrencySystem currency => currencySystem;
+        public StatusEffectManager statusEffects => statusEffectManager;
 
         [Header("Game State")]
         public string currentLocation;
@@ -133,11 +140,32 @@ namespace ACOTAR
 
         /// <summary>
         /// Grant player abilities based on ACOTAR lore
+        /// Enhanced in v2.5.2: Added null checks
         /// </summary>
         public void GrantAbility(MagicType ability)
         {
+            if (playerCharacter == null)
+            {
+                Debug.LogWarning("Cannot grant ability: player character not initialized");
+                return;
+            }
+
             playerCharacter.LearnAbility(ability);
             Debug.Log($"{playerCharacter.name} has learned: {ability}");
+        }
+
+        /// <summary>
+        /// Safely get player stats with null checking (v2.5.2: NEW)
+        /// Useful for UI and other systems that need safe stat access
+        /// </summary>
+        public CharacterStats GetPlayerStats()
+        {
+            if (playerCharacter == null)
+            {
+                Debug.LogWarning("Cannot get player stats: player character not initialized");
+                return null;
+            }
+            return playerCharacter.stats;
         }
 
         /// <summary>
@@ -520,6 +548,7 @@ namespace ACOTAR
 
         /// <summary>
         /// Get inventory system (for external access)
+        /// NOTE: Prefer using the 'inventory' property for cleaner code
         /// </summary>
         public InventorySystem GetInventorySystem()
         {
@@ -528,6 +557,7 @@ namespace ACOTAR
 
         /// <summary>
         /// Get reputation system (for external access)
+        /// NOTE: Prefer using the 'reputation' property for cleaner code
         /// </summary>
         public ReputationSystem GetReputationSystem()
         {
@@ -536,6 +566,7 @@ namespace ACOTAR
 
         /// <summary>
         /// Get crafting system (for external access)
+        /// NOTE: Prefer using the 'crafting' property for cleaner code
         /// </summary>
         public CraftingSystem GetCraftingSystem()
         {
@@ -544,6 +575,7 @@ namespace ACOTAR
 
         /// <summary>
         /// Get currency system (for external access)
+        /// NOTE: Prefer using the 'currency' property for cleaner code
         /// </summary>
         public CurrencySystem GetCurrencySystem()
         {
@@ -552,10 +584,34 @@ namespace ACOTAR
 
         /// <summary>
         /// Get status effect manager (for external access)
+        /// NOTE: Prefer using the 'statusEffects' property for cleaner code
         /// </summary>
         public StatusEffectManager GetStatusEffectManager()
         {
             return statusEffectManager;
+        }
+
+        /// <summary>
+        /// Check if all critical game systems are initialized (v2.5.2: NEW)
+        /// Useful for debugging initialization issues
+        /// </summary>
+        public bool AreSystemsInitialized()
+        {
+            return inventorySystem != null 
+                && reputationSystem != null 
+                && craftingSystem != null
+                && currencySystem != null
+                && statusEffectManager != null;
+        }
+
+        /// <summary>
+        /// Validate game state for safe operations (v2.5.2: NEW)
+        /// </summary>
+        public bool IsGameReady()
+        {
+            return Instance != null 
+                && playerCharacter != null 
+                && AreSystemsInitialized();
         }
     }
 }
