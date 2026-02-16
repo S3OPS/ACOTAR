@@ -1,6 +1,6 @@
 # ACOTAR Fantasy RPG
 
-**Version 2.5.0** | **Enhanced Experience: Advanced Systems & Quality-of-Life** ✨
+**Version 2.5.1** | **Enhanced Experience: Infrastructure & Quality-of-Life** ✨
 
 A lore-accurate Fantasy RPG based on Sarah J. Maas's *A Court of Thorns and Roses* series, built with Unity and Docker.
 
@@ -64,6 +64,47 @@ Experience the epic conclusion to the trilogy:
 - **NEW: Valkyrie Abilities**: Unlock Nesta's ultimate powers
 
 ## 🎮 Features
+
+### 🆕 New in v2.5.1 - Infrastructure & Quality-of-Life
+- **Centralized Logging System** 🆕:
+  - Multi-level logging (Trace, Debug, Info, Warning, Error, Critical)
+  - Automatic file rotation and cleanup
+  - Error statistics and tracking
+  - Export logs for bug reports
+  - Category-based log organization
+  - Zero performance impact
+
+- **In-Game Notification System** 🆕:
+  - 10 notification types (Info, Success, Warning, Error, Achievement, Combat, Quest, Loot, Level, System)
+  - Priority-based notification queue
+  - Notification history with 100 message buffer
+  - Read/unread tracking
+  - Rich text formatting support
+  - Automatic game event integration
+
+- **Performance Monitoring System** 🆕:
+  - Real-time FPS tracking and display
+  - Frame time metrics (current, average, max)
+  - Memory usage monitoring
+  - Code profiling for optimization
+  - Debug overlay (toggle with F3)
+  - Performance report export
+
+- **Batch Crafting System** 🆕:
+  - Craft up to 99 items at once
+  - Auto-calculate maximum craftable quantity
+  - Queue multiple batches
+  - Progress tracking with time estimation
+  - Background crafting support
+  - Crafting statistics tracking
+
+- **Customizable Keybinding System** 🆕:
+  - 30+ remappable actions (UI, combat, gameplay, system)
+  - Primary and secondary key bindings
+  - Modifier key support (Ctrl, Shift, Alt)
+  - Conflict detection and prevention
+  - Save/load keybinding profiles
+  - Quick access hotkeys (F5 quick save, F9 quick load)
 
 ### 🆕 New in v2.5.0 - Advanced Systems & Quality-of-Life
 - **Advanced Statistics & Analytics Dashboard** 🆕:
