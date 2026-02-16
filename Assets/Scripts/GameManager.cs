@@ -29,6 +29,13 @@ namespace ACOTAR
         private CraftingSystem craftingSystem;
         private CurrencySystem currencySystem;
         private StatusEffectManager statusEffectManager;
+        
+        // Public property accessors for systems (v2.5.2: Added for cleaner access patterns)
+        public InventorySystem inventory => inventorySystem;
+        public ReputationSystem reputation => reputationSystem;
+        public CraftingSystem crafting => craftingSystem;
+        public CurrencySystem currency => currencySystem;
+        public StatusEffectManager statusEffects => statusEffectManager;
 
         [Header("Game State")]
         public string currentLocation;

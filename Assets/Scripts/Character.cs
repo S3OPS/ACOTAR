@@ -204,11 +204,20 @@ namespace ACOTAR
         /// <summary>
         /// Update equipment bonuses from inventory (v2.3.3: NEW)
         /// Should be called whenever equipment changes
+        /// Enhanced in v2.5.2: Added defensive null checks for better stability
         /// </summary>
         public void UpdateEquipmentBonuses()
         {
+            // Defensive checks to prevent null reference exceptions
             if (GameManager.Instance == null || GameManager.Instance.inventory == null)
             {
+                Debug.LogWarning("Cannot update equipment bonuses: GameManager or inventory not initialized");
+                return;
+            }
+
+            if (_stats == null)
+            {
+                Debug.LogWarning("Cannot update equipment bonuses: Character stats not initialized");
                 return;
             }
 

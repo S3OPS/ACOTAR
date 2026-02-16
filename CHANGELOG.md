@@ -7,6 +7,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.5.2] - 2026-02-16
+
+### 🔧 Code Quality Improvements
+
+- **Enhanced System Access Patterns**
+  - Added public property accessors for all game systems in GameManager
+  - New properties: `inventory`, `reputation`, `crafting`, `currency`, `statusEffects`
+  - Cleaner access pattern: `GameManager.Instance.inventory` instead of `GameManager.Instance.GetInventorySystem()`
+  - Backward compatible: getter methods still available
+
+- **Defensive Programming Enhancements**
+  - Improved null checking in Character.UpdateEquipmentBonuses()
+  - Added defensive checks with informative warning messages
+  - Enhanced error handling throughout critical paths
+  - Better stability and crash prevention
+
+- **Documentation Improvements**
+  - Enhanced XML documentation for critical methods
+  - Added usage notes and version markers
+  - Improved inline comments for complex logic
+
+### 🐛 Bug Fixes
+
+- Fixed Character.cs attempting to access non-existent `GameManager.Instance.inventory` property
+- Resolved potential null reference exceptions in equipment bonus updates
+- Improved initialization flow clarity
+
+### 📊 Code Metrics
+
+- Zero compilation errors
+- Improved code maintainability
+- Enhanced defensive programming throughout
+
+---
+
 ## [2.5.1] - 2026-02-15
 
 ### 🎯 Major Features Added
