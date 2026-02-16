@@ -1,6 +1,6 @@
 # ACOTAR Fantasy RPG
 
-**Version 2.5.3** | **Enhanced Experience: Extended System Improvements** ✨
+**Version 2.6.0** | **Major Gameplay Enhancements: Strategic Depth Update** ✨
 
 A lore-accurate Fantasy RPG based on Sarah J. Maas's *A Court of Thorns and Roses* series, built with Unity and Docker.
 
@@ -64,6 +64,40 @@ Experience the epic conclusion to the trilogy:
 - **NEW: Valkyrie Abilities**: Unlock Nesta's ultimate powers
 
 ## 🎮 Features
+
+### 🆕 New in v2.6.0 - Major Gameplay Enhancements
+- **Party Synergy System** 🆕:
+  - 14 unique companion synergies based on ACOTAR lore
+  - 6 synergy bonus types (Damage, Defense, Healing, Critical, Magic, Experience)
+  - 4 unlockable combo abilities (Starfall Strike, Twin Strike, Death Dancers, Valkyrie Assault)
+  - Strategic party composition gameplay
+  - Achievement tracking for synergy usage
+  - Real-time combat bonus application
+
+- **Advanced Loot System** 🆕:
+  - 6 rarity tiers: Common → Uncommon → Rare → Epic → Legendary → Mythic
+  - 20 equipment affix types for endless variety
+  - 7 themed equipment sets with powerful bonuses (Night Court, Illyrian, Cauldron-Forged)
+  - Procedural item generation based on player level
+  - Set bonus tracking and activation
+  - Color-coded rarity display
+
+- **Enhanced Boss Mechanics** 🆕:
+  - Multi-phase boss encounters (3 phases per major boss)
+  - 10 unique boss abilities (summons, AOE, life drain, ultimate attacks)
+  - 7 environmental hazard types (falling rocks, fire pits, poison gas)
+  - 4 fully configured bosses (Amarantha, Middengard Wyrm, King of Hybern, Attor Leader)
+  - Ultimate attack charging system
+  - Phase-specific damage scaling
+
+- **NPC Schedule System** 🆕:
+  - 6 fully scheduled NPCs with daily routines
+  - 4 time periods with dynamic NPC locations
+  - 7-tier relationship progression (-100 to +100)
+  - Relationship-specific dialogue trees
+  - Random encounter system
+  - Romanceable NPCs (Seraphina the Bard)
+  - Living, breathing world atmosphere
 
 ### 🆕 New in v2.5.1 - Infrastructure & Quality-of-Life
 - **Centralized Logging System** 🆕:
