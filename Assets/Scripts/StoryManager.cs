@@ -32,6 +32,8 @@ namespace ACOTAR
     /// BASE GAME: Book 1 story arcs (Book1_*)
     /// DLC 1: Book 2 story arcs (Book2_*) - requires DLC purchase
     /// DLC 2: Book 3 story arcs (Book3_*) - requires DLC purchase
+    /// 
+    /// v2.5.3: Enhanced with property accessors and defensive programming
     /// </summary>
     public class StoryManager : MonoBehaviour
     {
@@ -39,6 +41,27 @@ namespace ACOTAR
         private StoryArc currentArc;
         private List<string> unlockedLocations;
         private List<string> metCharacters;
+
+        // Public property accessors for cleaner code (v2.5.3)
+        /// <summary>
+        /// Get the current story arc
+        /// </summary>
+        public StoryArc CurrentArc => currentArc;
+
+        /// <summary>
+        /// Get the number of unlocked locations
+        /// </summary>
+        public int UnlockedLocationCount => unlockedLocations?.Count ?? 0;
+
+        /// <summary>
+        /// Get the number of characters met
+        /// </summary>
+        public int MetCharacterCount => metCharacters?.Count ?? 0;
+
+        /// <summary>
+        /// Check if the story system is properly initialized
+        /// </summary>
+        public bool IsInitialized => completedArcs != null && unlockedLocations != null && metCharacters != null;
 
         void Awake()
         {
@@ -114,9 +137,23 @@ namespace ACOTAR
 
         /// <summary>
         /// Complete a story arc and unlock next content
+        /// v2.5.3: Enhanced with defensive checks
         /// </summary>
         public void CompleteArc(StoryArc arc)
         {
+            // Defensive check (v2.5.3)
+            if (!IsInitialized)
+            {
+                Debug.LogWarning("StoryManager: Cannot complete arc - system not initialized");
+                return;
+            }
+
+            if (!completedArcs.ContainsKey(arc))
+            {
+                Debug.LogWarning($"StoryManager: Story arc '{arc}' not found in dictionary");
+                return;
+            }
+
             if (!completedArcs[arc])
             {
                 completedArcs[arc] = true;
@@ -295,8 +332,25 @@ namespace ACOTAR
         /// <summary>
         /// Unlock a location for travel
         /// </summary>
+        /// <summary>
+        /// Unlock a location for the player
+        /// v2.5.3: Enhanced with defensive checks
+        /// </summary>
         public void UnlockLocation(string locationName)
         {
+            // Defensive checks (v2.5.3)
+            if (!IsInitialized)
+            {
+                Debug.LogWarning("StoryManager: Cannot unlock location - system not initialized");
+                return;
+            }
+
+            if (string.IsNullOrEmpty(locationName))
+            {
+                Debug.LogWarning("StoryManager: Cannot unlock location with null or empty name");
+                return;
+            }
+
             if (!unlockedLocations.Contains(locationName))
             {
                 unlockedLocations.Add(locationName);
@@ -306,9 +360,23 @@ namespace ACOTAR
 
         /// <summary>
         /// Track that player has met a character
+        /// v2.5.3: Enhanced with defensive checks
         /// </summary>
         public void UnlockCharacter(string characterName)
         {
+            // Defensive checks (v2.5.3)
+            if (!IsInitialized)
+            {
+                Debug.LogWarning("StoryManager: Cannot unlock character - system not initialized");
+                return;
+            }
+
+            if (string.IsNullOrEmpty(characterName))
+            {
+                Debug.LogWarning("StoryManager: Cannot unlock character with null or empty name");
+                return;
+            }
+
             if (!metCharacters.Contains(characterName))
             {
                 metCharacters.Add(characterName);
@@ -318,22 +386,33 @@ namespace ACOTAR
 
         /// <summary>
         /// Check if location is unlocked
+        /// v2.5.3: Enhanced with defensive checks
         /// </summary>
         public bool IsLocationUnlocked(string locationName)
         {
+            if (!IsInitialized || string.IsNullOrEmpty(locationName))
+            {
+                return false;
+            }
             return unlockedLocations.Contains(locationName);
         }
 
         /// <summary>
         /// Check if character has been met
+        /// v2.5.3: Enhanced with defensive checks
         /// </summary>
         public bool HasMetCharacter(string characterName)
         {
+            if (!IsInitialized || string.IsNullOrEmpty(characterName))
+            {
+                return false;
+            }
             return metCharacters.Contains(characterName);
         }
 
         /// <summary>
         /// Get current story arc
+        /// NOTE: Prefer using the 'CurrentArc' property for cleaner code (v2.5.3)
         /// </summary>
         public StoryArc GetCurrentArc()
         {
@@ -342,9 +421,14 @@ namespace ACOTAR
 
         /// <summary>
         /// Check if story arc is complete
+        /// v2.5.3: Enhanced with defensive checks
         /// </summary>
         public bool IsArcComplete(StoryArc arc)
         {
+            if (!IsInitialized)
+            {
+                return false;
+            }
             return completedArcs.ContainsKey(arc) && completedArcs[arc];
         }
 
@@ -428,6 +512,66 @@ namespace ACOTAR
             string status = completedArcs[arc] ? "✓" : " ";
             string current = (arc == currentArc) ? " <-- CURRENT" : "";
             Debug.Log($"  [{status}] {arc}{current}");
+        }
+
+        /// <summary>
+        /// Get all unlocked location names
+        /// v2.5.3: New helper method for safe access
+        /// </summary>
+        /// <returns>Read-only list of unlocked location names</returns>
+        public List<string> GetUnlockedLocations()
+        {
+            if (!IsInitialized)
+            {
+                Debug.LogWarning("StoryManager: Cannot get unlocked locations - system not initialized");
+                return new List<string>();
+            }
+            return new List<string>(unlockedLocations);
+        }
+
+        /// <summary>
+        /// Get all met character names
+        /// v2.5.3: New helper method for safe access
+        /// </summary>
+        /// <returns>Read-only list of met character names</returns>
+        public List<string> GetMetCharacters()
+        {
+            if (!IsInitialized)
+            {
+                Debug.LogWarning("StoryManager: Cannot get met characters - system not initialized");
+                return new List<string>();
+            }
+            return new List<string>(metCharacters);
+        }
+
+        /// <summary>
+        /// Get story progression percentage (0-100)
+        /// v2.5.3: New helper method for progress tracking
+        /// </summary>
+        /// <returns>Percentage of story arcs completed</returns>
+        public float GetProgressPercentage()
+        {
+            if (!IsInitialized)
+            {
+                return 0f;
+            }
+
+            int totalArcs = completedArcs.Count;
+            if (totalArcs == 0)
+            {
+                return 0f;
+            }
+
+            int completedCount = 0;
+            foreach (bool completed in completedArcs.Values)
+            {
+                if (completed)
+                {
+                    completedCount++;
+                }
+            }
+
+            return (float)completedCount / totalArcs * 100f;
         }
     }
 }

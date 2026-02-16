@@ -9,6 +9,8 @@ namespace ACOTAR
     /// Central audio management system for ACOTAR RPG
     /// Handles music, sound effects, and ambient audio
     /// Integrates with SettingsUI for volume control
+    /// 
+    /// v2.5.3: Enhanced with property accessors and defensive programming
     /// </summary>
     public class AudioManager : MonoBehaviour
     {
@@ -42,6 +44,53 @@ namespace ACOTAR
         // Audio pooling for performance
         private Queue<AudioSource> sfxPool = new Queue<AudioSource>();
         private const int SFX_POOL_SIZE = 10;
+
+        // Public property accessors for cleaner code (v2.5.3)
+        /// <summary>
+        /// Get the master volume (0-1)
+        /// </summary>
+        public float MasterVolume => masterVolume;
+
+        /// <summary>
+        /// Get the music volume (0-1)
+        /// </summary>
+        public float MusicVolume => musicVolume;
+
+        /// <summary>
+        /// Get the SFX volume (0-1)
+        /// </summary>
+        public float SFXVolume => sfxVolume;
+
+        /// <summary>
+        /// Get the ambient volume (0-1)
+        /// </summary>
+        public float AmbientVolume => ambientVolume;
+
+        /// <summary>
+        /// Get the UI volume (0-1)
+        /// </summary>
+        public float UIVolume => uiVolume;
+
+        /// <summary>
+        /// Check if audio is muted
+        /// </summary>
+        public bool IsMuted => isMuted;
+
+        /// <summary>
+        /// Get the currently playing music clip
+        /// </summary>
+        public AudioClip CurrentMusic => currentMusic;
+
+        /// <summary>
+        /// Get the currently playing ambient clip
+        /// </summary>
+        public AudioClip CurrentAmbient => currentAmbient;
+
+        /// <summary>
+        /// Check if the audio system is properly initialized
+        /// </summary>
+        public bool IsInitialized => musicSource != null && ambientSource != null && 
+                                      sfxSource != null && uiSource != null && sfxPool != null;
 
         private void Awake()
         {
@@ -124,9 +173,29 @@ namespace ACOTAR
         /// <summary>
         /// Play background music with optional fade in
         /// </summary>
+        /// <summary>
+        /// Play music with optional crossfade
+        /// v2.5.3: Enhanced with defensive checks
+        /// </summary>
         public void PlayMusic(AudioClip clip, float fadeInTime = 1.0f, bool loop = true)
         {
-            if (clip == null || clip == currentMusic) return;
+            // Defensive checks (v2.5.3)
+            if (!IsInitialized)
+            {
+                Debug.LogWarning("AudioManager: Cannot play music - system not initialized");
+                return;
+            }
+
+            if (clip == null)
+            {
+                Debug.LogWarning("AudioManager: Cannot play null music clip");
+                return;
+            }
+
+            if (clip == currentMusic)
+            {
+                return; // Already playing this track
+            }
 
             if (musicFadeCoroutine != null)
             {
@@ -138,15 +207,37 @@ namespace ACOTAR
 
         /// <summary>
         /// Play music by name from sound library
+        /// v2.5.3: Enhanced with defensive checks
         /// </summary>
         public void PlayMusicByName(string musicName, float fadeInTime = 1.0f)
         {
-            if (soundLibrary == null) return;
+            // Defensive checks (v2.5.3)
+            if (!IsInitialized)
+            {
+                Debug.LogWarning("AudioManager: Cannot play music by name - system not initialized");
+                return;
+            }
+
+            if (string.IsNullOrEmpty(musicName))
+            {
+                Debug.LogWarning("AudioManager: Cannot play music with null or empty name");
+                return;
+            }
+
+            if (soundLibrary == null)
+            {
+                Debug.LogWarning("AudioManager: Sound library not assigned");
+                return;
+            }
             
             AudioClip clip = soundLibrary.GetMusicClip(musicName);
             if (clip != null)
             {
                 PlayMusic(clip, fadeInTime);
+            }
+            else
+            {
+                Debug.LogWarning($"AudioManager: Music clip '{musicName}' not found in sound library");
             }
         }
 
@@ -229,25 +320,64 @@ namespace ACOTAR
 
         /// <summary>
         /// Play ambient sound loop
+        /// v2.5.3: Enhanced with defensive checks
         /// </summary>
         public void PlayAmbient(AudioClip clip, float fadeInTime = 2.0f)
         {
-            if (clip == null || clip == currentAmbient) return;
+            // Defensive checks (v2.5.3)
+            if (!IsInitialized)
+            {
+                Debug.LogWarning("AudioManager: Cannot play ambient - system not initialized");
+                return;
+            }
+
+            if (clip == null)
+            {
+                Debug.LogWarning("AudioManager: Cannot play null ambient clip");
+                return;
+            }
+
+            if (clip == currentAmbient)
+            {
+                return; // Already playing this ambient
+            }
 
             StartCoroutine(FadeAmbient(clip, fadeInTime));
         }
 
         /// <summary>
         /// Play ambient by name from sound library
+        /// v2.5.3: Enhanced with defensive checks
         /// </summary>
         public void PlayAmbientByName(string ambientName, float fadeInTime = 2.0f)
         {
-            if (soundLibrary == null) return;
+            // Defensive checks (v2.5.3)
+            if (!IsInitialized)
+            {
+                Debug.LogWarning("AudioManager: Cannot play ambient by name - system not initialized");
+                return;
+            }
+
+            if (string.IsNullOrEmpty(ambientName))
+            {
+                Debug.LogWarning("AudioManager: Cannot play ambient with null or empty name");
+                return;
+            }
+
+            if (soundLibrary == null)
+            {
+                Debug.LogWarning("AudioManager: Sound library not assigned");
+                return;
+            }
 
             AudioClip clip = soundLibrary.GetAmbientClip(ambientName);
             if (clip != null)
             {
                 PlayAmbient(clip, fadeInTime);
+            }
+            else
+            {
+                Debug.LogWarning($"AudioManager: Ambient clip '{ambientName}' not found in sound library");
             }
         }
 
@@ -321,10 +451,27 @@ namespace ACOTAR
 
         /// <summary>
         /// Play a sound effect once
+        /// v2.5.3: Enhanced with defensive checks
         /// </summary>
         public void PlaySFX(AudioClip clip, float volumeScale = 1.0f, float pitch = 1.0f)
         {
-            if (clip == null || isMuted) return;
+            // Defensive checks (v2.5.3)
+            if (!IsInitialized)
+            {
+                Debug.LogWarning("AudioManager: Cannot play SFX - system not initialized");
+                return;
+            }
+
+            if (clip == null)
+            {
+                Debug.LogWarning("AudioManager: Cannot play null SFX clip");
+                return;
+            }
+
+            if (isMuted)
+            {
+                return; // Audio is muted
+            }
 
             if (sfxPool.Count > 0)
             {
@@ -341,15 +488,37 @@ namespace ACOTAR
 
         /// <summary>
         /// Play SFX by name from sound library
+        /// v2.5.3: Enhanced with defensive checks
         /// </summary>
         public void PlaySFXByName(string sfxName, float volumeScale = 1.0f, float pitch = 1.0f)
         {
-            if (soundLibrary == null) return;
+            // Defensive checks (v2.5.3)
+            if (!IsInitialized)
+            {
+                Debug.LogWarning("AudioManager: Cannot play SFX by name - system not initialized");
+                return;
+            }
+
+            if (string.IsNullOrEmpty(sfxName))
+            {
+                Debug.LogWarning("AudioManager: Cannot play SFX with null or empty name");
+                return;
+            }
+
+            if (soundLibrary == null)
+            {
+                Debug.LogWarning("AudioManager: Sound library not assigned");
+                return;
+            }
 
             AudioClip clip = soundLibrary.GetSFXClip(sfxName);
             if (clip != null)
             {
                 PlaySFX(clip, volumeScale, pitch);
+            }
+            else
+            {
+                Debug.LogWarning($"AudioManager: SFX clip '{sfxName}' not found in sound library");
             }
         }
 
