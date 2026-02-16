@@ -330,9 +330,6 @@ namespace ACOTAR
         }
 
         /// <summary>
-        /// Unlock a location for travel
-        /// </summary>
-        /// <summary>
         /// Unlock a location for the player
         /// v2.5.3: Enhanced with defensive checks
         /// </summary>

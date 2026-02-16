@@ -171,9 +171,6 @@ namespace ACOTAR
         #region Music Control
 
         /// <summary>
-        /// Play background music with optional fade in
-        /// </summary>
-        /// <summary>
         /// Play music with optional crossfade
         /// v2.5.3: Enhanced with defensive checks
         /// </summary>

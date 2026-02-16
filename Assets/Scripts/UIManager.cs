@@ -132,7 +132,6 @@ namespace ACOTAR
         }
 
         /// <summary>
-        /// <summary>
         /// Show a specific UI panel
         /// v2.5.3: Enhanced with defensive checks
         /// </summary>
@@ -241,7 +240,6 @@ namespace ACOTAR
             }
         }
 
-        /// <summary>
         /// <summary>
         /// Update HUD with character information
         /// v2.5.3: Enhanced with defensive checks
