@@ -7,6 +7,8 @@ namespace ACOTAR
     /// <summary>
     /// Central UI management system for ACOTAR RPG
     /// Manages all UI panels, screens, and user interactions
+    /// 
+    /// v2.5.3: Enhanced with property accessors and defensive programming
     /// </summary>
     public class UIManager : MonoBehaviour
     {
@@ -65,6 +67,27 @@ namespace ACOTAR
         private Dictionary<string, GameObject> activePanels;
         private bool isGamePaused;
 
+        // Public property accessors for cleaner code (v2.5.3)
+        /// <summary>
+        /// Check if the game is currently paused
+        /// </summary>
+        public bool IsPaused => isGamePaused;
+
+        /// <summary>
+        /// Check if a notification is currently being shown
+        /// </summary>
+        public bool IsShowingNotification => isShowingNotification;
+
+        /// <summary>
+        /// Get the number of queued notifications
+        /// </summary>
+        public int NotificationQueueCount => notificationQueue?.Count ?? 0;
+
+        /// <summary>
+        /// Check if the UI system is properly initialized
+        /// </summary>
+        public bool IsInitialized => activePanels != null && hudPanel != null;
+
         void Awake()
         {
             // Singleton pattern
@@ -110,9 +133,23 @@ namespace ACOTAR
 
         /// <summary>
         /// Show a specific UI panel
+        /// v2.5.3: Enhanced with defensive checks
         /// </summary>
         public void ShowPanel(string panelName)
         {
+            // Defensive checks (v2.5.3)
+            if (!IsInitialized)
+            {
+                Debug.LogWarning("UIManager: Cannot show panel - system not initialized");
+                return;
+            }
+
+            if (string.IsNullOrEmpty(panelName))
+            {
+                Debug.LogWarning("UIManager: Cannot show panel with null or empty name");
+                return;
+            }
+
             if (activePanels.ContainsKey(panelName) && activePanels[panelName] != null)
             {
                 activePanels[panelName].SetActive(true);
@@ -126,9 +163,23 @@ namespace ACOTAR
 
         /// <summary>
         /// Hide a specific UI panel
+        /// v2.5.3: Enhanced with defensive checks
         /// </summary>
         public void HidePanel(string panelName)
         {
+            // Defensive checks (v2.5.3)
+            if (!IsInitialized)
+            {
+                Debug.LogWarning("UIManager: Cannot hide panel - system not initialized");
+                return;
+            }
+
+            if (string.IsNullOrEmpty(panelName))
+            {
+                Debug.LogWarning("UIManager: Cannot hide panel with null or empty name");
+                return;
+            }
+
             if (activePanels.ContainsKey(panelName) && activePanels[panelName] != null)
             {
                 activePanels[panelName].SetActive(false);
@@ -138,22 +189,48 @@ namespace ACOTAR
 
         /// <summary>
         /// Toggle a UI panel's visibility
+        /// v2.5.3: Enhanced with defensive checks
         /// </summary>
         public void TogglePanel(string panelName)
         {
+            // Defensive checks (v2.5.3)
+            if (!IsInitialized)
+            {
+                Debug.LogWarning("UIManager: Cannot toggle panel - system not initialized");
+                return;
+            }
+
+            if (string.IsNullOrEmpty(panelName))
+            {
+                Debug.LogWarning("UIManager: Cannot toggle panel with null or empty name");
+                return;
+            }
+
             if (activePanels.ContainsKey(panelName) && activePanels[panelName] != null)
             {
                 bool isActive = activePanels[panelName].activeSelf;
                 activePanels[panelName].SetActive(!isActive);
                 Debug.Log($"Toggling panel {panelName}: {!isActive}");
             }
+            else
+            {
+                Debug.LogWarning($"Panel not found: {panelName}");
+            }
         }
 
         /// <summary>
         /// Hide all UI panels
+        /// v2.5.3: Enhanced with defensive checks
         /// </summary>
         public void HideAllPanels()
         {
+            // Defensive check (v2.5.3)
+            if (!IsInitialized)
+            {
+                Debug.LogWarning("UIManager: Cannot hide all panels - system not initialized");
+                return;
+            }
+
             foreach (var panel in activePanels.Values)
             {
                 if (panel != null)
@@ -165,10 +242,28 @@ namespace ACOTAR
 
         /// <summary>
         /// Update HUD with character information
+        /// v2.5.3: Enhanced with defensive checks
         /// </summary>
         public void UpdateHUD(Character character)
         {
-            if (character == null) return;
+            // Defensive checks (v2.5.3)
+            if (!IsInitialized)
+            {
+                Debug.LogWarning("UIManager: Cannot update HUD - system not initialized");
+                return;
+            }
+
+            if (character == null)
+            {
+                Debug.LogWarning("UIManager: Cannot update HUD with null character");
+                return;
+            }
+
+            if (character.stats == null)
+            {
+                Debug.LogWarning("UIManager: Cannot update HUD - character stats are null");
+                return;
+            }
 
             // Update health bar
             if (healthBar != null)

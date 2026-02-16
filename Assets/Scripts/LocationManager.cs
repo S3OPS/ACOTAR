@@ -40,12 +40,25 @@ namespace ACOTAR
     /// <summary>
     /// Manages all locations in Prythian
     /// Optimized with caching for court-based lookups
+    /// 
+    /// v2.5.3: Enhanced with property accessors and defensive programming
     /// </summary>
     public class LocationManager : MonoBehaviour
     {
         private Dictionary<string, Location> locations;
         private Dictionary<Court, List<Location>> courtLocationCache;
         private List<string> locationNamesCache;
+
+        // Public property accessors for cleaner code (v2.5.3)
+        /// <summary>
+        /// Get the total number of locations defined in the system
+        /// </summary>
+        public int LocationCount => locations?.Count ?? 0;
+
+        /// <summary>
+        /// Check if the location system is properly initialized
+        /// </summary>
+        public bool IsInitialized => locations != null && locations.Count > 0;
 
         void Awake()
         {
@@ -188,6 +201,26 @@ namespace ACOTAR
 
         private void AddLocation(Location location)
         {
+            // Defensive check (v2.5.3)
+            if (location == null)
+            {
+                Debug.LogWarning("LocationManager: Attempted to add null location");
+                return;
+            }
+
+            if (string.IsNullOrEmpty(location.name))
+            {
+                Debug.LogWarning("LocationManager: Attempted to add location with null or empty name");
+                return;
+            }
+
+            // Check for duplicate to prevent overwriting existing locations
+            if (locations.ContainsKey(location.name))
+            {
+                Debug.LogWarning($"LocationManager: Location '{location.name}' already exists. Skipping duplicate.");
+                return;
+            }
+
             locations[location.name] = location;
             
             // Invalidate cache when adding new location
@@ -195,20 +228,49 @@ namespace ACOTAR
             locationNamesCache = null;
         }
 
+        /// <summary>
+        /// Get a location by name
+        /// v2.5.3: Enhanced with defensive checks and informative warnings
+        /// </summary>
+        /// <param name="name">The name of the location to retrieve</param>
+        /// <returns>The location if found, null otherwise</returns>
         public Location GetLocation(string name)
         {
+            // Defensive checks (v2.5.3)
+            if (!IsInitialized)
+            {
+                Debug.LogWarning("LocationManager: Cannot get location - system not initialized");
+                return null;
+            }
+
+            if (string.IsNullOrEmpty(name))
+            {
+                Debug.LogWarning("LocationManager: Cannot get location with null or empty name");
+                return null;
+            }
+
             if (locations.ContainsKey(name))
             {
                 return locations[name];
             }
+            
+            // Location not found - this is normal, not a warning
             return null;
         }
 
         /// <summary>
         /// Get locations by court with caching for optimization
+        /// v2.5.3: Enhanced with defensive checks
         /// </summary>
         public List<Location> GetLocationsByCourt(Court court)
         {
+            // Defensive checks (v2.5.3)
+            if (!IsInitialized)
+            {
+                Debug.LogWarning("LocationManager: Cannot get locations by court - system not initialized");
+                return new List<Location>();
+            }
+
             // Check cache first
             if (courtLocationCache.ContainsKey(court))
             {
@@ -231,14 +293,52 @@ namespace ACOTAR
 
         /// <summary>
         /// Get all location names with caching for optimization
+        /// v2.5.3: Enhanced with defensive checks
         /// </summary>
         public List<string> GetAllLocationNames()
         {
+            // Defensive check (v2.5.3)
+            if (!IsInitialized)
+            {
+                Debug.LogWarning("LocationManager: Cannot get location names - system not initialized");
+                return new List<string>();
+            }
+
             if (locationNamesCache == null)
             {
                 locationNamesCache = new List<string>(locations.Keys);
             }
             return new List<string>(locationNamesCache);
+        }
+
+        /// <summary>
+        /// Check if a specific location exists in the system
+        /// v2.5.3: New helper method
+        /// </summary>
+        /// <param name="locationName">The name of the location to check</param>
+        /// <returns>True if the location exists, false otherwise</returns>
+        public bool LocationExists(string locationName)
+        {
+            if (!IsInitialized || string.IsNullOrEmpty(locationName))
+            {
+                return false;
+            }
+            return locations.ContainsKey(locationName);
+        }
+
+        /// <summary>
+        /// Get all locations in the system
+        /// v2.5.3: New helper method for complete location access
+        /// </summary>
+        /// <returns>List of all locations</returns>
+        public List<Location> GetAllLocations()
+        {
+            if (!IsInitialized)
+            {
+                Debug.LogWarning("LocationManager: Cannot get all locations - system not initialized");
+                return new List<Location>();
+            }
+            return new List<Location>(locations.Values);
         }
     }
 }
