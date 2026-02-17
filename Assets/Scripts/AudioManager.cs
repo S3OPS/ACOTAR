@@ -172,69 +172,123 @@ namespace ACOTAR
 
         /// <summary>
         /// Play music with optional crossfade
-        /// v2.5.3: Enhanced with defensive checks
         /// </summary>
+        /// <param name="clip">The audio clip to play</param>
+        /// <param name="fadeInTime">Time in seconds to fade in the music</param>
+        /// <param name="loop">Whether the music should loop</param>
+        /// <remarks>
+        /// v2.5.3: Enhanced with defensive checks
+        /// v2.6.3: Added comprehensive error handling, structured logging, and XML documentation
+        /// 
+        /// This method safely plays music with crossfade support. It validates the audio system
+        /// initialization, checks for null clips, and handles coroutine management.
+        /// 
+        /// If the system is not initialized or the clip is null, the method logs a warning
+        /// and returns gracefully without throwing exceptions.
+        /// </remarks>
         public void PlayMusic(AudioClip clip, float fadeInTime = 1.0f, bool loop = true)
         {
-            // Defensive checks (v2.5.3)
-            if (!IsInitialized)
+            try
             {
-                Debug.LogWarning("AudioManager: Cannot play music - system not initialized");
-                return;
-            }
+                // Input validation
+                if (!IsInitialized)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "Audio", "Cannot play music: AudioManager not initialized");
+                    return;
+                }
 
-            if (clip == null)
+                if (clip == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "Audio", "Cannot play music: clip is null");
+                    return;
+                }
+
+                if (clip == currentMusic)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Debug, 
+                        "Audio", $"Music '{clip.name}' is already playing");
+                    return; // Already playing this track
+                }
+
+                // Stop existing fade coroutine
+                if (musicFadeCoroutine != null)
+                {
+                    StopCoroutine(musicFadeCoroutine);
+                }
+
+                // Start music crossfade
+                musicFadeCoroutine = StartCoroutine(CrossfadeMusic(clip, fadeInTime, loop));
+                
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, 
+                    "Audio", $"Playing music: {clip.name} (fade: {fadeInTime}s, loop: {loop})");
+            }
+            catch (System.Exception ex)
             {
-                Debug.LogWarning("AudioManager: Cannot play null music clip");
-                return;
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                    "Audio", $"Exception in PlayMusic: {ex.Message}\nStack: {ex.StackTrace}");
             }
-
-            if (clip == currentMusic)
-            {
-                return; // Already playing this track
-            }
-
-            if (musicFadeCoroutine != null)
-            {
-                StopCoroutine(musicFadeCoroutine);
-            }
-
-            musicFadeCoroutine = StartCoroutine(CrossfadeMusic(clip, fadeInTime, loop));
         }
 
         /// <summary>
         /// Play music by name from sound library
-        /// v2.5.3: Enhanced with defensive checks
         /// </summary>
+        /// <param name="musicName">Name of the music track to play</param>
+        /// <param name="fadeInTime">Time in seconds to fade in the music</param>
+        /// <remarks>
+        /// v2.5.3: Enhanced with defensive checks
+        /// v2.6.3: Added comprehensive error handling, structured logging, and XML documentation
+        /// 
+        /// This method looks up a music clip by name in the sound library and plays it.
+        /// It performs validation on the audio system, music name, and sound library before
+        /// attempting to retrieve and play the clip.
+        /// 
+        /// If the clip is not found in the library, a warning is logged and the method
+        /// returns gracefully without throwing exceptions.
+        /// </remarks>
         public void PlayMusicByName(string musicName, float fadeInTime = 1.0f)
         {
-            // Defensive checks (v2.5.3)
-            if (!IsInitialized)
+            try
             {
-                Debug.LogWarning("AudioManager: Cannot play music by name - system not initialized");
-                return;
-            }
+                // Input validation
+                if (!IsInitialized)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "Audio", "Cannot play music by name: AudioManager not initialized");
+                    return;
+                }
 
-            if (string.IsNullOrEmpty(musicName))
-            {
-                Debug.LogWarning("AudioManager: Cannot play music with null or empty name");
-                return;
-            }
+                if (string.IsNullOrEmpty(musicName))
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "Audio", "Cannot play music: musicName is null or empty");
+                    return;
+                }
 
-            if (soundLibrary == null)
-            {
-                Debug.LogWarning("AudioManager: Sound library not assigned");
-                return;
+                if (soundLibrary == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "Audio", "Cannot play music: sound library not assigned");
+                    return;
+                }
+                
+                // Get clip from library
+                AudioClip clip = soundLibrary.GetMusicClip(musicName);
+                if (clip != null)
+                {
+                    PlayMusic(clip, fadeInTime);
+                }
+                else
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "Audio", $"Music clip '{musicName}' not found in sound library");
+                }
             }
-            
-            AudioClip clip = soundLibrary.GetMusicClip(musicName);
-            if (clip != null)
+            catch (System.Exception ex)
             {
-                PlayMusic(clip, fadeInTime);
-            }
-            else
-            {
-                Debug.LogWarning($"AudioManager: Music clip '{musicName}' not found in sound library");
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                    "Audio", $"Exception in PlayMusicByName: {ex.Message}\nStack: {ex.StackTrace}");
             }
         }
 
@@ -317,29 +371,56 @@ namespace ACOTAR
 
         /// <summary>
         /// Play ambient sound loop
-        /// v2.5.3: Enhanced with defensive checks
         /// </summary>
+        /// <param name="clip">The ambient audio clip to play</param>
+        /// <param name="fadeInTime">Time in seconds to fade in the ambient sound</param>
+        /// <remarks>
+        /// v2.5.3: Enhanced with defensive checks
+        /// v2.6.3: Added comprehensive error handling, structured logging, and XML documentation
+        /// 
+        /// This method plays ambient sound effects that loop continuously. It validates the
+        /// audio system initialization and checks for null clips before starting the fade.
+        /// 
+        /// If the same ambient is already playing, the method returns early to avoid unnecessary
+        /// coroutine creation.
+        /// </remarks>
         public void PlayAmbient(AudioClip clip, float fadeInTime = 2.0f)
         {
-            // Defensive checks (v2.5.3)
-            if (!IsInitialized)
+            try
             {
-                Debug.LogWarning("AudioManager: Cannot play ambient - system not initialized");
-                return;
-            }
+                // Input validation
+                if (!IsInitialized)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "Audio", "Cannot play ambient: AudioManager not initialized");
+                    return;
+                }
 
-            if (clip == null)
+                if (clip == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "Audio", "Cannot play ambient: clip is null");
+                    return;
+                }
+
+                if (clip == currentAmbient)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Debug, 
+                        "Audio", $"Ambient '{clip.name}' is already playing");
+                    return; // Already playing this ambient
+                }
+
+                // Start ambient fade
+                StartCoroutine(FadeAmbient(clip, fadeInTime));
+                
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, 
+                    "Audio", $"Playing ambient: {clip.name} (fade: {fadeInTime}s)");
+            }
+            catch (System.Exception ex)
             {
-                Debug.LogWarning("AudioManager: Cannot play null ambient clip");
-                return;
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                    "Audio", $"Exception in PlayAmbient: {ex.Message}\nStack: {ex.StackTrace}");
             }
-
-            if (clip == currentAmbient)
-            {
-                return; // Already playing this ambient
-            }
-
-            StartCoroutine(FadeAmbient(clip, fadeInTime));
         }
 
         /// <summary>
@@ -448,38 +529,77 @@ namespace ACOTAR
 
         /// <summary>
         /// Play a sound effect once
-        /// v2.5.3: Enhanced with defensive checks
         /// </summary>
+        /// <param name="clip">The sound effect clip to play</param>
+        /// <param name="volumeScale">Volume multiplier for this SFX (0-1)</param>
+        /// <param name="pitch">Pitch modification for this SFX</param>
+        /// <remarks>
+        /// v2.5.3: Enhanced with defensive checks
+        /// v2.6.3: Added comprehensive error handling, structured logging, and XML documentation
+        /// 
+        /// This method plays sound effects using an audio source pool for performance.
+        /// It validates system initialization, checks for null clips, and respects mute settings.
+        /// 
+        /// If the SFX pool is exhausted, the method falls back to using the main SFX source.
+        /// This prevents audio from being dropped when many sounds play simultaneously.
+        /// </remarks>
         public void PlaySFX(AudioClip clip, float volumeScale = 1.0f, float pitch = 1.0f)
         {
-            // Defensive checks (v2.5.3)
-            if (!IsInitialized)
+            try
             {
-                Debug.LogWarning("AudioManager: Cannot play SFX - system not initialized");
-                return;
-            }
+                // Input validation
+                if (!IsInitialized)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "Audio", "Cannot play SFX: AudioManager not initialized");
+                    return;
+                }
 
-            if (clip == null)
-            {
-                Debug.LogWarning("AudioManager: Cannot play null SFX clip");
-                return;
-            }
+                if (clip == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "Audio", "Cannot play SFX: clip is null");
+                    return;
+                }
 
-            if (isMuted)
-            {
-                return; // Audio is muted
-            }
+                if (isMuted)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Debug, 
+                        "Audio", "Cannot play SFX: audio is muted");
+                    return; // Audio is muted
+                }
 
-            if (sfxPool.Count > 0)
-            {
-                AudioSource pooledSource = sfxPool.Dequeue();
-                StartCoroutine(PlayPooledSFX(pooledSource, clip, volumeScale, pitch));
+                // Use pooled audio source if available
+                if (sfxPool != null && sfxPool.Count > 0)
+                {
+                    AudioSource pooledSource = sfxPool.Dequeue();
+                    if (pooledSource != null)
+                    {
+                        StartCoroutine(PlayPooledSFX(pooledSource, clip, volumeScale, pitch));
+                        LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Debug, 
+                            "Audio", $"Playing SFX from pool: {clip.name}");
+                    }
+                    else
+                    {
+                        LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                            "Audio", "Pool returned null audio source, using fallback");
+                        sfxSource.pitch = pitch;
+                        sfxSource.PlayOneShot(clip, sfxVolume * masterVolume * volumeScale);
+                    }
+                }
+                else
+                {
+                    // Fallback if pool is exhausted
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Debug, 
+                        "Audio", $"SFX pool exhausted, using fallback for: {clip.name}");
+                    sfxSource.pitch = pitch;
+                    sfxSource.PlayOneShot(clip, sfxVolume * masterVolume * volumeScale);
+                }
             }
-            else
+            catch (System.Exception ex)
             {
-                // Fallback if pool is exhausted
-                sfxSource.pitch = pitch;
-                sfxSource.PlayOneShot(clip, sfxVolume * masterVolume * volumeScale);
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                    "Audio", $"Exception in PlaySFX: {ex.Message}\nStack: {ex.StackTrace}");
             }
         }
 

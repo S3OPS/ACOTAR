@@ -112,50 +112,143 @@ namespace ACOTAR
         /// <summary>
         /// Add minutes to current time
         /// </summary>
+        /// <param name="minutes">Number of minutes to add</param>
+        /// <remarks>
+        /// v2.6.3: Added comprehensive error handling, structured logging, and XML documentation
+        /// 
+        /// This method advances the game time by the specified number of minutes. If the minutes
+        /// exceed 60, hours are automatically advanced through the AddHours method.
+        /// 
+        /// This method is called frequently during Update, so error handling is critical to prevent
+        /// cascading failures in the time system.
+        /// </remarks>
         public void AddMinutes(int minutes)
         {
-            currentMinute += minutes;
-
-            while (currentMinute >= 60)
+            try
             {
-                currentMinute -= 60;
-                AddHours(1);
-            }
+                // Input validation
+                if (minutes < 0)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "Time", $"Cannot add negative minutes: {minutes}");
+                    return;
+                }
 
-            CheckTimeOfDayChange();
+                currentMinute += minutes;
+
+                while (currentMinute >= 60)
+                {
+                    currentMinute -= 60;
+                    AddHours(1);
+                }
+
+                CheckTimeOfDayChange();
+            }
+            catch (System.Exception ex)
+            {
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                    "Time", $"Exception in AddMinutes: {ex.Message}\nStack: {ex.StackTrace}");
+            }
         }
 
         /// <summary>
         /// Add hours to current time
         /// </summary>
+        /// <param name="hours">Number of hours to add</param>
+        /// <remarks>
+        /// v2.6.3: Added comprehensive error handling, structured logging, and XML documentation
+        /// 
+        /// This method advances the game time by the specified number of hours. If the hours
+        /// exceed 24, days are automatically advanced through the AddDays method, which fires
+        /// the OnDayChanged event.
+        /// 
+        /// Error handling is critical here as this method is in the call chain from AddMinutes
+        /// and any failure could break the entire time progression system.
+        /// </remarks>
         public void AddHours(int hours)
         {
-            currentHour += hours;
-
-            while (currentHour >= 24)
+            try
             {
-                currentHour -= 24;
-                AddDays(1);
-            }
+                // Input validation
+                if (hours < 0)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "Time", $"Cannot add negative hours: {hours}");
+                    return;
+                }
 
-            CheckTimeOfDayChange();
+                currentHour += hours;
+
+                while (currentHour >= 24)
+                {
+                    currentHour -= 24;
+                    AddDays(1);
+                }
+
+                CheckTimeOfDayChange();
+            }
+            catch (System.Exception ex)
+            {
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                    "Time", $"Exception in AddHours: {ex.Message}\nStack: {ex.StackTrace}");
+            }
         }
 
         /// <summary>
         /// Add days to current time
         /// </summary>
+        /// <param name="days">Number of days to add</param>
+        /// <remarks>
+        /// v2.6.3: Added comprehensive error handling, structured logging, and XML documentation
+        /// 
+        /// This method advances the game time by the specified number of days. It updates the
+        /// moon cycle, fires the OnDayChanged event, and checks for moon phase changes.
+        /// 
+        /// CRITICAL: This method invokes event handlers. Any exception in event listeners could
+        /// propagate back here. The try-catch block protects against listener failures breaking
+        /// the time system.
+        /// </remarks>
         public void AddDays(int days)
         {
-            currentDay += days;
-            moonCycle = (moonCycle + days) % 30;
-
-            OnDayChanged?.Invoke(currentDay);
-            CheckMoonPhaseChange();
-
-            while (currentDay > daysPerMonth)
+            try
             {
-                currentDay -= daysPerMonth;
-                AddMonths(1);
+                // Input validation
+                if (days < 0)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "Time", $"Cannot add negative days: {days}");
+                    return;
+                }
+
+                currentDay += days;
+                moonCycle = (moonCycle + days) % 30;
+
+                // Safely invoke day changed event
+                try
+                {
+                    OnDayChanged?.Invoke(currentDay);
+                }
+                catch (System.Exception eventEx)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "Time", $"Exception in OnDayChanged event handler: {eventEx.Message}");
+                }
+
+                CheckMoonPhaseChange();
+
+                while (currentDay > daysPerMonth)
+                {
+                    currentDay -= daysPerMonth;
+                    AddMonths(1);
+                }
+                
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Debug, 
+                    "Time", $"Advanced {days} day(s), now Day {currentDay}");
+            }
+            catch (System.Exception ex)
+            {
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                    "Time", $"Exception in AddDays: {ex.Message}\nStack: {ex.StackTrace}");
             }
         }
 

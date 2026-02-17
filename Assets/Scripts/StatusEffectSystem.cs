@@ -220,26 +220,87 @@ namespace ACOTAR
         /// <summary>
         /// Apply a status effect to a character
         /// </summary>
+        /// <param name="target">Character to apply the effect to</param>
+        /// <param name="effectType">Type of status effect to apply</param>
+        /// <param name="duration">Duration in turns</param>
+        /// <param name="potency">Strength of the effect</param>
+        /// <remarks>
+        /// v2.6.3: Added comprehensive error handling, structured logging, and XML documentation
+        /// 
+        /// This method applies a status effect to a character. If the effect already exists,
+        /// it refreshes the duration and potency to the maximum values.
+        /// 
+        /// Error handling prevents null reference exceptions and ensures the character effects
+        /// dictionary is properly initialized before use.
+        /// </remarks>
         public void ApplyEffect(Character target, StatusEffectType effectType, int duration, int potency = 1)
         {
-            if (!characterEffects.ContainsKey(target))
+            try
             {
-                characterEffects[target] = new List<StatusEffect>();
-            }
+                // Input validation
+                if (target == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "StatusEffect", "Cannot apply effect: target character is null");
+                    return;
+                }
 
-            // Check if effect already exists - refresh duration if so
-            var existingEffect = characterEffects[target].Find(e => e.type == effectType);
-            if (existingEffect != null)
-            {
-                existingEffect.duration = Mathf.Max(existingEffect.duration, duration);
-                existingEffect.potency = Mathf.Max(existingEffect.potency, potency);
-                Debug.Log($"{target.name}'s {effectType} effect refreshed!");
+                if (duration <= 0)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "StatusEffect", $"Cannot apply effect to {target.name}: duration must be positive ({duration})");
+                    return;
+                }
+
+                if (potency <= 0)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "StatusEffect", $"Cannot apply effect to {target.name}: potency must be positive ({potency})");
+                    return;
+                }
+
+                // Initialize character effects list if needed
+                if (characterEffects == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "StatusEffect", "Character effects dictionary is null, initializing");
+                    characterEffects = new Dictionary<Character, List<StatusEffect>>();
+                }
+
+                if (!characterEffects.ContainsKey(target))
+                {
+                    characterEffects[target] = new List<StatusEffect>();
+                }
+
+                // Check if effect already exists - refresh duration if so
+                var existingEffect = characterEffects[target].Find(e => e != null && e.type == effectType);
+                if (existingEffect != null)
+                {
+                    existingEffect.duration = Mathf.Max(existingEffect.duration, duration);
+                    existingEffect.potency = Mathf.Max(existingEffect.potency, potency);
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, 
+                        "StatusEffect", $"{target.name}'s {effectType} effect refreshed! Duration: {existingEffect.duration}, Potency: {existingEffect.potency}");
+                }
+                else
+                {
+                    StatusEffect effect = new StatusEffect(effectType, duration, potency);
+                    if (effect != null)
+                    {
+                        characterEffects[target].Add(effect);
+                        LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, 
+                            "StatusEffect", $"{target.name} is now {effect.name}! ({duration} turns)");
+                    }
+                    else
+                    {
+                        LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                            "StatusEffect", $"Failed to create status effect {effectType} for {target.name}");
+                    }
+                }
             }
-            else
+            catch (System.Exception ex)
             {
-                StatusEffect effect = new StatusEffect(effectType, duration, potency);
-                characterEffects[target].Add(effect);
-                Debug.Log($"{target.name} is now {effect.name}! ({duration} turns)");
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                    "StatusEffect", $"Exception in ApplyEffect (Character): {ex.Message}\nStack: {ex.StackTrace}");
             }
         }
 
@@ -271,47 +332,110 @@ namespace ACOTAR
         /// <summary>
         /// Process turn start effects for a character
         /// </summary>
+        /// <param name="target">Character to process effects for</param>
+        /// <returns>Total damage dealt by status effects</returns>
+        /// <remarks>
+        /// v2.6.3: Added comprehensive error handling, structured logging, and XML documentation
+        /// 
+        /// CRITICAL: This method is called every combat turn. Any exception here would break
+        /// the combat flow. The try-catch blocks protect against failures in TakeDamage/Heal
+        /// calls and effect processing.
+        /// 
+        /// The method processes all active effects, applies their damage/healing, decrements
+        /// duration, and removes expired effects.
+        /// </remarks>
         public int ProcessTurnStart(Character target)
         {
-            if (!characterEffects.ContainsKey(target))
-                return 0;
-
-            int totalDamage = 0;
-            List<StatusEffect> toRemove = new List<StatusEffect>();
-
-            foreach (var effect in characterEffects[target])
+            try
             {
-                // Apply tick damage
-                if (effect.tickDamage != 0)
+                // Input validation
+                if (target == null)
                 {
-                    if (effect.tickDamage > 0)
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "StatusEffect", "Cannot process turn: target character is null");
+                    return 0;
+                }
+
+                if (characterEffects == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "StatusEffect", "Character effects dictionary is null");
+                    return 0;
+                }
+
+                if (!characterEffects.ContainsKey(target))
+                    return 0;
+
+                int totalDamage = 0;
+                List<StatusEffect> toRemove = new List<StatusEffect>();
+
+                foreach (var effect in characterEffects[target])
+                {
+                    if (effect == null)
                     {
-                        target.TakeDamage(effect.tickDamage);
-                        totalDamage += effect.tickDamage;
-                        Debug.Log($"{target.name} takes {effect.tickDamage} {effect.name} damage!");
+                        LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                            "StatusEffect", $"Null effect found for {target.name}, skipping");
+                        toRemove.Add(effect);
+                        continue;
+                    }
+
+                    try
+                    {
+                        // Apply tick damage
+                        if (effect.tickDamage != 0)
+                        {
+                            if (effect.tickDamage > 0)
+                            {
+                                target.TakeDamage(effect.tickDamage);
+                                totalDamage += effect.tickDamage;
+                                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, 
+                                    "StatusEffect", $"{target.name} takes {effect.tickDamage} {effect.name} damage!");
+                            }
+                            else
+                            {
+                                target.Heal(-effect.tickDamage);
+                                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, 
+                                    "StatusEffect", $"{target.name} heals {-effect.tickDamage} from {effect.name}!");
+                            }
+                        }
+
+                        // Tick duration
+                        if (!effect.Tick())
+                        {
+                            toRemove.Add(effect);
+                        }
+                    }
+                    catch (System.Exception effectEx)
+                    {
+                        LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                            "StatusEffect", $"Exception processing effect {effect.name} for {target.name}: {effectEx.Message}");
+                        toRemove.Add(effect); // Remove problematic effect
+                    }
+                }
+
+                // Remove expired effects
+                foreach (var effect in toRemove)
+                {
+                    if (effect != null)
+                    {
+                        characterEffects[target].Remove(effect);
+                        LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, 
+                            "StatusEffect", $"{target.name}'s {effect.name} effect has worn off.");
                     }
                     else
                     {
-                        target.Heal(-effect.tickDamage);
-                        Debug.Log($"{target.name} heals {-effect.tickDamage} from {effect.name}!");
+                        characterEffects[target].Remove(effect); // Remove null effect
                     }
                 }
 
-                // Tick duration
-                if (!effect.Tick())
-                {
-                    toRemove.Add(effect);
-                }
+                return totalDamage;
             }
-
-            // Remove expired effects
-            foreach (var effect in toRemove)
+            catch (System.Exception ex)
             {
-                characterEffects[target].Remove(effect);
-                Debug.Log($"{target.name}'s {effect.name} effect has worn off.");
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                    "StatusEffect", $"Exception in ProcessTurnStart (Character): {ex.Message}\nStack: {ex.StackTrace}");
+                return 0;
             }
-
-            return totalDamage;
         }
 
         /// <summary>
