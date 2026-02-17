@@ -413,7 +413,6 @@ namespace ACOTAR
         }
 
         /// <summary>
-        /// <summary>
         /// Check if a recipe can be crafted
         /// </summary>
         /// <param name="recipeId">ID of the recipe to check</param>
