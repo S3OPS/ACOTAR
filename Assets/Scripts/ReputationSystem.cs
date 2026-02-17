@@ -57,6 +57,10 @@ namespace ACOTAR
         /// <summary>
         /// Update reputation level based on points
         /// </summary>
+        /// <remarks>
+        /// Logs level changes to the LoggingSystem.
+        /// v2.6.2: Enhanced with structured logging integration
+        /// </remarks>
         private void UpdateLevel()
         {
             ReputationLevel oldLevel = level;
@@ -78,17 +82,22 @@ namespace ACOTAR
 
             if (oldLevel != level)
             {
-                Debug.Log($"Reputation with {court} Court changed to: {level}");
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, "Reputation", 
+                    $"Reputation with {court} Court changed from {oldLevel} to {level}");
             }
         }
 
         /// <summary>
         /// Log reputation changes
         /// </summary>
+        /// <remarks>
+        /// v2.6.2: Enhanced with structured logging integration
+        /// </remarks>
         private void LogReputationChange(int amount)
         {
             string change = amount > 0 ? "increased" : "decreased";
-            Debug.Log($"Reputation with {court} Court {change} by {Mathf.Abs(amount)} (Now: {reputationPoints}, {level})");
+            LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Debug, "Reputation", 
+                $"Reputation with {court} Court {change} by {Mathf.Abs(amount)} (Now: {reputationPoints}, {level})");
         }
 
         /// <summary>
@@ -157,25 +166,90 @@ namespace ACOTAR
         /// <summary>
         /// Gain reputation with a specific court
         /// </summary>
+        /// <param name="court">The court to gain reputation with</param>
+        /// <param name="amount">The amount of reputation points to gain</param>
+        /// <remarks>
+        /// May cause reputation loss with rival courts.
+        /// v2.6.2: Enhanced with error handling and structured logging
+        /// </remarks>
         public void GainReputation(Court court, int amount)
         {
-            if (courtReputations.ContainsKey(court))
+            try
             {
-                courtReputations[court].GainReputation(amount);
-                
-                // Rival courts may lose reputation
-                ApplyRivalPenalty(court, amount);
+                if (amount <= 0)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, "Reputation", 
+                        $"Cannot gain reputation: invalid amount {amount}");
+                    return;
+                }
+
+                if (courtReputations == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, "Reputation", 
+                        "Cannot gain reputation: courtReputations dictionary is null");
+                    return;
+                }
+
+                if (courtReputations.ContainsKey(court))
+                {
+                    courtReputations[court].GainReputation(amount);
+                    
+                    // Rival courts may lose reputation
+                    ApplyRivalPenalty(court, amount);
+                }
+                else
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, "Reputation", 
+                        $"Court {court} not found in reputation system");
+                }
+            }
+            catch (System.Exception ex)
+            {
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, "Reputation", 
+                    $"Exception in GainReputation({court}, {amount}): {ex.Message}\nStack: {ex.StackTrace}");
             }
         }
 
         /// <summary>
         /// Lose reputation with a specific court
         /// </summary>
+        /// <param name="court">The court to lose reputation with</param>
+        /// <param name="amount">The amount of reputation points to lose</param>
+        /// <remarks>
+        /// v2.6.2: Enhanced with error handling and structured logging
+        /// </remarks>
         public void LoseReputation(Court court, int amount)
         {
-            if (courtReputations.ContainsKey(court))
+            try
             {
-                courtReputations[court].LoseReputation(amount);
+                if (amount <= 0)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, "Reputation", 
+                        $"Cannot lose reputation: invalid amount {amount}");
+                    return;
+                }
+
+                if (courtReputations == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, "Reputation", 
+                        "Cannot lose reputation: courtReputations dictionary is null");
+                    return;
+                }
+
+                if (courtReputations.ContainsKey(court))
+                {
+                    courtReputations[court].LoseReputation(amount);
+                }
+                else
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, "Reputation", 
+                        $"Court {court} not found in reputation system");
+                }
+            }
+            catch (System.Exception ex)
+            {
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, "Reputation", 
+                    $"Exception in LoseReputation({court}, {amount}): {ex.Message}\nStack: {ex.StackTrace}");
             }
         }
 

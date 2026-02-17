@@ -520,81 +520,173 @@ namespace ACOTAR
         /// <summary>
         /// Add item to inventory
         /// </summary>
+        /// <param name="itemId">The unique identifier of the item to add</param>
+        /// <param name="quantity">The number of items to add (default: 1)</param>
+        /// <returns>True if the item was successfully added, false otherwise</returns>
+        /// <remarks>
+        /// This method handles item stacking for stackable items (maxStackSize > 1).
+        /// Items will be stacked with existing slots before creating new inventory slots.
+        /// Will fail if the inventory is full or if the item doesn't exist in the database.
+        /// v2.6.2: Enhanced with error handling and structured logging
+        /// </remarks>
         public bool AddItem(string itemId, int quantity = 1)
         {
-            if (!itemDatabase.ContainsKey(itemId))
+            try
             {
-                Debug.LogWarning($"Item not found in database: {itemId}");
-                return false;
-            }
-
-            Item item = itemDatabase[itemId];
-
-            // Check if inventory is full
-            if (inventory.Count >= MAX_INVENTORY_SIZE)
-            {
-                Debug.LogWarning("Inventory is full!");
-                return false;
-            }
-
-            // Try to stack with existing item
-            if (item.maxStackSize > 1)
-            {
-                foreach (var slot in inventory)
+                // Validate inputs
+                if (string.IsNullOrEmpty(itemId))
                 {
-                    if (slot.item.itemId == itemId && slot.quantity < item.maxStackSize)
-                    {
-                        int spaceLeft = item.maxStackSize - slot.quantity;
-                        int toAdd = Mathf.Min(quantity, spaceLeft);
-                        slot.quantity += toAdd;
-                        quantity -= toAdd;
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, "Inventory", 
+                        "Cannot add item: itemId is null or empty");
+                    return false;
+                }
 
-                        if (quantity == 0)
+                if (quantity <= 0)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, "Inventory", 
+                        $"Cannot add item: invalid quantity {quantity}");
+                    return false;
+                }
+
+                if (!itemDatabase.ContainsKey(itemId))
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, "Inventory", 
+                        $"Item not found in database: {itemId}");
+                    return false;
+                }
+
+                Item item = itemDatabase[itemId];
+                if (item == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, "Inventory", 
+                        $"Item database contains null item for id: {itemId}");
+                    return false;
+                }
+
+                // Check if inventory is full
+                if (inventory.Count >= MAX_INVENTORY_SIZE)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, "Inventory", 
+                        "Inventory is full!");
+                    return false;
+                }
+
+                // Try to stack with existing item
+                if (item.maxStackSize > 1)
+                {
+                    foreach (var slot in inventory)
+                    {
+                        if (slot.item.itemId == itemId && slot.quantity < item.maxStackSize)
                         {
-                            Debug.Log($"Added {toAdd} x {item.name} to inventory");
-                            return true;
+                            int spaceLeft = item.maxStackSize - slot.quantity;
+                            int toAdd = Mathf.Min(quantity, spaceLeft);
+                            slot.quantity += toAdd;
+                            quantity -= toAdd;
+
+                            if (quantity == 0)
+                            {
+                                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Debug, "Inventory", 
+                                    $"Added {toAdd} x {item.name} to inventory (stacked)");
+                                return true;
+                            }
                         }
                     }
                 }
-            }
 
-            // Create new slot
-            if (quantity > 0)
+                // Create new slot
+                if (quantity > 0)
+                {
+                    inventory.Add(new InventorySlot(item, quantity));
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Debug, "Inventory", 
+                        $"Added {quantity} x {item.name} to inventory (new slot)");
+                }
+
+                return true;
+            }
+            catch (System.Exception ex)
             {
-                inventory.Add(new InventorySlot(item, quantity));
-                Debug.Log($"Added {quantity} x {item.name} to inventory");
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, "Inventory", 
+                    $"Exception in AddItem({itemId}, {quantity}): {ex.Message}\nStack: {ex.StackTrace}");
+                return false;
             }
-
-            return true;
         }
 
         /// <summary>
         /// Remove item from inventory
         /// </summary>
+        /// <param name="itemId">The unique identifier of the item to remove</param>
+        /// <param name="quantity">The number of items to remove (default: 1)</param>
+        /// <returns>True if the item was successfully removed, false if not enough items were found</returns>
+        /// <remarks>
+        /// This method will remove items from multiple stacks if necessary.
+        /// Returns false only if the total quantity of the item across all stacks is less than requested.
+        /// v2.6.2: Enhanced with error handling and structured logging
+        /// </remarks>
         public bool RemoveItem(string itemId, int quantity = 1)
         {
-            for (int i = inventory.Count - 1; i >= 0; i--)
+            try
             {
-                if (inventory[i].item.itemId == itemId)
+                // Validate inputs
+                if (string.IsNullOrEmpty(itemId))
                 {
-                    if (inventory[i].quantity > quantity)
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, "Inventory", 
+                        "Cannot remove item: itemId is null or empty");
+                    return false;
+                }
+
+                if (quantity <= 0)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, "Inventory", 
+                        $"Cannot remove item: invalid quantity {quantity}");
+                    return false;
+                }
+
+                int originalQuantity = quantity;
+                for (int i = inventory.Count - 1; i >= 0; i--)
+                {
+                    if (inventory[i] == null || inventory[i].item == null)
                     {
-                        inventory[i].quantity -= quantity;
-                        return true;
-                    }
-                    else if (inventory[i].quantity == quantity)
-                    {
+                        LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, "Inventory", 
+                            $"Found null inventory slot at index {i}, removing");
                         inventory.RemoveAt(i);
-                        return true;
+                        continue;
                     }
-                    else
+
+                    if (inventory[i].item.itemId == itemId)
                     {
-                        quantity -= inventory[i].quantity;
-                        inventory.RemoveAt(i);
+                        if (inventory[i].quantity > quantity)
+                        {
+                            inventory[i].quantity -= quantity;
+                            LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Debug, "Inventory", 
+                                $"Removed {originalQuantity} x {itemId} from inventory");
+                            return true;
+                        }
+                        else if (inventory[i].quantity == quantity)
+                        {
+                            inventory.RemoveAt(i);
+                            LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Debug, "Inventory", 
+                                $"Removed {originalQuantity} x {itemId} from inventory");
+                            return true;
+                        }
+                        else
+                        {
+                            quantity -= inventory[i].quantity;
+                            inventory.RemoveAt(i);
+                        }
                     }
                 }
+                
+                // If we get here, we didn't have enough items
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, "Inventory", 
+                    $"Failed to remove {originalQuantity} x {itemId}: insufficient quantity");
+                return false;
             }
-            return false;
+            catch (System.Exception ex)
+            {
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, "Inventory", 
+                    $"Exception in RemoveItem({itemId}, {quantity}): {ex.Message}\nStack: {ex.StackTrace}");
+                return false;
+            }
         }
 
         /// <summary>
@@ -694,37 +786,68 @@ namespace ACOTAR
         /// <summary>
         /// Use a consumable item (v2.3.3: Enhanced validation)
         /// </summary>
+        /// <param name="itemId">The unique identifier of the item to use</param>
+        /// <returns>True if the item was successfully used and removed, false otherwise</returns>
+        /// <remarks>
+        /// Only works with ItemType.Consumable items.
+        /// Applies item effects to the player character and removes one instance from inventory.
+        /// v2.6.2: Enhanced with error handling and structured logging
+        /// </remarks>
         public bool UseItem(string itemId)
         {
-            var slot = FindSlot(itemId);
-            if (slot == null)
+            try
             {
-                Debug.LogWarning($"Item {itemId} not found in inventory");
-                return false;
-            }
-
-            if (slot.item.type != ItemType.Consumable)
-            {
-                Debug.LogWarning($"Item {slot.item.name} is not consumable");
-                if (UIManager.Instance != null)
+                // Validate input
+                if (string.IsNullOrEmpty(itemId))
                 {
-                    UIManager.Instance.ShowNotification("Item is not consumable", Color.red);
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, "Inventory", 
+                        "Cannot use item: itemId is null or empty");
+                    return false;
                 }
+
+                var slot = FindSlot(itemId);
+                if (slot == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, "Inventory", 
+                        $"Item {itemId} not found in inventory");
+                    return false;
+                }
+
+                if (slot.item.type != ItemType.Consumable)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, "Inventory", 
+                        $"Item {slot.item.name} is not consumable");
+                    if (UIManager.Instance != null)
+                    {
+                        UIManager.Instance.ShowNotification("Item is not consumable", Color.red);
+                    }
+                    return false;
+                }
+
+                // Apply item effects
+                ApplyItemEffects(slot.item);
+                
+                // Remove one from quantity
+                bool removed = RemoveItem(itemId, 1);
+                
+                if (removed)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, "Inventory", 
+                        $"Used {slot.item.name}");
+                    if (UIManager.Instance != null)
+                    {
+                        UIManager.Instance.ShowNotification($"Used {slot.item.name}", Color.white);
+                    }
+                }
+                
+                return removed;
+            }
+            catch (System.Exception ex)
+            {
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, "Inventory", 
+                    $"Exception in UseItem({itemId}): {ex.Message}\nStack: {ex.StackTrace}");
                 return false;
             }
-
-            // Apply item effects
-            ApplyItemEffects(slot.item);
-            
-            // Remove one from quantity
-            bool removed = RemoveItem(itemId, 1);
-            
-            if (removed && UIManager.Instance != null)
-            {
-                UIManager.Instance.ShowNotification($"Used {slot.item.name}", Color.white);
-            }
-            
-            return removed;
         }
 
         /// <summary>
@@ -751,145 +874,256 @@ namespace ACOTAR
         /// <summary>
         /// Apply item effects to player character (v2.3.3: Now actually applies effects)
         /// </summary>
+        /// <remarks>
+        /// v2.6.2: Enhanced with error handling and structured logging
+        /// </remarks>
         private void ApplyItemEffects(Item item)
         {
-            if (!IsGameManagerAvailable())
+            try
             {
-                Debug.LogWarning("Cannot apply item effects: GameManager or player not found");
-                return;
-            }
-
-            Character player = GameManager.Instance.player;
-
-            // Apply health bonus (consumable healing)
-            if (item.healthBonus > 0)
-            {
-                player.Heal(item.healthBonus);
-                Debug.Log($"Restored {item.healthBonus} health");
-                
-                // Trigger visual feedback
-                if (UIManager.Instance != null)
+                if (item == null)
                 {
-                    UIManager.Instance.ShowNotification($"+{item.healthBonus} Health", Color.green);
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, "Inventory", 
+                        "Cannot apply item effects: item is null");
+                    return;
+                }
+
+                if (!IsGameManagerAvailable())
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, "Inventory", 
+                        "Cannot apply item effects: GameManager or player not found");
+                    return;
+                }
+
+                Character player = GameManager.Instance.player;
+                if (player == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, "Inventory", 
+                        "Cannot apply item effects: player is null");
+                    return;
+                }
+
+                // Apply health bonus (consumable healing)
+                if (item.healthBonus > 0)
+                {
+                    player.Heal(item.healthBonus);
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, "Inventory", 
+                        $"Restored {item.healthBonus} health with {item.name}");
+                    
+                    // Trigger visual feedback
+                    if (UIManager.Instance != null)
+                    {
+                        UIManager.Instance.ShowNotification($"+{item.healthBonus} Health", Color.green);
+                    }
+                }
+
+                // Apply magic power bonus (temporary buff for consumables)
+                if (item.magicPowerBonus > 0)
+                {
+                    // For consumables, this is a temporary effect
+                    // Note: Permanent bonuses from equipment are handled in GetEquipmentBonuses()
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, "Inventory", 
+                        $"Magic power increased by {item.magicPowerBonus} (temporary)");
+                    
+                    if (UIManager.Instance != null)
+                    {
+                        UIManager.Instance.ShowNotification($"+{item.magicPowerBonus} Magic (Temporary)", Color.cyan);
+                    }
+                }
+
+                // Apply strength bonus (temporary buff)
+                if (item.strengthBonus > 0)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, "Inventory", 
+                        $"Strength increased by {item.strengthBonus} (temporary)");
+                    
+                    if (UIManager.Instance != null)
+                    {
+                        UIManager.Instance.ShowNotification($"+{item.strengthBonus} Strength (Temporary)", Color.yellow);
+                    }
+                }
+
+                // Apply agility bonus (temporary buff)
+                if (item.agilityBonus > 0)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, "Inventory", 
+                        $"Agility increased by {item.agilityBonus} (temporary)");
+                    
+                    if (UIManager.Instance != null)
+                    {
+                        UIManager.Instance.ShowNotification($"+{item.agilityBonus} Agility (Temporary)", Color.green);
+                    }
                 }
             }
-
-            // Apply magic power bonus (temporary buff for consumables)
-            if (item.magicPowerBonus > 0)
+            catch (System.Exception ex)
             {
-                // For consumables, this is a temporary effect
-                // Note: Permanent bonuses from equipment are handled in GetEquipmentBonuses()
-                Debug.Log($"Magic power increased by {item.magicPowerBonus}");
-                
-                if (UIManager.Instance != null)
-                {
-                    UIManager.Instance.ShowNotification($"+{item.magicPowerBonus} Magic (Temporary)", Color.cyan);
-                }
-            }
-
-            // Apply strength bonus (temporary buff)
-            if (item.strengthBonus > 0)
-            {
-                Debug.Log($"Strength increased by {item.strengthBonus}");
-                
-                if (UIManager.Instance != null)
-                {
-                    UIManager.Instance.ShowNotification($"+{item.strengthBonus} Strength (Temporary)", Color.yellow);
-                }
-            }
-
-            // Apply agility bonus (temporary buff)
-            if (item.agilityBonus > 0)
-            {
-                Debug.Log($"Agility increased by {item.agilityBonus}");
-                
-                if (UIManager.Instance != null)
-                {
-                    UIManager.Instance.ShowNotification($"+{item.agilityBonus} Agility (Temporary)", Color.green);
-                }
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, "Inventory", 
+                    $"Exception in ApplyItemEffects: {ex.Message}\nStack: {ex.StackTrace}");
             }
         }
 
         /// <summary>
         /// Equip a weapon (v2.3.3: Enhanced with stat application)
         /// </summary>
+        /// <param name="itemId">The unique identifier of the weapon to equip</param>
+        /// <returns>True if the weapon was successfully equipped, false otherwise</returns>
+        /// <remarks>
+        /// Only works with ItemType.Weapon items.
+        /// Automatically unequips the currently equipped weapon before equipping the new one.
+        /// Triggers GameEvents.OnEquipmentChanged event when successful.
+        /// v2.6.2: Enhanced with error handling and structured logging
+        /// </remarks>
         public bool EquipWeapon(string itemId)
         {
-            var slot = FindSlot(itemId);
-            if (slot == null || slot.item.type != ItemType.Weapon)
+            try
             {
-                Debug.LogWarning($"Item {itemId} is not a valid weapon");
+                // Validate input
+                if (string.IsNullOrEmpty(itemId))
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, "Inventory", 
+                        "Cannot equip weapon: itemId is null or empty");
+                    return false;
+                }
+
+                var slot = FindSlot(itemId);
+                if (slot == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, "Inventory", 
+                        $"Item {itemId} not found in inventory");
+                    return false;
+                }
+
+                if (slot.item == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, "Inventory", 
+                        $"Found null item in slot for id: {itemId}");
+                    return false;
+                }
+
+                if (slot.item.type != ItemType.Weapon)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, "Inventory", 
+                        $"Item {itemId} is not a valid weapon (type: {slot.item.type})");
+                    return false;
+                }
+
+                // Unequip current weapon and remove its bonuses
+                if (equippedWeapon != null)
+                {
+                    var oldSlot = FindSlot(equippedWeapon.itemId);
+                    if (oldSlot != null) 
+                    {
+                        oldSlot.isEquipped = false;
+                    }
+                }
+
+                // Equip new weapon
+                equippedWeapon = slot.item;
+                slot.isEquipped = true;
+                
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, "Inventory", 
+                    $"Equipped weapon: {slot.item.name}");
+                if (UIManager.Instance != null)
+                {
+                    UIManager.Instance.ShowNotification($"Equipped: {slot.item.name}", Color.green);
+                }
+
+                // Trigger equipment changed event
+                if (GameEvents.OnEquipmentChanged != null)
+                {
+                    GameEvents.OnEquipmentChanged.Invoke();
+                }
+
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, "Inventory", 
+                    $"Exception in EquipWeapon({itemId}): {ex.Message}\nStack: {ex.StackTrace}");
                 return false;
             }
-
-            // Unequip current weapon and remove its bonuses
-            if (equippedWeapon != null)
-            {
-                var oldSlot = FindSlot(equippedWeapon.itemId);
-                if (oldSlot != null) 
-                {
-                    oldSlot.isEquipped = false;
-                }
-            }
-
-            // Equip new weapon
-            equippedWeapon = slot.item;
-            slot.isEquipped = true;
-            
-            Debug.Log($"Equipped weapon: {slot.item.name}");
-            if (UIManager.Instance != null)
-            {
-                UIManager.Instance.ShowNotification($"Equipped: {slot.item.name}", Color.green);
-            }
-
-            // Trigger equipment changed event
-            if (GameEvents.OnEquipmentChanged != null)
-            {
-                GameEvents.OnEquipmentChanged.Invoke();
-            }
-
-            return true;
         }
 
         /// <summary>
         /// Equip armor (v2.3.3: Enhanced with stat application)
         /// </summary>
+        /// <param name="itemId">The unique identifier of the armor to equip</param>
+        /// <returns>True if the armor was successfully equipped, false otherwise</returns>
+        /// <remarks>
+        /// Only works with ItemType.Armor items.
+        /// Automatically unequips the currently equipped armor before equipping the new one.
+        /// Triggers GameEvents.OnEquipmentChanged event when successful.
+        /// v2.6.2: Enhanced with error handling and structured logging
+        /// </remarks>
         public bool EquipArmor(string itemId)
         {
-            var slot = FindSlot(itemId);
-            if (slot == null || slot.item.type != ItemType.Armor)
+            try
             {
-                Debug.LogWarning($"Item {itemId} is not valid armor");
+                // Validate input
+                if (string.IsNullOrEmpty(itemId))
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, "Inventory", 
+                        "Cannot equip armor: itemId is null or empty");
+                    return false;
+                }
+
+                var slot = FindSlot(itemId);
+                if (slot == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, "Inventory", 
+                        $"Item {itemId} not found in inventory");
+                    return false;
+                }
+
+                if (slot.item == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, "Inventory", 
+                        $"Found null item in slot for id: {itemId}");
+                    return false;
+                }
+
+                if (slot.item.type != ItemType.Armor)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, "Inventory", 
+                        $"Item {itemId} is not valid armor (type: {slot.item.type})");
+                    return false;
+                }
+
+                // Unequip current armor and remove its bonuses
+                if (equippedArmor != null)
+                {
+                    var oldSlot = FindSlot(equippedArmor.itemId);
+                    if (oldSlot != null)
+                    {
+                        oldSlot.isEquipped = false;
+                    }
+                }
+
+                // Equip new armor
+                equippedArmor = slot.item;
+                slot.isEquipped = true;
+                
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, "Inventory", 
+                    $"Equipped armor: {slot.item.name}");
+                if (UIManager.Instance != null)
+                {
+                    UIManager.Instance.ShowNotification($"Equipped: {slot.item.name}", Color.green);
+                }
+
+                // Trigger equipment changed event
+                if (GameEvents.OnEquipmentChanged != null)
+                {
+                    GameEvents.OnEquipmentChanged.Invoke();
+                }
+
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, "Inventory", 
+                    $"Exception in EquipArmor({itemId}): {ex.Message}\nStack: {ex.StackTrace}");
                 return false;
             }
-
-            // Unequip current armor and remove its bonuses
-            if (equippedArmor != null)
-            {
-                var oldSlot = FindSlot(equippedArmor.itemId);
-                if (oldSlot != null)
-                {
-                    oldSlot.isEquipped = false;
-                }
-            }
-
-            // Equip new armor
-            equippedArmor = slot.item;
-            slot.isEquipped = true;
-            
-            Debug.Log($"Equipped armor: {slot.item.name}");
-            if (UIManager.Instance != null)
-            {
-                UIManager.Instance.ShowNotification($"Equipped: {slot.item.name}", Color.green);
-            }
-
-            // Trigger equipment changed event
-            if (GameEvents.OnEquipmentChanged != null)
-            {
-                GameEvents.OnEquipmentChanged.Invoke();
-            }
-
-            return true;
         }
 
         /// <summary>
