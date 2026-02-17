@@ -65,6 +65,7 @@ namespace ACOTAR
     /// <summary>
     /// Enhanced turn-based combat system
     /// Integrates with difficulty settings, elemental system, and status effects
+    /// v2.6.1: Enhanced with comprehensive error handling and logging
     /// </summary>
     public class CombatSystem
     {
@@ -81,13 +82,23 @@ namespace ACOTAR
 
         /// <summary>
         /// Calculate physical attack damage with difficulty and elemental modifiers
+        /// v2.6.1: Enhanced with error handling
         /// </summary>
         public static CombatResult CalculatePhysicalAttack(Character attacker, Character defender, bool isPlayerAttack = true)
         {
-            if (attacker == null || defender == null)
+            try
             {
-                return new CombatResult(0, DamageType.Physical, "Invalid combat participants");
-            }
+                if (attacker == null || defender == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, "Combat", "Invalid combat participants in CalculatePhysicalAttack");
+                    return new CombatResult(0, DamageType.Physical, "Invalid combat participants");
+                }
+                
+                if (attacker.stats == null || defender.stats == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, "Combat", $"Missing character stats: attacker={attacker.name}, defender={defender.name}");
+                    return new CombatResult(0, DamageType.Physical, "Character stats not initialized");
+                }
 
             // Base damage from strength (v2.3.3: Use effective strength with equipment)
             int baseDamage = attacker.stats.EffectiveStrength;
@@ -149,21 +160,38 @@ namespace ACOTAR
             {
                 result.appliedEffect = StatusEffectType.Bleeding;
                 result.description += " and caused BLEEDING!";
-            }
+                }
 
-            return result;
+                return result;
+            }
+            catch (System.Exception ex)
+            {
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, "Combat", 
+                    $"Exception in CalculatePhysicalAttack: {ex.Message}\nStack: {ex.StackTrace}");
+                return new CombatResult(0, DamageType.Physical, "Combat error occurred");
+            }
         }
 
         /// <summary>
         /// Calculate magic attack damage with elemental system integration
         /// v2.3.3: Enhanced with mana cost system
+        /// v2.6.1: Enhanced with error handling
         /// </summary>
         public static CombatResult CalculateMagicAttack(Character attacker, Character defender, MagicType magicType, bool isPlayerAttack = true)
         {
-            if (attacker == null || defender == null)
+            try
             {
-                return new CombatResult(0, DamageType.Magical, "Invalid combat participants");
-            }
+                if (attacker == null || defender == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, "Combat", "Invalid combat participants in CalculateMagicAttack");
+                    return new CombatResult(0, DamageType.Magical, "Invalid combat participants");
+                }
+                
+                if (attacker.stats == null || defender.stats == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, "Combat", $"Missing character stats in magic attack");
+                    return new CombatResult(0, DamageType.Magical, "Character stats not initialized");
+                }
 
             // Check if attacker has the ability
             if (!attacker.HasAbility(magicType))
@@ -248,18 +276,28 @@ namespace ACOTAR
             if (potentialEffect.HasValue && Random.value < 0.25f)
             {
                 result.appliedEffect = potentialEffect;
-                result.description += $" and applied {potentialEffect.Value}!";
+                    result.description += $" and applied {potentialEffect.Value}!";
             }
 
             return result;
+            }
+            catch (System.Exception ex)
+            {
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, "Combat", 
+                    $"Exception in CalculateMagicAttack: {ex.Message}\nStack: {ex.StackTrace}");
+                return new CombatResult(0, DamageType.Magical, "Magic attack error occurred");
+            }
         }
 
         /// <summary>
         /// Calculate attack against enemy with element consideration
+        /// v2.6.1: Enhanced with error handling
         /// </summary>
         public static CombatResult CalculatePhysicalAttack(Character attacker, Enemy defender)
         {
-            CombatResult result = CalculatePhysicalAttack(attacker, defender as Character, true);
+            try
+            {
+                CombatResult result = CalculatePhysicalAttack(attacker, defender as Character, true);
             
             // Apply enemy-specific difficulty scaling to damage taken
             if (result.damage > 0)
@@ -268,6 +306,13 @@ namespace ACOTAR
             }
             
             return result;
+            }
+            catch (System.Exception ex)
+            {
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, "Combat", 
+                    $"Exception in CalculatePhysicalAttack (Enemy): {ex.Message}");
+                return new CombatResult(0, DamageType.Physical, "Combat error occurred");
+            }
         }
 
         /// <summary>
@@ -514,7 +559,8 @@ namespace ACOTAR
                 
                 if (reduction > 0)
                 {
-                    Debug.Log($"Defense Synergy reduced damage by {reduction}!");
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Debug, "Combat", 
+                        $"Defense Synergy reduced damage by {reduction}!");
                 }
                 
                 return reducedDamage;

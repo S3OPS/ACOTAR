@@ -240,9 +240,21 @@ namespace ACOTAR
             quests[quest.questId] = quest;
         }
 
+        /// <summary>
+        /// Start a quest by ID
+        /// v2.6.1: Enhanced with error handling and logging
+        /// </summary>
         public void StartQuest(string questId)
         {
-            if (quests.ContainsKey(questId))
+            try
+            {
+                if (string.IsNullOrEmpty(questId))
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, "Quest", "StartQuest called with null or empty questId");
+                    return;
+                }
+                
+                if (quests.ContainsKey(questId))
             {
                 Quest quest = quests[questId];
                 
@@ -252,7 +264,8 @@ namespace ACOTAR
                     DLCPackage? dlcPackage = DLCManager.Instance.GetQuestDLCPackage(questId);
                     if (dlcPackage.HasValue && !DLCManager.Instance.IsDLCInstalled(dlcPackage.Value))
                     {
-                        Debug.LogWarning($"Quest '{quest.title}' requires DLC: {dlcPackage.Value}");
+                        LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, "Quest", 
+                            $"Quest '{quest.title}' requires DLC: {dlcPackage.Value}");
                         return;
                     }
                 }
@@ -261,19 +274,39 @@ namespace ACOTAR
                 {
                     quest.isActive = true;
                     activeQuests.Add(quest);
-                    Debug.Log($"Quest Started: {quest.title}");
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, "Quest", 
+                        $"Quest Started: {quest.title}");
                     GameEvents.TriggerQuestStarted(quest);
                 }
             }
             else
             {
-                Debug.LogWarning($"Quest not found: {questId}");
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, "Quest", 
+                    $"Quest not found: {questId}");
+            }
+            }
+            catch (System.Exception ex)
+            {
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, "Quest", 
+                    $"Exception in StartQuest({questId}): {ex.Message}\nStack: {ex.StackTrace}");
             }
         }
 
+        /// <summary>
+        /// Complete a quest by ID
+        /// v2.6.1: Enhanced with error handling and logging
+        /// </summary>
         public void CompleteQuest(string questId)
         {
-            if (quests.ContainsKey(questId))
+            try
+            {
+                if (string.IsNullOrEmpty(questId))
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, "Quest", "CompleteQuest called with null or empty questId");
+                    return;
+                }
+                
+                if (quests.ContainsKey(questId))
             {
                 Quest quest = quests[questId];
                 if (quest.isActive)
@@ -287,11 +320,13 @@ namespace ACOTAR
                     if (GameManager.Instance != null && GameManager.Instance.playerCharacter != null)
                     {
                         GameManager.Instance.playerCharacter.GainExperience(quest.experienceReward);
-                        Debug.Log($"Quest Completed: {quest.title} - Granted {quest.experienceReward} XP to {GameManager.Instance.playerCharacter.name}");
+                        LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, "Quest", 
+                            $"Quest Completed: {quest.title} - Granted {quest.experienceReward} XP to {GameManager.Instance.playerCharacter.name}");
                     }
                     else
                     {
-                        Debug.Log($"Quest Completed: {quest.title} - Reward: {quest.experienceReward} XP");
+                        LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, "Quest", 
+                            $"Quest Completed: {quest.title} - Reward: {quest.experienceReward} XP");
                     }
 
                     GameEvents.TriggerQuestCompleted(quest);
@@ -305,8 +340,8 @@ namespace ACOTAR
                             DLCPackage? dlcPackage = DLCManager.Instance.GetQuestDLCPackage(quest.nextQuestId);
                             if (dlcPackage.HasValue && !DLCManager.Instance.IsDLCInstalled(dlcPackage.Value))
                             {
-                                Debug.Log($"Congratulations! You've completed the base game content.");
-                                Debug.Log($"To continue the story, purchase DLC: {dlcPackage.Value}");
+                                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, "Quest", 
+                                    $"Congratulations! You've completed the base game content. To continue, purchase DLC: {dlcPackage.Value}");
                                 return;
                             }
                         }
@@ -316,7 +351,14 @@ namespace ACOTAR
             }
             else
             {
-                Debug.LogWarning($"Quest not found: {questId}");
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, "Quest", 
+                    $"Quest not found: {questId}");
+            }
+            }
+            catch (System.Exception ex)
+            {
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, "Quest", 
+                    $"Exception in CompleteQuest({questId}): {ex.Message}\nStack: {ex.StackTrace}");
             }
         }
 
