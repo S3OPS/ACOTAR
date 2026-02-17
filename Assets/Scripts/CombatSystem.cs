@@ -65,6 +65,7 @@ namespace ACOTAR
     /// <summary>
     /// Enhanced turn-based combat system
     /// Integrates with difficulty settings, elemental system, and status effects
+    /// v2.6.1: Enhanced with comprehensive error handling and logging
     /// </summary>
     public class CombatSystem
     {
@@ -81,13 +82,37 @@ namespace ACOTAR
 
         /// <summary>
         /// Calculate physical attack damage with difficulty and elemental modifiers
+        /// v2.6.1: Enhanced with error handling and comprehensive logging
         /// </summary>
+        /// <param name="attacker">The character performing the physical attack</param>
+        /// <param name="defender">The character receiving the attack</param>
+        /// <param name="isPlayerAttack">True if player is attacking (affects difficulty modifiers)</param>
+        /// <returns>CombatResult containing damage, type, and descriptive text</returns>
+        /// <remarks>
+        /// Calculates damage using:
+        /// - Base damage from effective strength (includes equipment bonuses)
+        /// - Difficulty multipliers (player/enemy)
+        /// - Critical hit system (15% base chance, 2x multiplier)
+        /// - Dodge mechanics based on defender agility
+        /// - Combo system (increases with consecutive hits)
+        /// - Random variance (80-120%)
+        /// - Status effects (30% chance of bleeding on critical)
+        /// </remarks>
         public static CombatResult CalculatePhysicalAttack(Character attacker, Character defender, bool isPlayerAttack = true)
         {
-            if (attacker == null || defender == null)
+            try
             {
-                return new CombatResult(0, DamageType.Physical, "Invalid combat participants");
-            }
+                if (attacker == null || defender == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, "Combat", "Invalid combat participants in CalculatePhysicalAttack");
+                    return new CombatResult(0, DamageType.Physical, "Invalid combat participants");
+                }
+                
+                if (attacker.stats == null || defender.stats == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, "Combat", $"Missing character stats: attacker={attacker.name}, defender={defender.name}");
+                    return new CombatResult(0, DamageType.Physical, "Character stats not initialized");
+                }
 
             // Base damage from strength (v2.3.3: Use effective strength with equipment)
             int baseDamage = attacker.stats.EffectiveStrength;
@@ -149,21 +174,54 @@ namespace ACOTAR
             {
                 result.appliedEffect = StatusEffectType.Bleeding;
                 result.description += " and caused BLEEDING!";
-            }
+                }
 
-            return result;
+                return result;
+            }
+            catch (System.Exception ex)
+            {
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, "Combat", 
+                    $"Exception in CalculatePhysicalAttack: {ex.Message}\nStack: {ex.StackTrace}");
+                return new CombatResult(0, DamageType.Physical, "Combat error occurred");
+            }
         }
 
         /// <summary>
         /// Calculate magic attack damage with elemental system integration
         /// v2.3.3: Enhanced with mana cost system
+        /// v2.6.1: Enhanced with error handling and comprehensive logging
         /// </summary>
+        /// <param name="attacker">The character casting the magic spell</param>
+        /// <param name="defender">The character receiving the magic attack</param>
+        /// <param name="magicType">Type of magic spell being cast</param>
+        /// <param name="isPlayerAttack">True if player is attacking (affects difficulty modifiers)</param>
+        /// <returns>CombatResult containing damage, elemental effectiveness, and status effects</returns>
+        /// <remarks>
+        /// Calculates magic damage using:
+        /// - Mana cost validation and consumption (15-60 mana per spell)
+        /// - Base damage from effective magic power
+        /// - Difficulty multipliers
+        /// - Magic type multipliers (different spells have different power)
+        /// - Elemental effectiveness (e.g., Fire vs Ice)
+        /// - Critical hit system
+        /// - Combo bonuses
+        /// - Status effects (25% chance based on magic type)
+        /// </remarks>
         public static CombatResult CalculateMagicAttack(Character attacker, Character defender, MagicType magicType, bool isPlayerAttack = true)
         {
-            if (attacker == null || defender == null)
+            try
             {
-                return new CombatResult(0, DamageType.Magical, "Invalid combat participants");
-            }
+                if (attacker == null || defender == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, "Combat", "Invalid combat participants in CalculateMagicAttack");
+                    return new CombatResult(0, DamageType.Magical, "Invalid combat participants");
+                }
+                
+                if (attacker.stats == null || defender.stats == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, "Combat", $"Missing character stats in magic attack");
+                    return new CombatResult(0, DamageType.Magical, "Character stats not initialized");
+                }
 
             // Check if attacker has the ability
             if (!attacker.HasAbility(magicType))
@@ -248,18 +306,28 @@ namespace ACOTAR
             if (potentialEffect.HasValue && Random.value < 0.25f)
             {
                 result.appliedEffect = potentialEffect;
-                result.description += $" and applied {potentialEffect.Value}!";
+                    result.description += $" and applied {potentialEffect.Value}!";
             }
 
             return result;
+            }
+            catch (System.Exception ex)
+            {
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, "Combat", 
+                    $"Exception in CalculateMagicAttack: {ex.Message}\nStack: {ex.StackTrace}");
+                return new CombatResult(0, DamageType.Magical, "Magic attack error occurred");
+            }
         }
 
         /// <summary>
         /// Calculate attack against enemy with element consideration
+        /// v2.6.1: Enhanced with error handling
         /// </summary>
         public static CombatResult CalculatePhysicalAttack(Character attacker, Enemy defender)
         {
-            CombatResult result = CalculatePhysicalAttack(attacker, defender as Character, true);
+            try
+            {
+                CombatResult result = CalculatePhysicalAttack(attacker, defender as Character, true);
             
             // Apply enemy-specific difficulty scaling to damage taken
             if (result.damage > 0)
@@ -268,6 +336,13 @@ namespace ACOTAR
             }
             
             return result;
+            }
+            catch (System.Exception ex)
+            {
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, "Combat", 
+                    $"Exception in CalculatePhysicalAttack (Enemy): {ex.Message}");
+                return new CombatResult(0, DamageType.Physical, "Combat error occurred");
+            }
         }
 
         /// <summary>
@@ -444,6 +519,17 @@ namespace ACOTAR
         /// Apply party synergy bonuses to combat result
         /// v2.6.0: NEW - Integrates party synergy system with combat
         /// </summary>
+        /// <param name="baseResult">The base combat result before synergy bonuses</param>
+        /// <param name="attacker">The attacking character</param>
+        /// <param name="synergySystem">Reference to the party synergy system</param>
+        /// <returns>Modified CombatResult with synergy bonuses applied</returns>
+        /// <remarks>
+        /// Applies synergy bonuses based on active party composition:
+        /// - Damage synergy: Adds percentage-based bonus damage
+        /// - Critical rate synergy: Chance to upgrade hits to critical
+        /// - Magic power synergy: Boosts magical damage types
+        /// All bonuses stack with other combat modifiers
+        /// </remarks>
         public static CombatResult ApplySynergyBonuses(CombatResult baseResult, Character attacker, PartySynergySystem synergySystem)
         {
             // Defensive check (v2.6.0)
@@ -498,6 +584,14 @@ namespace ACOTAR
         /// Apply defensive synergy bonuses to reduce incoming damage
         /// v2.6.0: NEW - Reduce damage based on defense synergies
         /// </summary>
+        /// <param name="incomingDamage">The amount of damage before defense synergy</param>
+        /// <param name="synergySystem">Reference to the party synergy system</param>
+        /// <returns>Reduced damage amount after applying defense synergy</returns>
+        /// <remarks>
+        /// Defensive synergies reduce incoming damage by a percentage.
+        /// Logs the reduction amount when damage is reduced.
+        /// Always returns at least 0 damage (never negative).
+        /// </remarks>
         public static int ApplyDefensiveSynergy(int incomingDamage, PartySynergySystem synergySystem)
         {
             // Defensive check (v2.6.0)
@@ -514,7 +608,8 @@ namespace ACOTAR
                 
                 if (reduction > 0)
                 {
-                    Debug.Log($"Defense Synergy reduced damage by {reduction}!");
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Debug, "Combat", 
+                        $"Defense Synergy reduced damage by {reduction}!");
                 }
                 
                 return reducedDamage;

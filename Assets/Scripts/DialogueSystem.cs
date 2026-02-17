@@ -379,14 +379,24 @@ namespace ACOTAR
 
         /// <summary>
         /// Select a dialogue choice
+        /// v2.6.1: Enhanced with error handling and logging
         /// </summary>
         public void SelectChoice(int choiceIndex)
         {
-            if (currentNode == null || choiceIndex < 0 || choiceIndex >= currentNode.choices.Count)
+            try
             {
-                Debug.LogWarning("Invalid choice!");
-                return;
-            }
+                if (currentNode == null || currentNode.choices == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, "Dialogue", "No active dialogue or choices available");
+                    return;
+                }
+                
+                if (choiceIndex < 0 || choiceIndex >= currentNode.choices.Count)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, "Dialogue", 
+                        $"Invalid choice index: {choiceIndex}, valid range: 0-{currentNode.choices.Count - 1}");
+                    return;
+                }
 
             DialogueChoice choice = currentNode.choices[choiceIndex];
 
@@ -406,7 +416,8 @@ namespace ACOTAR
             // Start quest if specified
             if (!string.IsNullOrEmpty(choice.questToStart))
             {
-                Debug.Log($"Quest started: {choice.questToStart}");
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, "Dialogue", 
+                    $"Quest started: {choice.questToStart}");
                 // Would integrate with QuestManager here
             }
 
@@ -427,8 +438,17 @@ namespace ACOTAR
                 }
                 else
                 {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, "Dialogue", 
+                        $"Target node not found: {choice.targetNodeId}");
                     EndDialogue();
                 }
+            }
+            }
+            catch (System.Exception ex)
+            {
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, "Dialogue", 
+                    $"Exception in SelectChoice({choiceIndex}): {ex.Message}\nStack: {ex.StackTrace}");
+                EndDialogue();
             }
         }
 
@@ -458,6 +478,13 @@ namespace ACOTAR
                 {
                     EndDialogue();
                 }
+            }
+            }
+            catch (System.Exception ex)
+            {
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, "Dialogue", 
+                    $"Exception in Continue: {ex.Message}");
+                EndDialogue();
             }
         }
 
