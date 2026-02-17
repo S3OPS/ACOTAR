@@ -362,6 +362,14 @@ namespace ACOTAR
             }
         }
 
+        /// <summary>
+        /// Get all active quests
+        /// </summary>
+        /// <returns>List of currently active quests</returns>
+        /// <remarks>
+        /// Returns a new list copy to prevent external modification of the active quest collection.
+        /// Active quests are those that have been started but not yet completed.
+        /// </remarks>
         public List<Quest> GetActiveQuests()
         {
             return new List<Quest>(activeQuests);
@@ -370,6 +378,12 @@ namespace ACOTAR
         /// <summary>
         /// Get only base game quests (no DLC)
         /// </summary>
+        /// <returns>List of quests available in the base game</returns>
+        /// <remarks>
+        /// Filters quests to return only those that don't require DLC packages.
+        /// Useful for displaying available content to players without DLC.
+        /// Uses DLCManager to determine quest ownership.
+        /// </remarks>
         public List<Quest> GetBaseGameQuests()
         {
             List<Quest> baseQuests = new List<Quest>();
@@ -387,6 +401,13 @@ namespace ACOTAR
         /// <summary>
         /// Get quests from a specific DLC
         /// </summary>
+        /// <param name="package">The DLC package to filter by</param>
+        /// <returns>List of quests belonging to the specified DLC</returns>
+        /// <remarks>
+        /// Returns quests that are part of the specified DLC package.
+        /// Empty list if DLC is not installed or no quests found.
+        /// Requires DLCManager to be initialized.
+        /// </remarks>
         public List<Quest> GetDLCQuests(DLCPackage package)
         {
             List<Quest> dlcQuests = new List<Quest>();

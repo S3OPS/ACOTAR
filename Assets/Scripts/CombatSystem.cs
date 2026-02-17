@@ -82,8 +82,22 @@ namespace ACOTAR
 
         /// <summary>
         /// Calculate physical attack damage with difficulty and elemental modifiers
-        /// v2.6.1: Enhanced with error handling
+        /// v2.6.1: Enhanced with error handling and comprehensive logging
         /// </summary>
+        /// <param name="attacker">The character performing the physical attack</param>
+        /// <param name="defender">The character receiving the attack</param>
+        /// <param name="isPlayerAttack">True if player is attacking (affects difficulty modifiers)</param>
+        /// <returns>CombatResult containing damage, type, and descriptive text</returns>
+        /// <remarks>
+        /// Calculates damage using:
+        /// - Base damage from effective strength (includes equipment bonuses)
+        /// - Difficulty multipliers (player/enemy)
+        /// - Critical hit system (15% base chance, 2x multiplier)
+        /// - Dodge mechanics based on defender agility
+        /// - Combo system (increases with consecutive hits)
+        /// - Random variance (80-120%)
+        /// - Status effects (30% chance of bleeding on critical)
+        /// </remarks>
         public static CombatResult CalculatePhysicalAttack(Character attacker, Character defender, bool isPlayerAttack = true)
         {
             try
@@ -175,8 +189,24 @@ namespace ACOTAR
         /// <summary>
         /// Calculate magic attack damage with elemental system integration
         /// v2.3.3: Enhanced with mana cost system
-        /// v2.6.1: Enhanced with error handling
+        /// v2.6.1: Enhanced with error handling and comprehensive logging
         /// </summary>
+        /// <param name="attacker">The character casting the magic spell</param>
+        /// <param name="defender">The character receiving the magic attack</param>
+        /// <param name="magicType">Type of magic spell being cast</param>
+        /// <param name="isPlayerAttack">True if player is attacking (affects difficulty modifiers)</param>
+        /// <returns>CombatResult containing damage, elemental effectiveness, and status effects</returns>
+        /// <remarks>
+        /// Calculates magic damage using:
+        /// - Mana cost validation and consumption (15-60 mana per spell)
+        /// - Base damage from effective magic power
+        /// - Difficulty multipliers
+        /// - Magic type multipliers (different spells have different power)
+        /// - Elemental effectiveness (e.g., Fire vs Ice)
+        /// - Critical hit system
+        /// - Combo bonuses
+        /// - Status effects (25% chance based on magic type)
+        /// </remarks>
         public static CombatResult CalculateMagicAttack(Character attacker, Character defender, MagicType magicType, bool isPlayerAttack = true)
         {
             try
@@ -489,6 +519,17 @@ namespace ACOTAR
         /// Apply party synergy bonuses to combat result
         /// v2.6.0: NEW - Integrates party synergy system with combat
         /// </summary>
+        /// <param name="baseResult">The base combat result before synergy bonuses</param>
+        /// <param name="attacker">The attacking character</param>
+        /// <param name="synergySystem">Reference to the party synergy system</param>
+        /// <returns>Modified CombatResult with synergy bonuses applied</returns>
+        /// <remarks>
+        /// Applies synergy bonuses based on active party composition:
+        /// - Damage synergy: Adds percentage-based bonus damage
+        /// - Critical rate synergy: Chance to upgrade hits to critical
+        /// - Magic power synergy: Boosts magical damage types
+        /// All bonuses stack with other combat modifiers
+        /// </remarks>
         public static CombatResult ApplySynergyBonuses(CombatResult baseResult, Character attacker, PartySynergySystem synergySystem)
         {
             // Defensive check (v2.6.0)
@@ -543,6 +584,14 @@ namespace ACOTAR
         /// Apply defensive synergy bonuses to reduce incoming damage
         /// v2.6.0: NEW - Reduce damage based on defense synergies
         /// </summary>
+        /// <param name="incomingDamage">The amount of damage before defense synergy</param>
+        /// <param name="synergySystem">Reference to the party synergy system</param>
+        /// <returns>Reduced damage amount after applying defense synergy</returns>
+        /// <remarks>
+        /// Defensive synergies reduce incoming damage by a percentage.
+        /// Logs the reduction amount when damage is reduced.
+        /// Always returns at least 0 damage (never negative).
+        /// </remarks>
         public static int ApplyDefensiveSynergy(int incomingDamage, PartySynergySystem synergySystem)
         {
             // Defensive check (v2.6.0)

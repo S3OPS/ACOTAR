@@ -7,6 +7,95 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.6.1] - 2026-02-16
+
+### 🔧 Code Quality & Robustness Enhancements
+
+This minor release focuses on code quality, error handling, and documentation improvements to make the codebase more maintainable and robust.
+
+#### **Enhanced Error Handling** 🛡️
+
+- **CombatSystem.cs Improvements**
+  - Added try-catch blocks to all critical combat calculation methods
+  - Enhanced null checking for character stats validation
+  - Comprehensive error logging with stack traces
+  - Graceful error recovery returns safe default values
+  - Methods enhanced:
+    - `CalculatePhysicalAttack()` (both overloads)
+    - `CalculateMagicAttack()` (both overloads)
+  
+- **QuestManager.cs Improvements**
+  - Added try-catch blocks to quest state management methods
+  - Enhanced input validation (null/empty string checks)
+  - Comprehensive error logging for quest operations
+  - Methods enhanced:
+    - `StartQuest()` 
+    - `CompleteQuest()`
+  
+- **DialogueSystem.cs Improvements**
+  - Added try-catch blocks to dialogue flow methods
+  - Enhanced validation for dialogue tree navigation
+  - Better error messages for invalid choices/nodes
+  - Methods enhanced:
+    - `StartDialogue()`
+    - `SelectChoice()`
+    - `Continue()`
+
+#### **Logging System Integration** 📝
+
+- **Standardized Logging Approach**
+  - Migrated Debug.Log calls to LoggingSystem in enhanced methods
+  - Added structured logging categories: "Combat", "Quest", "Dialogue"
+  - Implemented appropriate log levels (Debug, Info, Warning, Error)
+  - Context-rich log messages with relevant parameters
+  
+- **Benefits**
+  - Centralized log management and filtering
+  - Better debugging capabilities
+  - Production-ready error tracking
+  - Consistent logging patterns across systems
+
+#### **Documentation Enhancements** 📚
+
+- **CombatSystem.cs Documentation**
+  - Added comprehensive XML documentation to main methods
+  - Detailed parameter descriptions
+  - Return value documentation
+  - Extensive remarks sections explaining:
+    - Calculation formulas
+    - Game mechanics (critical hits, combos, dodges)
+    - System integrations (difficulty, synergies, elements)
+    - Status effect chances
+  
+- **QuestManager.cs Documentation**
+  - Enhanced XML docs for public API methods
+  - Added remarks explaining DLC integration
+  - Documented return value behaviors
+  - Clarified collection handling patterns
+
+### 🐛 Bug Fixes
+
+- Fixed potential null reference exceptions in combat calculations when stats are uninitialized
+- Fixed potential issues with invalid dialogue tree navigation
+- Improved handling of edge cases in quest progression
+
+### 📊 Code Metrics
+
+- **Files Modified**: 3 (CombatSystem.cs, QuestManager.cs, DialogueSystem.cs)
+- **Error Handlers Added**: 7 try-catch blocks
+- **Logging Calls Added**: 25+ structured log statements
+- **XML Documentation**: 10+ comprehensive documentation blocks
+- **Lines Changed**: ~115 additions for robustness
+
+### ✨ Developer Experience Improvements
+
+- Better error messages make debugging faster
+- Comprehensive XML docs improve IDE IntelliSense
+- Structured logging enables easier production monitoring
+- Error handling prevents crashes from edge cases
+
+---
+
 ## [2.6.0] - 2026-02-16
 
 ### 🎮 Major Gameplay Enhancements
