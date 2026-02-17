@@ -367,7 +367,6 @@ namespace ACOTAR
         }
 
         /// <summary>
-        /// <summary>
         /// Get NPC's current location based on time
         /// v2.6.4: Enhanced with error handling, validation, and structured logging
         /// </summary>

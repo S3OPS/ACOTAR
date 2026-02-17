@@ -252,7 +252,6 @@ namespace ACOTAR
         }
 
         /// <summary>
-        /// <summary>
         /// Generate a random enhanced item based on player level
         /// v2.6.4: Enhanced with error handling, validation, and structured logging
         /// </summary>
