@@ -237,10 +237,6 @@ namespace ACOTAR
         }
 
         /// <summary>
-        /// Transform player from human to High Fae (lore-accurate transformation)
-        /// Optimized to preserve progression and abilities
-        /// </summary>
-        /// <summary>
         /// Transform player character from Human to High Fae (story event)
         /// Enhanced in v2.6.5: Added comprehensive error handling and logging
         /// </summary>

@@ -230,10 +230,6 @@ namespace ACOTAR
 
         /// <summary>
         /// Get a location by name
-        /// v2.5.3: Enhanced with defensive checks and informative warnings
-        /// </summary>
-        /// <summary>
-        /// Get a location by name
         /// v2.5.3: Enhanced with defensive checks
         /// v2.6.5: Added comprehensive error handling and logging
         /// </summary>
@@ -389,9 +385,6 @@ namespace ACOTAR
         }
 
         /// <summary>
-        /// Check if a specific location exists in the system
-        /// v2.5.3: New helper method
-        /// </summary>
         /// <summary>
         /// Check if a location exists in the system
         /// v2.5.3: Enhanced with defensive checks

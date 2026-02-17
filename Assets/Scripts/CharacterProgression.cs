@@ -584,7 +584,6 @@ namespace ACOTAR
         }
 
         /// <summary>
-        /// <summary>
         /// Update a statistic
         /// Enhanced in v2.6.5: Added comprehensive error handling and logging
         /// </summary>

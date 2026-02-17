@@ -136,8 +136,6 @@ namespace ACOTAR
         }
 
         /// <summary>
-        /// Complete a story arc and unlock next content
-        /// <summary>
         /// Complete a story arc and unlock related content
         /// v2.5.3: Enhanced with defensive checks
         /// v2.6.5: Added comprehensive error handling and logging
@@ -379,8 +377,6 @@ namespace ACOTAR
             }
         }
 
-        /// <summary>
-        /// Unlock a location for the player
         /// <summary>
         /// Unlock a location for player access
         /// v2.5.3: Enhanced with defensive checks
