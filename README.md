@@ -1,6 +1,6 @@
 # ACOTAR Fantasy RPG
 
-**Version 2.6.0** | **Major Gameplay Enhancements: Strategic Depth Update** ✨
+**Version 2.6.1** | **Quality & Robustness Update** ✨
 
 A lore-accurate Fantasy RPG based on Sarah J. Maas's *A Court of Thorns and Roses* series, built with Unity and Docker.
 
@@ -98,6 +98,15 @@ Experience the epic conclusion to the trilogy:
   - Random encounter system
   - Romanceable NPCs (Seraphina the Bard)
   - Living, breathing world atmosphere
+
+- **Code Quality Enhancements v2.6.1** 🆕:
+  - Comprehensive error handling in CombatSystem, QuestManager, DialogueSystem
+  - Structured logging integration with LoggingSystem
+  - Detailed XML documentation for 10+ public APIs
+  - Production-ready error recovery patterns
+  - Enhanced debugging with context-rich error messages
+  - Zero security vulnerabilities (CodeQL verified)
+  - 100% backwards compatible
 
 ### 🆕 New in v2.5.1 - Infrastructure & Quality-of-Life
 - **Centralized Logging System** 🆕:
