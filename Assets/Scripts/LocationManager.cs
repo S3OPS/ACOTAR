@@ -232,63 +232,140 @@ namespace ACOTAR
         /// Get a location by name
         /// v2.5.3: Enhanced with defensive checks and informative warnings
         /// </summary>
+        /// <summary>
+        /// Get a location by name
+        /// v2.5.3: Enhanced with defensive checks
+        /// v2.6.5: Added comprehensive error handling and logging
+        /// </summary>
         /// <param name="name">The name of the location to retrieve</param>
         /// <returns>The location if found, null otherwise</returns>
+        /// <remarks>
+        /// This is a core method used throughout the game for location lookups.
+        /// Returning null for not-found locations is intentional and not an error.
+        /// The locations dictionary must be initialized before this method is called.
+        /// Location names are case-sensitive and must match the registered names.
+        /// </remarks>
         public Location GetLocation(string name)
         {
-            // Defensive checks (v2.5.3)
-            if (!IsInitialized)
+            try
             {
-                Debug.LogWarning("LocationManager: Cannot get location - system not initialized");
+                // Defensive checks (v2.5.3)
+                if (!IsInitialized)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "LocationManager", "Cannot get location - system not initialized");
+                    return null;
+                }
+
+                if (string.IsNullOrEmpty(name))
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "LocationManager", "Cannot get location with null or empty name");
+                    return null;
+                }
+
+                if (locations == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "LocationManager", "Cannot get location - locations dictionary is null");
+                    return null;
+                }
+
+                if (locations.ContainsKey(name))
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Debug, 
+                        "LocationManager", $"Retrieved location: {name}");
+                    return locations[name];
+                }
+                
+                // Location not found - this is normal, not a warning
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Debug, 
+                    "LocationManager", $"Location not found: {name}");
                 return null;
             }
-
-            if (string.IsNullOrEmpty(name))
+            catch (System.Exception ex)
             {
-                Debug.LogWarning("LocationManager: Cannot get location with null or empty name");
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                    "LocationManager", $"Exception in GetLocation: {ex.Message}\nStack: {ex.StackTrace}");
                 return null;
             }
-
-            if (locations.ContainsKey(name))
-            {
-                return locations[name];
-            }
-            
-            // Location not found - this is normal, not a warning
-            return null;
         }
 
         /// <summary>
         /// Get locations by court with caching for optimization
         /// v2.5.3: Enhanced with defensive checks
+        /// v2.6.5: Added comprehensive error handling and logging
         /// </summary>
+        /// <param name="court">The court to get locations for</param>
+        /// <returns>List of locations in the specified court</returns>
+        /// <remarks>
+        /// This method uses caching to improve performance for repeated queries.
+        /// The cache is automatically populated on first access per court.
+        /// Returns an empty list if the system is not initialized or court has no locations.
+        /// The returned list is a copy to prevent external modification of the cache.
+        /// Cache building is protected to ensure partial results on individual location errors.
+        /// </remarks>
         public List<Location> GetLocationsByCourt(Court court)
         {
-            // Defensive checks (v2.5.3)
-            if (!IsInitialized)
+            try
             {
-                Debug.LogWarning("LocationManager: Cannot get locations by court - system not initialized");
+                // Defensive checks (v2.5.3)
+                if (!IsInitialized)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "LocationManager", "Cannot get locations by court - system not initialized");
+                    return new List<Location>();
+                }
+
+                if (courtLocationCache == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "LocationManager", "Court location cache was null, initializing");
+                    courtLocationCache = new Dictionary<Court, List<Location>>();
+                }
+
+                // Check cache first
+                if (courtLocationCache.ContainsKey(court))
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Debug, 
+                        "LocationManager", $"Retrieved {courtLocationCache[court].Count} locations for {court} from cache");
+                    return new List<Location>(courtLocationCache[court]);
+                }
+
+                // Build cache entry with individual error handling
+                List<Location> courtLocations = new List<Location>();
+                
+                if (locations != null)
+                {
+                    foreach (var location in locations.Values)
+                    {
+                        try
+                        {
+                            if (location != null && location.rulingCourt == court)
+                            {
+                                courtLocations.Add(location);
+                            }
+                        }
+                        catch (System.Exception locEx)
+                        {
+                            LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                                "LocationManager", $"Exception processing location for court {court}: {locEx.Message}");
+                        }
+                    }
+                }
+                
+                courtLocationCache[court] = courtLocations;
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Debug, 
+                    "LocationManager", $"Built cache for {court}: {courtLocations.Count} locations");
+                
+                return new List<Location>(courtLocations);
+            }
+            catch (System.Exception ex)
+            {
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                    "LocationManager", $"Exception in GetLocationsByCourt: {ex.Message}\nStack: {ex.StackTrace}");
                 return new List<Location>();
             }
-
-            // Check cache first
-            if (courtLocationCache.ContainsKey(court))
-            {
-                return new List<Location>(courtLocationCache[court]);
-            }
-
-            // Build cache entry
-            List<Location> courtLocations = new List<Location>();
-            foreach (var location in locations.Values)
-            {
-                if (location.rulingCourt == court)
-                {
-                    courtLocations.Add(location);
-                }
-            }
-            
-            courtLocationCache[court] = courtLocations;
-            return new List<Location>(courtLocations);
         }
 
         /// <summary>
@@ -315,15 +392,55 @@ namespace ACOTAR
         /// Check if a specific location exists in the system
         /// v2.5.3: New helper method
         /// </summary>
+        /// <summary>
+        /// Check if a location exists in the system
+        /// v2.5.3: Enhanced with defensive checks
+        /// v2.6.5: Added comprehensive error handling and logging
+        /// </summary>
         /// <param name="locationName">The name of the location to check</param>
         /// <returns>True if the location exists, false otherwise</returns>
+        /// <remarks>
+        /// This is a lightweight validation method for checking location existence.
+        /// Returns false for null/empty names or if the system is not initialized.
+        /// Used by travel systems and quest logic to validate destinations.
+        /// </remarks>
         public bool LocationExists(string locationName)
         {
-            if (!IsInitialized || string.IsNullOrEmpty(locationName))
+            try
             {
+                if (!IsInitialized)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Debug, 
+                        "LocationManager", "LocationExists check failed: system not initialized");
+                    return false;
+                }
+                
+                if (string.IsNullOrEmpty(locationName))
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Debug, 
+                        "LocationManager", "LocationExists check failed: location name is null or empty");
+                    return false;
+                }
+                
+                if (locations == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "LocationManager", "LocationExists check failed: locations dictionary is null");
+                    return false;
+                }
+                
+                bool exists = locations.ContainsKey(locationName);
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Debug, 
+                    "LocationManager", $"Location '{locationName}' exists: {exists}");
+                
+                return exists;
+            }
+            catch (System.Exception ex)
+            {
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                    "LocationManager", $"Exception in LocationExists: {ex.Message}\nStack: {ex.StackTrace}");
                 return false;
             }
-            return locations.ContainsKey(locationName);
         }
 
         /// <summary>

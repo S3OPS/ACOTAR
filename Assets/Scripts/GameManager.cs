@@ -60,40 +60,174 @@ namespace ACOTAR
             InitializeGame();
         }
 
+        /// <summary>
+        /// Initialize all game systems and create initial player character
+        /// Enhanced in v2.6.5: Added comprehensive error handling and logging
+        /// </summary>
+        /// <remarks>
+        /// This method is critical for game startup. Any failure here would prevent the game from functioning.
+        /// All system initializations are protected to allow partial initialization if needed.
+        /// The save system is initialized first as other systems may depend on it.
+        /// Event notifications are sent to inform other systems of game readiness.
+        /// </remarks>
         private void InitializeGame()
         {
-            Debug.Log("=== ACOTAR Fantasy RPG Initialized ===");
-            Debug.Log("Welcome to Prythian!");
-            
-            // Initialize save system
-            SaveSystem.Initialize();
-            
-            // Initialize player with configuration
-            playerCharacter = new Character(
-                GameConfig.DEFAULT_PLAYER_NAME, 
-                GameConfig.DEFAULT_PLAYER_CLASS, 
-                GameConfig.DEFAULT_PLAYER_COURT
-            );
-            
-            // Initialize game systems
-            inventorySystem = new InventorySystem();
-            reputationSystem = new ReputationSystem(playerCharacter);
-            craftingSystem = new CraftingSystem(inventorySystem, playerCharacter);
-            currencySystem = new CurrencySystem();
-            statusEffectManager = new StatusEffectManager();
-            
-            // Set starting location
-            currentLocation = GameConfig.DEFAULT_STARTING_LOCATION;
-            gameTime = 0;
-            hasMetRhysand = false;
-            hasCompletedCurse = false;
+            try
+            {
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, 
+                    "GameManager", "=== ACOTAR Fantasy RPG Initialized ===\nWelcome to Prythian!");
+                
+                // Initialize save system
+                try
+                {
+                    SaveSystem.Initialize();
+                }
+                catch (System.Exception saveEx)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "GameManager", $"Exception initializing SaveSystem: {saveEx.Message}");
+                    // Continue initialization - game can function without save system
+                }
+                
+                // Initialize player with configuration
+                try
+                {
+                    if (string.IsNullOrEmpty(GameConfig.DEFAULT_PLAYER_NAME))
+                    {
+                        LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                            "GameManager", "Default player name is null or empty, using fallback");
+                        playerCharacter = new Character("Feyre", GameConfig.DEFAULT_PLAYER_CLASS, GameConfig.DEFAULT_PLAYER_COURT);
+                    }
+                    else
+                    {
+                        playerCharacter = new Character(
+                            GameConfig.DEFAULT_PLAYER_NAME, 
+                            GameConfig.DEFAULT_PLAYER_CLASS, 
+                            GameConfig.DEFAULT_PLAYER_COURT
+                        );
+                    }
+                }
+                catch (System.Exception charEx)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "GameManager", $"Exception creating player character: {charEx.Message}");
+                    // Create minimal fallback character
+                    playerCharacter = new Character("Feyre", CharacterClass.Human, Court.None);
+                }
+                
+                // Initialize game systems with individual error handling
+                try
+                {
+                    inventorySystem = new InventorySystem();
+                }
+                catch (System.Exception invEx)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "GameManager", $"Exception initializing InventorySystem: {invEx.Message}");
+                }
+                
+                try
+                {
+                    if (playerCharacter != null)
+                    {
+                        reputationSystem = new ReputationSystem(playerCharacter);
+                    }
+                    else
+                    {
+                        LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                            "GameManager", "Cannot initialize ReputationSystem: player character is null");
+                    }
+                }
+                catch (System.Exception repEx)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "GameManager", $"Exception initializing ReputationSystem: {repEx.Message}");
+                }
+                
+                try
+                {
+                    if (inventorySystem != null && playerCharacter != null)
+                    {
+                        craftingSystem = new CraftingSystem(inventorySystem, playerCharacter);
+                    }
+                    else
+                    {
+                        LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                            "GameManager", "Cannot initialize CraftingSystem: dependencies are null");
+                    }
+                }
+                catch (System.Exception craftEx)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "GameManager", $"Exception initializing CraftingSystem: {craftEx.Message}");
+                }
+                
+                try
+                {
+                    currencySystem = new CurrencySystem();
+                }
+                catch (System.Exception currEx)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "GameManager", $"Exception initializing CurrencySystem: {currEx.Message}");
+                }
+                
+                try
+                {
+                    statusEffectManager = new StatusEffectManager();
+                }
+                catch (System.Exception statusEx)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "GameManager", $"Exception initializing StatusEffectManager: {statusEx.Message}");
+                }
+                
+                // Set starting location
+                if (string.IsNullOrEmpty(GameConfig.DEFAULT_STARTING_LOCATION))
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "GameManager", "Default starting location is null or empty, using fallback");
+                    currentLocation = "Human Lands";
+                }
+                else
+                {
+                    currentLocation = GameConfig.DEFAULT_STARTING_LOCATION;
+                }
+                
+                gameTime = 0;
+                hasMetRhysand = false;
+                hasCompletedCurse = false;
 
-            Debug.Log($"Created character: {playerCharacter.name}");
-            Debug.Log($"Class: {playerCharacter.characterClass}");
-            Debug.Log($"Starting location: {currentLocation}");
-            Debug.Log($"Difficulty: {DifficultySettings.CurrentDifficulty}");
-            Debug.Log($"Starting Gold: {currencySystem.Gold}");
-            Debug.Log("All systems initialized successfully!");
+                // Log initialization results
+                if (playerCharacter != null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, 
+                        "GameManager", $"Created character: {playerCharacter.name}\nClass: {playerCharacter.characterClass}\nStarting location: {currentLocation}\nDifficulty: {DifficultySettings.CurrentDifficulty}");
+                }
+                
+                if (currencySystem != null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Debug, 
+                        "GameManager", $"Starting Gold: {currencySystem.Gold}");
+                }
+                
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, 
+                    "GameManager", "All systems initialized successfully!");
+            }
+            catch (System.Exception ex)
+            {
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                    "GameManager", $"Critical exception in InitializeGame: {ex.Message}\nStack: {ex.StackTrace}");
+                // Attempt to create minimal viable game state
+                if (playerCharacter == null)
+                {
+                    playerCharacter = new Character("Feyre", CharacterClass.Human, Court.None);
+                }
+                if (string.IsNullOrEmpty(currentLocation))
+                {
+                    currentLocation = "Human Lands";
+                }
+            }
         }
 
         private void Update()
@@ -106,35 +240,107 @@ namespace ACOTAR
         /// Transform player from human to High Fae (lore-accurate transformation)
         /// Optimized to preserve progression and abilities
         /// </summary>
+        /// <summary>
+        /// Transform player character from Human to High Fae (story event)
+        /// Enhanced in v2.6.5: Added comprehensive error handling and logging
+        /// </summary>
+        /// <remarks>
+        /// This is a critical story moment that must preserve all character progression.
+        /// The transformation stores and restores XP, level, and all learned abilities.
+        /// Event handlers are protected to prevent transformation failures from breaking the game.
+        /// If the character is already High Fae, the method safely returns without changes.
+        /// </remarks>
         public void TransformToHighFae()
         {
-            if (playerCharacter.characterClass == CharacterClass.Human)
+            try
             {
+                // Validation
+                if (playerCharacter == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "GameManager", "Cannot transform to High Fae: player character is null");
+                    return;
+                }
+                
+                if (playerCharacter.characterClass != CharacterClass.Human)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "GameManager", $"Cannot transform to High Fae: character is already {playerCharacter.characterClass}");
+                    return;
+                }
+                
                 CharacterClass oldClass = playerCharacter.characterClass;
                 
                 // Store current progression
                 int currentXP = playerCharacter.experience;
                 int currentLevel = playerCharacter.level;
-                List<MagicType> currentAbilities = new List<MagicType>(playerCharacter.abilities);
+                List<MagicType> currentAbilities = new List<MagicType>();
+                
+                if (playerCharacter.abilities != null)
+                {
+                    currentAbilities = new List<MagicType>(playerCharacter.abilities);
+                }
+                
+                string characterName = playerCharacter.name;
+                Court characterCourt = playerCharacter.allegiance;
                 
                 // Create new High Fae character preserving identity
-                playerCharacter = new Character(
-                    playerCharacter.name, 
-                    CharacterClass.HighFae, 
-                    playerCharacter.allegiance
-                );
-                playerCharacter.isMadeByTheCauldron = true;
-                
-                // Restore progression
-                playerCharacter.experience = currentXP;
-                playerCharacter.level = currentLevel;
-                foreach (var ability in currentAbilities)
+                try
                 {
-                    playerCharacter.LearnAbility(ability);
-                }
+                    playerCharacter = new Character(
+                        characterName, 
+                        CharacterClass.HighFae, 
+                        characterCourt
+                    );
+                    playerCharacter.isMadeByTheCauldron = true;
+                    
+                    // Restore progression
+                    playerCharacter.experience = currentXP;
+                    playerCharacter.level = currentLevel;
+                    
+                    foreach (var ability in currentAbilities)
+                    {
+                        try
+                        {
+                            playerCharacter.LearnAbility(ability);
+                        }
+                        catch (System.Exception abilityEx)
+                        {
+                            LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                                "GameManager", $"Exception restoring ability {ability}: {abilityEx.Message}");
+                        }
+                    }
 
-                Debug.Log($"{playerCharacter.name} has been Made by the Cauldron and transformed into High Fae!");
-                GameEvents.TriggerCharacterTransformed(playerCharacter, CharacterClass.HighFae);
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, 
+                        "GameManager", $"{characterName} has been Made by the Cauldron and transformed into High Fae!");
+                    
+                    // Trigger event with protection
+                    try
+                    {
+                        GameEvents.TriggerCharacterTransformed(playerCharacter, CharacterClass.HighFae);
+                    }
+                    catch (System.Exception eventEx)
+                    {
+                        LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                            "GameManager", $"Exception in CharacterTransformed event handler: {eventEx.Message}");
+                    }
+                }
+                catch (System.Exception charEx)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "GameManager", $"Exception creating new High Fae character: {charEx.Message}");
+                    // Character creation failed - try to preserve old character
+                    if (playerCharacter == null)
+                    {
+                        // Create minimal High Fae character as fallback
+                        playerCharacter = new Character(characterName, CharacterClass.HighFae, characterCourt);
+                    }
+                }
+            }
+            catch (System.Exception ex)
+            {
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                    "GameManager", $"Exception in TransformToHighFae: {ex.Message}\nStack: {ex.StackTrace}");
             }
         }
 
@@ -170,39 +376,125 @@ namespace ACOTAR
 
         /// <summary>
         /// Travel to a new location with event notification
+        /// Enhanced in v2.6.5: Added comprehensive error handling and logging
         /// </summary>
+        /// <param name="locationName">Name of the destination location</param>
+        /// <remarks>
+        /// This method handles player movement between locations in Prythian.
+        /// Location validation is performed before travel to prevent invalid moves.
+        /// Game time advances by one day when traveling.
+        /// Event handlers are protected to prevent travel failures from breaking the game.
+        /// If location is invalid, the player remains at their current location.
+        /// </remarks>
         public void TravelTo(string locationName)
         {
-            if (locationManager == null)
+            try
             {
-                Debug.LogWarning("LocationManager not initialized");
-                return;
+                // Input validation
+                if (string.IsNullOrEmpty(locationName))
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "GameManager", "Cannot travel: destination location name is null or empty");
+                    return;
+                }
+                
+                if (locationManager == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "GameManager", "Cannot travel: LocationManager not initialized");
+                    return;
+                }
+                
+                Location location = null;
+                try
+                {
+                    location = locationManager.GetLocation(locationName);
+                }
+                catch (System.Exception locEx)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "GameManager", $"Exception getting location {locationName}: {locEx.Message}");
+                    return;
+                }
+                
+                if (location != null)
+                {
+                    string previousLocation = currentLocation;
+                    currentLocation = locationName;
+                    gameTime++;
+                    
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, 
+                        "GameManager", $"Traveled to: {locationName}\nDescription: {location.description}");
+                    
+                    // Trigger event with protection
+                    try
+                    {
+                        GameEvents.TriggerLocationChanged(previousLocation, locationName);
+                    }
+                    catch (System.Exception eventEx)
+                    {
+                        LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                            "GameManager", $"Exception in LocationChanged event handler: {eventEx.Message}");
+                    }
+                }
+                else
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "GameManager", $"Location not found: {locationName}");
+                }
             }
-            
-            Location location = locationManager.GetLocation(locationName);
-            if (location != null)
+            catch (System.Exception ex)
             {
-                string previousLocation = currentLocation;
-                currentLocation = locationName;
-                gameTime++;
-                Debug.Log($"Traveled to: {locationName}");
-                Debug.Log($"Description: {location.description}");
-                GameEvents.TriggerLocationChanged(previousLocation, locationName);
-            }
-            else
-            {
-                Debug.LogWarning($"Location not found: {locationName}");
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                    "GameManager", $"Exception in TravelTo: {ex.Message}\nStack: {ex.StackTrace}");
             }
         }
 
         /// <summary>
         /// Change player's court allegiance with event notification
+        /// Enhanced in v2.6.5: Added comprehensive error handling and logging
         /// </summary>
+        /// <param name="newCourt">The court to pledge allegiance to</param>
+        /// <remarks>
+        /// This method changes the player's court allegiance, a significant story choice.
+        /// The allegiance change immediately affects reputation with all courts.
+        /// Event handlers are protected to prevent allegiance failures from breaking the game.
+        /// If player character is null, the operation safely fails without changing state.
+        /// </remarks>
         public void ChangeCourtAllegiance(Court newCourt)
         {
-            playerCharacter.allegiance = newCourt;
-            Debug.Log($"{playerCharacter.name} now serves the {newCourt} Court");
-            GameEvents.TriggerCourtAllegianceChanged(playerCharacter, newCourt);
+            try
+            {
+                // Validation
+                if (playerCharacter == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "GameManager", "Cannot change court allegiance: player character is null");
+                    return;
+                }
+                
+                Court previousCourt = playerCharacter.allegiance;
+                playerCharacter.allegiance = newCourt;
+                
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, 
+                    "GameManager", $"{playerCharacter.name} now serves the {newCourt} Court");
+                
+                // Trigger event with protection
+                try
+                {
+                    GameEvents.TriggerCourtAllegianceChanged(playerCharacter, newCourt);
+                }
+                catch (System.Exception eventEx)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "GameManager", $"Exception in CourtAllegianceChanged event handler: {eventEx.Message}");
+                }
+            }
+            catch (System.Exception ex)
+            {
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                    "GameManager", $"Exception in ChangeCourtAllegiance: {ex.Message}\nStack: {ex.StackTrace}");
+            }
         }
 
         /// <summary>
