@@ -385,7 +385,6 @@ namespace ACOTAR
         }
 
         /// <summary>
-        /// <summary>
         /// Check if a location exists in the system
         /// v2.5.3: Enhanced with defensive checks
         /// v2.6.5: Added comprehensive error handling and logging
