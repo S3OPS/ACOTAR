@@ -253,53 +253,137 @@ namespace ACOTAR
 
         /// <summary>
         /// Generate a random enhanced item based on player level
+        /// v2.6.4: Enhanced with error handling, validation, and structured logging
         /// </summary>
+        /// <param name="playerLevel">Player's current level for loot generation</param>
+        /// <param name="itemType">Type of item to generate (default: Weapon)</param>
+        /// <returns>Generated EnhancedItem with random properties, or null on error</returns>
+        /// <remarks>
+        /// This method generates procedural loot with rarity, affixes, and set bonuses.
+        /// Enhanced in v2.6.4 with:
+        /// - Try-catch for exception protection
+        /// - Level validation (minimum 1)
+        /// - Null checking throughout generation process
+        /// - Protected method calls for each generation step
+        /// - Structured logging via LoggingSystem
+        /// Returns null if system not initialized or on error.
+        /// </remarks>
         public EnhancedItem GenerateLoot(int playerLevel, ItemType itemType = ItemType.Weapon)
         {
-            // Defensive check (v2.6.0)
-            if (!IsInitialized)
+            try
             {
-                Debug.LogWarning("AdvancedLootSystem: Cannot generate loot - system not initialized");
+                // Initialization check
+                if (!IsInitialized)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "LootSystem", "Cannot generate loot: system not initialized");
+                    return null;
+                }
+
+                // Input validation
+                if (playerLevel < 1)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "LootSystem", $"Invalid player level {playerLevel}, using level 1");
+                    playerLevel = 1;
+                }
+
+                // Determine rarity based on level and random chance
+                ItemRarity rarity = DetermineRarity(playerLevel);
+                
+                // Create base item
+                string baseId = $"generated_{itemType}_{System.Guid.NewGuid().ToString().Substring(0, 8)}";
+                EnhancedItem item = new EnhancedItem(baseId, itemType, rarity);
+                if (item == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "LootSystem", "Failed to create EnhancedItem instance");
+                    return null;
+                }
+
+                item.level = playerLevel;
+                
+                // Set base name based on type
+                try
+                {
+                    item.displayName = GetBaseItemName(itemType);
+                }
+                catch (System.Exception nameEx)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "LootSystem", $"Exception generating item name: {nameEx.Message}");
+                    item.displayName = "Unknown Item";
+                }
+                
+                // Generate affixes based on rarity
+                try
+                {
+                    int affixCount = GetAffixCountForRarity(rarity);
+                    for (int i = 0; i < affixCount; i++)
+                    {
+                        AffixType affix = GenerateRandomAffix();
+                        if (!item.affixes.Contains(affix))
+                        {
+                            item.affixes.Add(affix);
+                            ApplyAffixStats(item, affix, rarity);
+                        }
+                    }
+                }
+                catch (System.Exception affixEx)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "LootSystem", $"Exception generating affixes: {affixEx.Message}");
+                }
+                
+                // Chance for set item (higher at higher rarities)
+                try
+                {
+                    if (ShouldBeSetItem(rarity))
+                    {
+                        item.set = GenerateRandomSet();
+                    }
+                }
+                catch (System.Exception setEx)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "LootSystem", $"Exception generating set item: {setEx.Message}");
+                }
+                
+                // Calculate gold value
+                try
+                {
+                    item.goldValue = CalculateItemValue(item);
+                }
+                catch (System.Exception valueEx)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "LootSystem", $"Exception calculating item value: {valueEx.Message}");
+                    item.goldValue = 100; // Default value
+                }
+                
+                // Generate description
+                try
+                {
+                    item.description = GenerateItemDescription(item);
+                }
+                catch (System.Exception descEx)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "LootSystem", $"Exception generating description: {descEx.Message}");
+                    item.description = "A mysterious item";
+                }
+                
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, 
+                    "LootSystem", $"Generated {rarity} {item.GetFullDisplayName()} (Level {item.level})");
+                
+                return item;
+            }
+            catch (System.Exception ex)
+            {
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                    "LootSystem", $"Exception in GenerateLoot: {ex.Message}\nStack: {ex.StackTrace}");
                 return null;
             }
-
-            // Determine rarity based on level and random chance
-            ItemRarity rarity = DetermineRarity(playerLevel);
-            
-            // Create base item
-            string baseId = $"generated_{itemType}_{System.Guid.NewGuid().ToString().Substring(0, 8)}";
-            EnhancedItem item = new EnhancedItem(baseId, itemType, rarity);
-            item.level = playerLevel;
-            
-            // Set base name based on type
-            item.displayName = GetBaseItemName(itemType);
-            
-            // Generate affixes based on rarity
-            int affixCount = GetAffixCountForRarity(rarity);
-            for (int i = 0; i < affixCount; i++)
-            {
-                AffixType affix = GenerateRandomAffix();
-                if (!item.affixes.Contains(affix))
-                {
-                    item.affixes.Add(affix);
-                    ApplyAffixStats(item, affix, rarity);
-                }
-            }
-            
-            // Chance for set item (higher at higher rarities)
-            if (ShouldBeSetItem(rarity))
-            {
-                item.set = GenerateRandomSet();
-            }
-            
-            // Calculate gold value
-            item.goldValue = CalculateItemValue(item);
-            
-            // Generate description
-            item.description = GenerateItemDescription(item);
-            
-            Debug.Log($"Generated {rarity} {item.GetFullDisplayName()} (Level {item.level})");
-            return item;
         }
 
         /// <summary>
@@ -497,54 +581,148 @@ namespace ACOTAR
 
         /// <summary>
         /// Check active set bonuses for equipped items
+        /// v2.6.4: Enhanced with error handling, validation, and structured logging
         /// </summary>
+        /// <param name="equippedItems">List of currently equipped items to check</param>
+        /// <returns>Dictionary mapping equipment sets to count of equipped pieces</returns>
+        /// <remarks>
+        /// This method counts how many pieces of each equipment set are equipped.
+        /// Enhanced in v2.6.4 with:
+        /// - Try-catch for exception protection
+        /// - Null checking for input list and items
+        /// - Protected iteration with individual error handling
+        /// - Structured logging via LoggingSystem
+        /// Returns empty dictionary on error.
+        /// </remarks>
         public Dictionary<EquipmentSet, int> CheckSetBonuses(List<EnhancedItem> equippedItems)
         {
-            // Defensive check (v2.6.0)
-            if (equippedItems == null)
+            try
             {
+                // Input validation
+                if (equippedItems == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Debug, 
+                        "LootSystem", "Cannot check set bonuses: equipped items list is null");
+                    return new Dictionary<EquipmentSet, int>();
+                }
+
+                var setCounts = new Dictionary<EquipmentSet, int>();
+                
+                foreach (var item in equippedItems)
+                {
+                    try
+                    {
+                        if (item == null)
+                        {
+                            LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                                "LootSystem", "Skipping null item in equipped items list");
+                            continue;
+                        }
+
+                        if (item.set != EquipmentSet.None)
+                        {
+                            if (!setCounts.ContainsKey(item.set))
+                            {
+                                setCounts[item.set] = 0;
+                            }
+                            setCounts[item.set]++;
+                        }
+                    }
+                    catch (System.Exception itemEx)
+                    {
+                        LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                            "LootSystem", $"Exception checking item for set bonus: {itemEx.Message}");
+                        // Continue with other items
+                    }
+                }
+                
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Debug, 
+                    "LootSystem", $"Found {setCounts.Count} different equipment sets among {equippedItems.Count} items");
+                
+                return setCounts;
+            }
+            catch (System.Exception ex)
+            {
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                    "LootSystem", $"Exception in CheckSetBonuses: {ex.Message}\nStack: {ex.StackTrace}");
                 return new Dictionary<EquipmentSet, int>();
             }
-
-            var setCounts = new Dictionary<EquipmentSet, int>();
-            
-            foreach (var item in equippedItems)
-            {
-                if (item.set != EquipmentSet.None)
-                {
-                    if (!setCounts.ContainsKey(item.set))
-                    {
-                        setCounts[item.set] = 0;
-                    }
-                    setCounts[item.set]++;
-                }
-            }
-            
-            return setCounts;
         }
 
         /// <summary>
         /// Get active set bonuses based on equipped items
+        /// v2.6.4: Enhanced with error handling, validation, and structured logging
         /// </summary>
+        /// <param name="equippedItems">List of currently equipped items</param>
+        /// <returns>List of active SetBonus objects based on equipped sets</returns>
+        /// <remarks>
+        /// This method determines which set bonuses are active based on equipped items.
+        /// Enhanced in v2.6.4 with:
+        /// - Try-catch for exception protection
+        /// - Null checking for bonuses dictionary
+        /// - Protected iteration with individual error handling
+        /// - Structured logging via LoggingSystem
+        /// Returns empty list on error.
+        /// </remarks>
         public List<SetBonus> GetActiveSetBonuses(List<EnhancedItem> equippedItems)
         {
-            var activeBonuses = new List<SetBonus>();
-            var setCounts = CheckSetBonuses(equippedItems);
-            
-            foreach (var setCount in setCounts)
+            try
             {
-                if (setBonuses.ContainsKey(setCount.Key))
+                var activeBonuses = new List<SetBonus>();
+                var setCounts = CheckSetBonuses(equippedItems);
+                
+                if (setCounts == null)
                 {
-                    var bonus = setBonuses[setCount.Key];
-                    if (setCount.Value >= bonus.requiredPieces)
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "LootSystem", "Cannot get active bonuses: set counts is null");
+                    return activeBonuses;
+                }
+
+                if (setBonuses == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "LootSystem", "Cannot get active bonuses: set bonuses dictionary is null");
+                    return activeBonuses;
+                }
+                
+                foreach (var setCount in setCounts)
+                {
+                    try
                     {
-                        activeBonuses.Add(bonus);
-                        Debug.Log($"✨ Set Bonus Active: {bonus.setName} ({setCount.Value}/{bonus.requiredPieces} pieces)");
+                        if (setBonuses.ContainsKey(setCount.Key))
+                        {
+                            var bonus = setBonuses[setCount.Key];
+                            if (bonus == null)
+                            {
+                                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                                    "LootSystem", $"Set bonus for {setCount.Key} exists but is null");
+                                continue;
+                            }
+
+                            if (setCount.Value >= bonus.requiredPieces)
+                            {
+                                activeBonuses.Add(bonus);
+                                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, 
+                                    "LootSystem", $"✨ Set Bonus Active: {bonus.setName} ({setCount.Value}/{bonus.requiredPieces} pieces)");
+                            }
+                        }
+                    }
+                    catch (System.Exception bonusEx)
+                    {
+                        LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                            "LootSystem", $"Exception checking set bonus: {bonusEx.Message}");
+                        // Continue with other sets
                     }
                 }
+                
+                return activeBonuses;
             }
-            
-            return activeBonuses;
+            catch (System.Exception ex)
+            {
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                    "LootSystem", $"Exception in GetActiveSetBonuses: {ex.Message}\nStack: {ex.StackTrace}");
+                return new List<SetBonus>();
+            }
         }
     }
 }

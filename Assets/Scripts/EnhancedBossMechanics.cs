@@ -240,79 +240,185 @@ namespace ACOTAR
 
         /// <summary>
         /// Start a boss encounter
+        /// v2.6.4: Enhanced with error handling, validation, and structured logging
         /// </summary>
+        /// <param name="bossName">Name of the boss to start encounter with</param>
+        /// <returns>BossEncounterState for the started encounter, or null on error</returns>
+        /// <remarks>
+        /// This method initializes a new boss encounter with multi-phase mechanics.
+        /// Enhanced in v2.6.4 with:
+        /// - Try-catch for exception protection
+        /// - Enhanced null/empty string validation
+        /// - Null checking for configuration dictionary
+        /// - Structured logging via LoggingSystem
+        /// Returns null if boss is not found or on error.
+        /// </remarks>
         public BossEncounterState StartBossEncounter(string bossName)
         {
-            // Defensive check (v2.6.0)
-            if (string.IsNullOrEmpty(bossName))
+            try
             {
-                Debug.LogWarning("EnhancedBossMechanics: Cannot start encounter with null or empty boss name");
+                // Input validation
+                if (string.IsNullOrEmpty(bossName))
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "BossMechanics", "Cannot start encounter: boss name is null or empty");
+                    return null;
+                }
+
+                if (bossConfigurations == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "BossMechanics", "Cannot start encounter: boss configurations dictionary is null");
+                    return null;
+                }
+
+                if (!bossConfigurations.ContainsKey(bossName))
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "BossMechanics", $"No configuration found for boss '{bossName}'");
+                    return null;
+                }
+
+                if (activeEncounters == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "BossMechanics", "Cannot start encounter: active encounters dictionary is null");
+                    return null;
+                }
+
+                var encounterState = new BossEncounterState(bossName);
+                activeEncounters[bossName] = encounterState;
+                
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, 
+                    "BossMechanics", $"🎭 Boss Encounter Started: {bossName}");
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, 
+                    "BossMechanics", $"⚔️ Multi-phase battle initiated for {bossName}");
+                
+                return encounterState;
+            }
+            catch (System.Exception ex)
+            {
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                    "BossMechanics", $"Exception in StartBossEncounter: {ex.Message}\nStack: {ex.StackTrace}");
                 return null;
             }
-
-            if (!bossConfigurations.ContainsKey(bossName))
-            {
-                Debug.LogWarning($"EnhancedBossMechanics: No configuration found for boss '{bossName}'");
-                return null;
-            }
-
-            var encounterState = new BossEncounterState(bossName);
-            activeEncounters[bossName] = encounterState;
-            
-            Debug.Log($"🎭 Boss Encounter Started: {bossName}");
-            Debug.Log($"⚔️ Prepare yourself! This will be a multi-phase battle!");
-            
-            return encounterState;
         }
 
         /// <summary>
         /// Update boss phase based on current health percentage
+        /// v2.6.4: Enhanced with error handling, validation, and structured logging
         /// </summary>
+        /// <param name="bossName">Name of the boss to update phase for</param>
+        /// <param name="currentHealthPercent">Current health as percentage (0.0 to 1.0)</param>
+        /// <returns>New BossPhaseConfig if phase changed, null otherwise</returns>
+        /// <remarks>
+        /// This method checks and updates the boss combat phase based on health thresholds.
+        /// Enhanced in v2.6.4 with:
+        /// - Try-catch for exception protection
+        /// - Enhanced initialization and null checking
+        /// - Protected phase transition logic
+        /// - Structured logging via LoggingSystem
+        /// Returns null if no phase change occurs or on error.
+        /// </remarks>
         public BossPhaseConfig UpdateBossPhase(string bossName, float currentHealthPercent)
         {
-            // Defensive checks (v2.6.0)
-            if (!IsInitialized)
+            try
             {
-                Debug.LogWarning("EnhancedBossMechanics: Cannot update phase - system not initialized");
-                return null;
-            }
-
-            if (string.IsNullOrEmpty(bossName))
-            {
-                Debug.LogWarning("EnhancedBossMechanics: Cannot update phase with null or empty boss name");
-                return null;
-            }
-
-            if (!activeEncounters.ContainsKey(bossName) || !bossConfigurations.ContainsKey(bossName))
-            {
-                return null;
-            }
-
-            var encounterState = activeEncounters[bossName];
-            var phases = bossConfigurations[bossName];
-            
-            // Check for phase transition
-            foreach (var phase in phases)
-            {
-                if (currentHealthPercent <= phase.healthThresholdPercent && 
-                    encounterState.currentPhase < phase.phase)
+                // Initialization check
+                if (!IsInitialized)
                 {
-                    encounterState.currentPhase = phase.phase;
-                    encounterState.phaseTransitionCount++;
-                    
-                    Debug.Log($"\n⚡ PHASE TRANSITION ⚡");
-                    Debug.Log($"🎭 {phase.phaseTransitionMessage}");
-                    Debug.Log($"⚔️ Boss entering {phase.phase}!\n");
-                    
-                    // Trigger phase-specific effects
-                    OnPhaseTransition(encounterState, phase);
-                    
-                    return phase;
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "BossMechanics", "Cannot update phase: system not initialized");
+                    return null;
                 }
+
+                // Input validation
+                if (string.IsNullOrEmpty(bossName))
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "BossMechanics", "Cannot update phase: boss name is null or empty");
+                    return null;
+                }
+
+                if (activeEncounters == null || bossConfigurations == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "BossMechanics", "Cannot update phase: encounter or configuration dictionary is null");
+                    return null;
+                }
+
+                if (!activeEncounters.ContainsKey(bossName) || !bossConfigurations.ContainsKey(bossName))
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Debug, 
+                        "BossMechanics", $"Boss '{bossName}' not found in active encounters or configurations");
+                    return null;
+                }
+
+                var encounterState = activeEncounters[bossName];
+                if (encounterState == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "BossMechanics", $"Encounter state for '{bossName}' exists but is null");
+                    return null;
+                }
+
+                var phases = bossConfigurations[bossName];
+                if (phases == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "BossMechanics", $"Phase configuration for '{bossName}' exists but is null");
+                    return null;
+                }
+                
+                // Check for phase transition
+                foreach (var phase in phases)
+                {
+                    try
+                    {
+                        if (phase == null) continue;
+
+                        if (currentHealthPercent <= phase.healthThresholdPercent && 
+                            encounterState.currentPhase < phase.phase)
+                        {
+                            encounterState.currentPhase = phase.phase;
+                            encounterState.phaseTransitionCount++;
+                            
+                            LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, 
+                                "BossMechanics", $"⚡ PHASE TRANSITION: {bossName} entering {phase.phase}");
+                            LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, 
+                                "BossMechanics", $"🎭 {phase.phaseTransitionMessage}");
+                            
+                            // Trigger phase-specific effects - protected
+                            try
+                            {
+                                OnPhaseTransition(encounterState, phase);
+                            }
+                            catch (System.Exception transitionEx)
+                            {
+                                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                                    "BossMechanics", $"Exception in phase transition: {transitionEx.Message}");
+                            }
+                            
+                            return phase;
+                        }
+                    }
+                    catch (System.Exception phaseEx)
+                    {
+                        LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                            "BossMechanics", $"Exception checking phase: {phaseEx.Message}");
+                        // Continue with other phases
+                    }
+                }
+                
+                // Return current phase config
+                return phases.Find(p => p.phase == encounterState.currentPhase);
             }
-            
-            // Return current phase config
-            return phases.Find(p => p.phase == encounterState.currentPhase);
+            catch (System.Exception ex)
+            {
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                    "BossMechanics", $"Exception in UpdateBossPhase: {ex.Message}\nStack: {ex.StackTrace}");
+                return null;
+            }
         }
 
         /// <summary>
@@ -343,54 +449,122 @@ namespace ACOTAR
         }
 
         /// <summary>
-        /// Execute a boss ability
+        /// Execute a boss ability on a target
+        /// v2.6.4: Enhanced with error handling, validation, and structured logging
         /// </summary>
+        /// <param name="bossName">Name of the boss executing the ability</param>
+        /// <param name="ability">Boss ability to execute</param>
+        /// <param name="target">Character target of the ability</param>
+        /// <returns>Description message of the executed ability</returns>
+        /// <remarks>
+        /// This method executes a special boss-only ability during combat.
+        /// Enhanced in v2.6.4 with:
+        /// - Try-catch for exception protection
+        /// - Enhanced validation for all parameters
+        /// - Null checking for state and dictionaries
+        /// - Protected ability execution calls
+        /// - Structured logging via LoggingSystem
+        /// Returns error message on failure.
+        /// </remarks>
         public string ExecuteBossAbility(string bossName, BossAbility ability, Character target)
         {
-            // Defensive checks (v2.6.0)
-            if (string.IsNullOrEmpty(bossName) || target == null)
+            try
             {
-                return "Invalid boss ability execution";
-            }
+                // Input validation
+                if (string.IsNullOrEmpty(bossName))
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "BossMechanics", "Cannot execute ability: boss name is null or empty");
+                    return "Invalid boss ability execution";
+                }
 
-            if (!activeEncounters.ContainsKey(bossName))
-            {
-                return $"{bossName} is not in an active encounter";
-            }
+                if (target == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "BossMechanics", $"Cannot execute ability for {bossName}: target is null");
+                    return "Invalid boss ability execution";
+                }
 
-            var state = activeEncounters[bossName];
-            
-            switch (ability)
+                if (activeEncounters == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "BossMechanics", "Cannot execute ability: active encounters dictionary is null");
+                    return "Invalid boss ability execution";
+                }
+
+                if (!activeEncounters.ContainsKey(bossName))
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "BossMechanics", $"Boss {bossName} is not in an active encounter");
+                    return $"{bossName} is not in an active encounter";
+                }
+
+                var state = activeEncounters[bossName];
+                if (state == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "BossMechanics", $"Encounter state for {bossName} exists but is null");
+                    return "Invalid boss ability execution";
+                }
+
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, 
+                    "BossMechanics", $"{bossName} executing ability: {ability}");
+                
+                // Execute ability with protected calls
+                string result;
+                switch (ability)
+                {
+                    case BossAbility.LifeDrain:
+                        result = ExecuteLifeDrain(bossName, target, state);
+                        break;
+                        
+                    case BossAbility.AreaOfEffect:
+                        result = ExecuteAreaOfEffect(bossName, state);
+                        break;
+                        
+                    case BossAbility.StatusCurse:
+                        result = ExecuteStatusCurse(bossName, target);
+                        break;
+                        
+                    case BossAbility.EnrageMode:
+                        result = ExecuteEnrage(bossName, state);
+                        break;
+                        
+                    case BossAbility.Shield:
+                        result = ExecuteShield(state);
+                        break;
+                        
+                    case BossAbility.UltimateAttack:
+                        result = ExecuteUltimate(bossName, target, state);
+                        break;
+                        
+                    case BossAbility.Teleport:
+                        result = ExecuteTeleport(bossName);
+                        break;
+                        
+                    case BossAbility.SummonMinions:
+                        result = "Boss summons reinforcements!";
+                        break;
+                        
+                    case BossAbility.EnvironmentalHazard:
+                        result = ExecuteEnvironmentalHazard(state);
+                        break;
+                        
+                    default:
+                        result = $"{bossName} uses {ability}!";
+                        break;
+                }
+
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Debug, 
+                    "BossMechanics", $"Ability execution result: {result}");
+                
+                return result;
+            }
+            catch (System.Exception ex)
             {
-                case BossAbility.LifeDrain:
-                    return ExecuteLifeDrain(bossName, target, state);
-                    
-                case BossAbility.AreaOfEffect:
-                    return ExecuteAreaOfEffect(bossName, state);
-                    
-                case BossAbility.StatusCurse:
-                    return ExecuteStatusCurse(bossName, target);
-                    
-                case BossAbility.EnrageMode:
-                    return ExecuteEnrage(bossName, state);
-                    
-                case BossAbility.Shield:
-                    return ExecuteShield(state);
-                    
-                case BossAbility.UltimateAttack:
-                    return ExecuteUltimate(bossName, target, state);
-                    
-                case BossAbility.Teleport:
-                    return ExecuteTeleport(bossName);
-                    
-                case BossAbility.SummonMinions:
-                    return "Boss summons reinforcements!";
-                    
-                case BossAbility.EnvironmentalHazard:
-                    return ExecuteEnvironmentalHazard(state);
-                    
-                default:
-                    return $"{bossName} uses {ability}!";
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                    "BossMechanics", $"Exception in ExecuteBossAbility: {ex.Message}\nStack: {ex.StackTrace}");
+                return "Boss ability execution failed";
             }
         }
 

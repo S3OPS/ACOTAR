@@ -368,91 +368,275 @@ namespace ACOTAR
 
         /// <summary>
         /// Get NPC's current location based on time
+        /// v2.6.4: Enhanced with error handling, validation, and structured logging
         /// </summary>
+        /// <param name="npcName">Name of the NPC to query</param>
+        /// <param name="currentTime">Current time of day</param>
+        /// <returns>Location name where NPC is currently located, or null if not found</returns>
+        /// <remarks>
+        /// This method retrieves the current location of an NPC based on their schedule.
+        /// Enhanced in v2.6.4 with:
+        /// - Try-catch for exception protection
+        /// - Enhanced null/empty string validation
+        /// - Null checking for NPC dictionary
+        /// - Structured logging via LoggingSystem
+        /// Returns null if NPC is not found or on error.
+        /// </remarks>
         public string GetNPCLocation(string npcName, TimeOfDay currentTime)
         {
-            // Defensive check (v2.6.0)
-            if (string.IsNullOrEmpty(npcName))
+            try
             {
-                Debug.LogWarning("NPCScheduleSystem: Cannot get location for null or empty NPC name");
+                // Input validation
+                if (string.IsNullOrEmpty(npcName))
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "NPCSchedule", "Cannot get location: NPC name is null or empty");
+                    return null;
+                }
+
+                if (allNPCs == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "NPCSchedule", "Cannot get location: NPC dictionary is null");
+                    return null;
+                }
+
+                if (!allNPCs.ContainsKey(npcName))
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Debug, 
+                        "NPCSchedule", $"NPC '{npcName}' not found in schedule system");
+                    return null;
+                }
+
+                ScheduledNPC npc = allNPCs[npcName];
+                if (npc == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "NPCSchedule", $"NPC '{npcName}' exists but is null");
+                    return null;
+                }
+
+                string location = npc.GetCurrentLocation(currentTime);
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Debug, 
+                    "NPCSchedule", $"NPC '{npcName}' location at {currentTime}: {location ?? "Unknown"}");
+                
+                return location;
+            }
+            catch (System.Exception ex)
+            {
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                    "NPCSchedule", $"Exception in GetNPCLocation: {ex.Message}\nStack: {ex.StackTrace}");
                 return null;
             }
-
-            if (!allNPCs.ContainsKey(npcName))
-            {
-                return null;
-            }
-
-            return allNPCs[npcName].GetCurrentLocation(currentTime);
         }
 
         /// <summary>
         /// Get all NPCs at a specific location and time
+        /// v2.6.4: Enhanced with error handling, validation, and structured logging
         /// </summary>
+        /// <param name="locationName">Name of the location to check</param>
+        /// <param name="currentTime">Current time of day</param>
+        /// <returns>List of NPCs at the specified location, or empty list if none/error</returns>
+        /// <remarks>
+        /// This method retrieves all NPCs currently at a given location based on their schedules.
+        /// Enhanced in v2.6.4 with:
+        /// - Try-catch for exception protection
+        /// - Enhanced null/empty string validation
+        /// - Null checking for NPC dictionary and values
+        /// - Protected iteration with individual error handling
+        /// - Structured logging via LoggingSystem
+        /// Returns empty list on error to prevent crashes.
+        /// </remarks>
         public List<ScheduledNPC> GetNPCsAtLocation(string locationName, TimeOfDay currentTime)
         {
-            // Defensive check (v2.6.0)
-            if (string.IsNullOrEmpty(locationName))
+            try
             {
-                Debug.LogWarning("NPCScheduleSystem: Cannot get NPCs for null or empty location");
+                // Input validation
+                if (string.IsNullOrEmpty(locationName))
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "NPCSchedule", "Cannot get NPCs: location name is null or empty");
+                    return new List<ScheduledNPC>();
+                }
+
+                if (allNPCs == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "NPCSchedule", "Cannot get NPCs: NPC dictionary is null");
+                    return new List<ScheduledNPC>();
+                }
+
+                var npcsHere = new List<ScheduledNPC>();
+                
+                foreach (var npc in allNPCs.Values)
+                {
+                    try
+                    {
+                        if (npc == null)
+                        {
+                            LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                                "NPCSchedule", "Skipping null NPC in dictionary");
+                            continue;
+                        }
+
+                        string npcLocation = npc.GetCurrentLocation(currentTime);
+                        if (npcLocation == locationName)
+                        {
+                            npcsHere.Add(npc);
+                        }
+                    }
+                    catch (System.Exception npcEx)
+                    {
+                        LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                            "NPCSchedule", $"Exception checking NPC location: {npcEx.Message}");
+                        // Continue with other NPCs
+                    }
+                }
+                
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Debug, 
+                    "NPCSchedule", $"Found {npcsHere.Count} NPCs at '{locationName}' during {currentTime}");
+                
+                return npcsHere;
+            }
+            catch (System.Exception ex)
+            {
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                    "NPCSchedule", $"Exception in GetNPCsAtLocation: {ex.Message}\nStack: {ex.StackTrace}");
                 return new List<ScheduledNPC>();
             }
-
-            var npcsHere = new List<ScheduledNPC>();
-            
-            foreach (var npc in allNPCs.Values)
-            {
-                string npcLocation = npc.GetCurrentLocation(currentTime);
-                if (npcLocation == locationName)
-                {
-                    npcsHere.Add(npc);
-                }
-            }
-            
-            return npcsHere;
         }
 
         /// <summary>
         /// Check for random encounters at location
+        /// v2.6.4: Enhanced with error handling, validation, and structured logging
         /// </summary>
+        /// <param name="locationName">Name of the location to check for encounters</param>
+        /// <returns>RandomEncounter if one occurs, null otherwise</returns>
+        /// <remarks>
+        /// This method checks if a random NPC encounter occurs at the specified location.
+        /// Enhanced in v2.6.4 with:
+        /// - Try-catch for exception protection
+        /// - Null checking for encounters list
+        /// - Protected iteration with individual error handling
+        /// - Structured logging via LoggingSystem
+        /// Returns null on error or if no encounter occurs.
+        /// </remarks>
         public RandomEncounter CheckForRandomEncounter(string locationName)
         {
-            // Defensive check (v2.6.0)
-            if (string.IsNullOrEmpty(locationName))
+            try
             {
-                return null;
-            }
-
-            foreach (var encounter in randomEncounters)
-            {
-                if (encounter.locationName == locationName || encounter.locationName == "Various Courts")
+                // Input validation
+                if (string.IsNullOrEmpty(locationName))
                 {
-                    if (Random.value < encounter.encounterChance)
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Debug, 
+                        "NPCSchedule", "Cannot check random encounter: location name is null or empty");
+                    return null;
+                }
+
+                if (randomEncounters == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "NPCSchedule", "Cannot check random encounter: encounters list is null");
+                    return null;
+                }
+
+                foreach (var encounter in randomEncounters)
+                {
+                    try
                     {
-                        Debug.Log($"✨ Random Encounter: {encounter.npcName}");
-                        return encounter;
+                        if (encounter == null)
+                        {
+                            LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                                "NPCSchedule", "Skipping null encounter in list");
+                            continue;
+                        }
+
+                        if (encounter.locationName == locationName || encounter.locationName == "Various Courts")
+                        {
+                            if (Random.value < encounter.encounterChance)
+                            {
+                                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, 
+                                    "NPCSchedule", $"✨ Random Encounter: {encounter.npcName} at {locationName}");
+                                return encounter;
+                            }
+                        }
+                    }
+                    catch (System.Exception encounterEx)
+                    {
+                        LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                            "NPCSchedule", $"Exception processing encounter: {encounterEx.Message}");
+                        // Continue with other encounters
                     }
                 }
+                
+                return null;
             }
-            
-            return null;
+            catch (System.Exception ex)
+            {
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                    "NPCSchedule", $"Exception in CheckForRandomEncounter: {ex.Message}\nStack: {ex.StackTrace}");
+                return null;
+            }
         }
 
         /// <summary>
-        /// Modify NPC relationship
+        /// Modify NPC relationship with the player
+        /// v2.6.4: Enhanced with error handling, validation, and structured logging
         /// </summary>
+        /// <param name="npcName">Name of the NPC to modify relationship with</param>
+        /// <param name="points">Relationship points to add (positive) or subtract (negative)</param>
+        /// <remarks>
+        /// This method adjusts the relationship score between player and NPC.
+        /// Enhanced in v2.6.4 with:
+        /// - Try-catch for exception protection
+        /// - Enhanced null/empty string validation
+        /// - Null checking for NPC dictionary and NPC object
+        /// - Structured logging via LoggingSystem
+        /// Relationship changes can affect dialogue, prices, and quest availability.
+        /// </remarks>
         public void ModifyNPCRelationship(string npcName, int points)
         {
-            // Defensive check (v2.6.0)
-            if (string.IsNullOrEmpty(npcName))
+            try
             {
-                Debug.LogWarning("NPCScheduleSystem: Cannot modify relationship for null or empty NPC name");
-                return;
-            }
+                // Input validation
+                if (string.IsNullOrEmpty(npcName))
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "NPCSchedule", "Cannot modify relationship: NPC name is null or empty");
+                    return;
+                }
 
-            if (allNPCs.ContainsKey(npcName))
+                if (allNPCs == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "NPCSchedule", "Cannot modify relationship: NPC dictionary is null");
+                    return;
+                }
+
+                if (allNPCs.ContainsKey(npcName))
+                {
+                    ScheduledNPC npc = allNPCs[npcName];
+                    if (npc == null)
+                    {
+                        LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                            "NPCSchedule", $"Cannot modify relationship: NPC '{npcName}' exists but is null");
+                        return;
+                    }
+
+                    npc.ModifyRelationship(points);
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, 
+                        "NPCSchedule", $"Modified relationship with '{npcName}' by {points:+#;-#;0} points");
+                }
+                else
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "NPCSchedule", $"Cannot modify relationship: NPC '{npcName}' not found");
+                }
+            }
+            catch (System.Exception ex)
             {
-                allNPCs[npcName].ModifyRelationship(points);
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                    "NPCSchedule", $"Exception in ModifyNPCRelationship: {ex.Message}\nStack: {ex.StackTrace}");
             }
         }
 
