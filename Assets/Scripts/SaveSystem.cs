@@ -135,9 +135,6 @@ namespace ACOTAR
         }
 
         /// <summary>
-        /// Save current game state to specified slot
-        /// </summary>
-        /// <summary>
         /// Save game state to specified slot
         /// </summary>
         /// <param name="slot">The slot number to save to (1-5), or -1 for current slot</param>
