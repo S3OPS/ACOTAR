@@ -137,6 +137,17 @@ namespace ACOTAR
         /// <summary>
         /// Save current game state to specified slot
         /// </summary>
+        /// <summary>
+        /// Save game state to specified slot
+        /// </summary>
+        /// <param name="slot">The slot number to save to (1-5), or -1 for current slot</param>
+        /// <returns>True if save was successful, false otherwise</returns>
+        /// <remarks>
+        /// Creates a complete snapshot of the current game state including character,
+        /// quests, companions, inventory, and world state.
+        /// Automatically creates the save directory if it doesn't exist.
+        /// v2.6.2: Enhanced with structured logging integration
+        /// </remarks>
         public static bool SaveGame(int slot = -1)
         {
             if (slot == -1) slot = currentSlot;
@@ -146,12 +157,21 @@ namespace ACOTAR
             {
                 if (GameManager.Instance == null)
                 {
-                    Debug.LogError("Cannot save: GameManager not initialized");
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, "SaveSystem", 
+                        "Cannot save: GameManager not initialized");
                     OnSaveError?.Invoke("GameManager not initialized");
                     return false;
                 }
 
                 SaveData saveData = CreateSaveData(slot);
+                if (saveData == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, "SaveSystem", 
+                        "Failed to create save data");
+                    OnSaveError?.Invoke("Failed to create save data");
+                    return false;
+                }
+
                 string json = JsonUtility.ToJson(saveData, true);
                 string savePath = GetSavePath(slot);
                 
@@ -160,18 +180,22 @@ namespace ACOTAR
                 if (!System.IO.Directory.Exists(directory))
                 {
                     System.IO.Directory.CreateDirectory(directory);
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Debug, "SaveSystem", 
+                        $"Created save directory: {directory}");
                 }
                 
                 System.IO.File.WriteAllText(savePath, json);
                 currentSlot = slot;
                 
-                Debug.Log($"Game saved to slot {slot}: {savePath}");
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, "SaveSystem", 
+                    $"Game saved to slot {slot}: {savePath}");
                 OnGameSaved?.Invoke(slot);
                 return true;
             }
             catch (Exception e)
             {
-                Debug.LogError($"Failed to save game: {e.Message}");
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, "SaveSystem", 
+                    $"Failed to save game to slot {slot}: {e.Message}\nStack: {e.StackTrace}");
                 OnSaveError?.Invoke(e.Message);
                 return false;
             }
@@ -180,6 +204,13 @@ namespace ACOTAR
         /// <summary>
         /// Load game state from specified slot
         /// </summary>
+        /// <param name="slot">The slot number to load from (1-5), or -1 for current slot</param>
+        /// <returns>True if load was successful, false otherwise</returns>
+        /// <remarks>
+        /// Restores complete game state from a save file including character,
+        /// quests, companions, inventory, and world state.
+        /// v2.6.2: Enhanced with structured logging integration
+        /// </remarks>
         public static bool LoadGame(int slot = -1)
         {
             if (slot == -1) slot = currentSlot;
@@ -191,25 +222,43 @@ namespace ACOTAR
                 
                 if (!System.IO.File.Exists(savePath))
                 {
-                    Debug.LogWarning($"No save file found in slot {slot}");
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, "SaveSystem", 
+                        $"No save file found in slot {slot}");
                     return false;
                 }
 
                 string json = System.IO.File.ReadAllText(savePath);
+                if (string.IsNullOrEmpty(json))
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, "SaveSystem", 
+                        $"Save file in slot {slot} is empty");
+                    OnSaveError?.Invoke("Save file is empty");
+                    return false;
+                }
+
                 SaveData saveData = JsonUtility.FromJson<SaveData>(json);
+                if (saveData == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, "SaveSystem", 
+                        $"Failed to parse save data from slot {slot}");
+                    OnSaveError?.Invoke("Failed to parse save data");
+                    return false;
+                }
                 
                 ApplySaveData(saveData);
                 currentSlot = slot;
                 totalPlayTime = saveData.playTimeHours;
                 sessionStartTime = Time.realtimeSinceStartup;
                 
-                Debug.Log($"Game loaded from slot {slot}");
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, "SaveSystem", 
+                    $"Game loaded from slot {slot}");
                 OnGameLoaded?.Invoke(slot);
                 return true;
             }
             catch (Exception e)
             {
-                Debug.LogError($"Failed to load game from slot {slot}: {e.Message}");
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, "SaveSystem", 
+                    $"Failed to load game from slot {slot}: {e.Message}\nStack: {e.StackTrace}");
                 OnSaveError?.Invoke(e.Message);
                 return false;
             }
@@ -218,24 +267,39 @@ namespace ACOTAR
         /// <summary>
         /// Quick save to current slot
         /// </summary>
+        /// <returns>True if quick save was successful, false otherwise</returns>
+        /// <remarks>
+        /// v2.6.2: Enhanced with structured logging integration
+        /// </remarks>
         public static bool QuickSave()
         {
-            Debug.Log("Quick saving...");
+            LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, "SaveSystem", 
+                $"Quick saving to slot {currentSlot}...");
             return SaveGame(currentSlot);
         }
 
         /// <summary>
         /// Quick load from current slot
         /// </summary>
+        /// <returns>True if quick load was successful, false otherwise</returns>
+        /// <remarks>
+        /// v2.6.2: Enhanced with structured logging integration
+        /// </remarks>
         public static bool QuickLoad()
         {
-            Debug.Log("Quick loading...");
+            LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, "SaveSystem", 
+                $"Quick loading from slot {currentSlot}...");
             return LoadGame(currentSlot);
         }
 
         /// <summary>
         /// Auto-save if enabled and interval has passed
         /// </summary>
+        /// <remarks>
+        /// Checks the auto-save interval and saves if enough time has passed since the last auto-save.
+        /// Only performs auto-save if AutoSaveEnabled is true.
+        /// v2.6.2: Enhanced with structured logging integration
+        /// </remarks>
         public static void TryAutoSave()
         {
             if (!AutoSaveEnabled) return;
@@ -245,7 +309,8 @@ namespace ACOTAR
 
             if (currentTime - lastAutoSaveTime >= intervalSeconds)
             {
-                Debug.Log("Auto-saving...");
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, "SaveSystem", 
+                    "Auto-saving...");
                 if (SaveGame(currentSlot))
                 {
                     lastAutoSaveTime = currentTime;
@@ -265,6 +330,11 @@ namespace ACOTAR
         /// <summary>
         /// Delete save in specified slot
         /// </summary>
+        /// <param name="slot">The slot number to delete (1-5), or -1 for current slot</param>
+        /// <returns>True if the save was successfully deleted, false otherwise</returns>
+        /// <remarks>
+        /// v2.6.2: Enhanced with structured logging integration
+        /// </remarks>
         public static bool DeleteSave(int slot = -1)
         {
             if (slot == -1) slot = currentSlot;
@@ -275,14 +345,16 @@ namespace ACOTAR
                 if (System.IO.File.Exists(savePath))
                 {
                     System.IO.File.Delete(savePath);
-                    Debug.Log($"Save file in slot {slot} deleted");
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, "SaveSystem", 
+                        $"Save file in slot {slot} deleted");
                     return true;
                 }
                 return false;
             }
             catch (Exception e)
             {
-                Debug.LogError($"Failed to delete save: {e.Message}");
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, "SaveSystem", 
+                    $"Failed to delete save in slot {slot}: {e.Message}\nStack: {e.StackTrace}");
                 return false;
             }
         }

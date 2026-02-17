@@ -281,62 +281,196 @@ namespace ACOTAR
         /// <summary>
         /// Recruit a companion by name
         /// </summary>
+        /// <param name="companionName">The name of the companion to recruit</param>
+        /// <returns>True if the companion was successfully recruited, false otherwise</returns>
+        /// <remarks>
+        /// Only works if the companion exists and has not already been recruited.
+        /// v2.6.2: Enhanced with error handling and structured logging
+        /// </remarks>
         public bool RecruitCompanion(string companionName)
         {
-            Companion companion = availableCompanions.Find(c => c.name == companionName);
-            if (companion != null && !companion.isRecruited)
+            try
             {
+                // Validate input
+                if (string.IsNullOrEmpty(companionName))
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, "Companion", 
+                        "Cannot recruit companion: name is null or empty");
+                    return false;
+                }
+
+                if (availableCompanions == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, "Companion", 
+                        "Cannot recruit companion: availableCompanions list is null");
+                    return false;
+                }
+
+                Companion companion = availableCompanions.Find(c => c != null && c.name == companionName);
+                if (companion == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, "Companion", 
+                        $"Companion not found: {companionName}");
+                    return false;
+                }
+
+                if (companion.isRecruited)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Debug, "Companion", 
+                        $"{companionName} is already recruited");
+                    return false;
+                }
+
                 companion.isRecruited = true;
-                Debug.Log($"{companionName} has joined your cause!");
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, "Companion", 
+                    $"{companionName} has joined your cause!");
                 return true;
             }
-            return false;
+            catch (System.Exception ex)
+            {
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, "Companion", 
+                    $"Exception in RecruitCompanion({companionName}): {ex.Message}\nStack: {ex.StackTrace}");
+                return false;
+            }
         }
 
         /// <summary>
         /// Add companion to active party
         /// v2.6.0: Now updates synergy system when party composition changes
         /// </summary>
+        /// <param name="companionName">The name of the companion to add to the party</param>
+        /// <returns>True if the companion was successfully added, false otherwise</returns>
+        /// <remarks>
+        /// Party has a maximum size of 3 companions. Companion must be recruited first.
+        /// Updates the Party Synergy System when successful.
+        /// v2.6.2: Enhanced with error handling and structured logging
+        /// </remarks>
         public bool AddToParty(string companionName)
         {
-            if (activeParty.Count >= MAX_PARTY_SIZE)
+            try
             {
-                Debug.LogWarning("Party is full! Remove a companion first.");
-                return false;
-            }
+                // Validate input
+                if (string.IsNullOrEmpty(companionName))
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, "Companion", 
+                        "Cannot add to party: name is null or empty");
+                    return false;
+                }
 
-            Companion companion = availableCompanions.Find(c => c.name == companionName && c.isRecruited);
-            if (companion != null && !activeParty.Contains(companion))
-            {
+                if (availableCompanions == null || activeParty == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, "Companion", 
+                        "Cannot add to party: companion lists not initialized");
+                    return false;
+                }
+
+                if (activeParty.Count >= MAX_PARTY_SIZE)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, "Companion", 
+                        $"Party is full! Remove a companion first. (Max: {MAX_PARTY_SIZE})");
+                    return false;
+                }
+
+                Companion companion = availableCompanions.Find(c => c != null && c.name == companionName && c.isRecruited);
+                if (companion == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, "Companion", 
+                        $"Cannot add {companionName}: not found or not recruited");
+                    return false;
+                }
+
+                if (activeParty.Contains(companion))
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Debug, "Companion", 
+                        $"{companionName} is already in the party");
+                    return false;
+                }
+
                 activeParty.Add(companion);
-                Debug.Log($"{companionName} has joined your party!");
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, "Companion", 
+                    $"{companionName} has joined your party!");
                 
                 // v2.6.0: Update synergies when party changes
-                synergySystem.UpdateActiveSynergies(activeParty);
+                if (synergySystem != null)
+                {
+                    synergySystem.UpdateActiveSynergies(activeParty);
+                }
+                else
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, "Companion", 
+                        "Synergy system is null, cannot update synergies");
+                }
                 
                 return true;
             }
-            return false;
+            catch (System.Exception ex)
+            {
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, "Companion", 
+                    $"Exception in AddToParty({companionName}): {ex.Message}\nStack: {ex.StackTrace}");
+                return false;
+            }
         }
 
         /// <summary>
         /// Remove companion from active party
         /// v2.6.0: Now updates synergy system when party composition changes
         /// </summary>
+        /// <param name="companionName">The name of the companion to remove from the party</param>
+        /// <returns>True if the companion was successfully removed, false otherwise</returns>
+        /// <remarks>
+        /// Updates the Party Synergy System when successful.
+        /// v2.6.2: Enhanced with error handling and structured logging
+        /// </remarks>
         public bool RemoveFromParty(string companionName)
         {
-            Companion companion = activeParty.Find(c => c.name == companionName);
-            if (companion != null)
+            try
             {
+                // Validate input
+                if (string.IsNullOrEmpty(companionName))
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, "Companion", 
+                        "Cannot remove from party: name is null or empty");
+                    return false;
+                }
+
+                if (activeParty == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, "Companion", 
+                        "Cannot remove from party: activeParty list is null");
+                    return false;
+                }
+
+                Companion companion = activeParty.Find(c => c != null && c.name == companionName);
+                if (companion == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, "Companion", 
+                        $"{companionName} is not in the active party");
+                    return false;
+                }
+
                 activeParty.Remove(companion);
-                Debug.Log($"{companionName} has left your party.");
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, "Companion", 
+                    $"{companionName} has left your party");
                 
                 // v2.6.0: Update synergies when party changes
-                synergySystem.UpdateActiveSynergies(activeParty);
+                if (synergySystem != null)
+                {
+                    synergySystem.UpdateActiveSynergies(activeParty);
+                }
+                else
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, "Companion", 
+                        "Synergy system is null, cannot update synergies");
+                }
                 
                 return true;
             }
-            return false;
+            catch (System.Exception ex)
+            {
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, "Companion", 
+                    $"Exception in RemoveFromParty({companionName}): {ex.Message}\nStack: {ex.StackTrace}");
+                return false;
+            }
         }
 
         /// <summary>
