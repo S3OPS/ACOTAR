@@ -132,9 +132,6 @@ namespace ACOTAR
         }
 
         /// <summary>
-        /// Show a specific UI panel
-        /// v2.5.3: Enhanced with defensive checks
-        /// </summary>
         /// <summary>
         /// Show a specific UI panel
         /// v2.5.3: Enhanced with defensive checks
@@ -321,9 +318,6 @@ namespace ACOTAR
         }
 
         /// <summary>
-        /// Update HUD with character information
-        /// v2.5.3: Enhanced with defensive checks
-        /// </summary>
         /// <summary>
         /// Update HUD elements with current character information
         /// v2.5.3: Enhanced with defensive checks
@@ -552,9 +546,6 @@ namespace ACOTAR
         }
 
         /// <summary>
-        /// Toggle pause menu
-        /// </summary>
-        /// <summary>
         /// Toggle the pause menu and game time scale
         /// v2.6.6: Enhanced with comprehensive error handling and structured logging
         /// </summary>
@@ -672,9 +663,6 @@ namespace ACOTAR
             }
         }
 
-        /// <summary>
-        /// Display a notification message with queue system
-        /// </summary>
         /// <summary>
         /// Display a notification message to the player
         /// v2.6.6: Enhanced with comprehensive error handling and structured logging
