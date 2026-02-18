@@ -257,79 +257,235 @@ namespace ACOTAR
         /// <summary>
         /// Show a custom notification
         /// </summary>
+        /// <summary>
+        /// Show a notification with specified properties (static convenience method)
+        /// v2.6.6: Enhanced with comprehensive error handling and structured logging
+        /// </summary>
+        /// <param name="type">Type of notification</param>
+        /// <param name="title">Notification title</param>
+        /// <param name="message">Notification message</param>
+        /// <param name="duration">How long to display (default: 3 seconds)</param>
+        /// <param name="priority">Notification priority (default: Normal)</param>
+        /// <remarks>
+        /// Static convenience method for showing notifications from anywhere in the code.
+        /// Validates instance and initialization state before creating notification.
+        /// </remarks>
         public static void Show(NotificationType type, string title, string message, 
                                float duration = 3f, NotificationPriority priority = NotificationPriority.Normal)
         {
-            if (!Instance.isInitialized)
+            try
             {
-                LoggingSystem.Warning("Notification", "NotificationSystem not initialized, skipping notification");
-                return;
-            }
+                if (Instance == null)
+                {
+                    LoggingSystem.Warning("Notification", "NotificationSystem instance is null, cannot show notification");
+                    return;
+                }
 
-            var notification = new Notification(type, title, message, duration, priority);
-            notification.customColor = Instance.GetColorForType(type);
-            
-            Instance.QueueNotification(notification);
+                if (!Instance.isInitialized)
+                {
+                    LoggingSystem.Warning("Notification", "NotificationSystem not initialized, skipping notification");
+                    return;
+                }
+
+                if (string.IsNullOrEmpty(title) && string.IsNullOrEmpty(message))
+                {
+                    LoggingSystem.Warning("Notification", "Both title and message are empty, skipping notification");
+                    return;
+                }
+
+                var notification = new Notification(type, title, message, duration, priority);
+                notification.customColor = Instance.GetColorForType(type);
+                
+                Instance.QueueNotification(notification);
+            }
+            catch (System.Exception ex)
+            {
+                LoggingSystem.Error("Notification", $"Exception in Show: {ex.Message}");
+            }
         }
         #endregion
 
         #region Notification Queue Management
+        /// <summary>
+        /// Queue a notification for display
+        /// v2.6.6: Enhanced with comprehensive error handling and structured logging
+        /// </summary>
+        /// <param name="notification">Notification to queue</param>
+        /// <remarks>
+        /// Handles priority-based queue insertion and maintains notification history.
+        /// High priority notifications are inserted at the front of the queue.
+        /// Includes validation and exception handling for queue operations.
+        /// </remarks>
         private void QueueNotification(Notification notification)
         {
-            // Update statistics
-            notificationCounts[notification.type]++;
-
-            // Add to history
-            notificationHistory.Add(notification);
-            if (notificationHistory.Count > MAX_HISTORY)
+            try
             {
-                notificationHistory.RemoveAt(0);
-            }
-
-            // Priority-based insertion
-            if (notification.priority >= NotificationPriority.High)
-            {
-                // High priority notifications go to the front
-                var tempQueue = new Queue<Notification>();
-                tempQueue.Enqueue(notification);
-                
-                while (notificationQueue.Count > 0)
+                if (notification == null)
                 {
-                    tempQueue.Enqueue(notificationQueue.Dequeue());
+                    LoggingSystem.Error("Notification", "Cannot queue null notification");
+                    return;
                 }
-                
-                notificationQueue = tempQueue;
-            }
-            else
-            {
-                notificationQueue.Enqueue(notification);
-            }
 
-            LoggingSystem.Debug("Notification", $"Queued notification: [{notification.type}] {notification.title} - {notification.message}");
+                // Update statistics with validation
+                try
+                {
+                    if (notificationCounts == null)
+                    {
+                        LoggingSystem.Warning("Notification", "Notification counts dictionary was null, initializing");
+                        notificationCounts = new Dictionary<NotificationType, int>();
+                        foreach (NotificationType type in System.Enum.GetValues(typeof(NotificationType)))
+                        {
+                            notificationCounts[type] = 0;
+                        }
+                    }
+
+                    if (!notificationCounts.ContainsKey(notification.type))
+                    {
+                        notificationCounts[notification.type] = 0;
+                    }
+                    notificationCounts[notification.type]++;
+                }
+                catch (System.Exception statsEx)
+                {
+                    LoggingSystem.Error("Notification", $"Exception updating notification statistics: {statsEx.Message}");
+                }
+
+                // Add to history with validation
+                try
+                {
+                    if (notificationHistory == null)
+                    {
+                        LoggingSystem.Warning("Notification", "Notification history was null, initializing");
+                        notificationHistory = new List<Notification>();
+                    }
+
+                    notificationHistory.Add(notification);
+                    if (notificationHistory.Count > MAX_HISTORY)
+                    {
+                        notificationHistory.RemoveAt(0);
+                    }
+                }
+                catch (System.Exception historyEx)
+                {
+                    LoggingSystem.Error("Notification", $"Exception updating notification history: {historyEx.Message}");
+                }
+
+                // Priority-based insertion
+                try
+                {
+                    if (notificationQueue == null)
+                    {
+                        LoggingSystem.Warning("Notification", "Notification queue was null, initializing");
+                        notificationQueue = new Queue<Notification>();
+                    }
+
+                    if (notification.priority >= NotificationPriority.High)
+                    {
+                        // High priority notifications go to the front
+                        var tempQueue = new Queue<Notification>();
+                        tempQueue.Enqueue(notification);
+                        
+                        while (notificationQueue.Count > 0)
+                        {
+                            tempQueue.Enqueue(notificationQueue.Dequeue());
+                        }
+                        
+                        notificationQueue = tempQueue;
+                    }
+                    else
+                    {
+                        notificationQueue.Enqueue(notification);
+                    }
+
+                    LoggingSystem.Debug("Notification", $"Queued notification: [{notification.type}] {notification.title} - {notification.message}");
+                }
+                catch (System.Exception queueEx)
+                {
+                    LoggingSystem.Error("Notification", $"Exception queuing notification: {queueEx.Message}");
+                }
+            }
+            catch (System.Exception ex)
+            {
+                LoggingSystem.Error("Notification", $"Exception in QueueNotification: {ex.Message}\nStack: {ex.StackTrace}");
+            }
         }
 
+        /// <summary>
+        /// Display the next notification from the queue
+        /// v2.6.6: Enhanced with comprehensive error handling and structured logging
+        /// </summary>
+        /// <remarks>
+        /// CRITICAL: Dequeues and displays notifications with color formatting.
+        /// Failures here would prevent notifications from being shown to players.
+        /// Includes nested error handling for event invocation and color conversion.
+        /// </remarks>
         private void ShowNextNotification()
         {
-            if (notificationQueue.Count == 0)
-                return;
+            try
+            {
+                if (notificationQueue == null || notificationQueue.Count == 0)
+                    return;
 
-            var notification = notificationQueue.Dequeue();
-            activeNotifications.Add(notification);
+                var notification = notificationQueue.Dequeue();
+                
+                if (notification == null)
+                {
+                    LoggingSystem.Error("Notification", "Dequeued notification was null");
+                    return;
+                }
 
-            // Log notification
-            LoggingSystem.Info("Notification", $"Showing notification: [{notification.type}] {notification.title} - {notification.message}");
+                // Initialize active notifications list if needed
+                if (activeNotifications == null)
+                {
+                    LoggingSystem.Warning("Notification", "Active notifications list was null, initializing");
+                    activeNotifications = new List<Notification>();
+                }
 
-            // Invoke event
-            OnNotificationShown?.Invoke(notification);
+                activeNotifications.Add(notification);
 
-            // In a real implementation, this would create a UI element
-            // For now, we just use Unity's Debug.Log with formatting
-            string colorHex = ColorUtility.ToHtmlStringRGB(notification.customColor);
-            string formattedMessage = $"<color=#{colorHex}>[{notification.type}] {notification.title}</color>: {notification.message}";
-            UnityEngine.Debug.Log(formattedMessage);
+                // Log notification
+                LoggingSystem.Info("Notification", $"Showing notification: [{notification.type}] {notification.title} - {notification.message}");
 
-            // Start auto-dismiss coroutine
-            StartCoroutine(AutoDismissNotification(notification));
+                // Invoke event with protection
+                try
+                {
+                    OnNotificationShown?.Invoke(notification);
+                }
+                catch (System.Exception eventEx)
+                {
+                    LoggingSystem.Error("Notification", $"Exception in OnNotificationShown event handler: {eventEx.Message}");
+                }
+
+                // Display formatted notification
+                try
+                {
+                    // In a real implementation, this would create a UI element
+                    // For now, we just use Unity's Debug.Log with formatting
+                    string colorHex = ColorUtility.ToHtmlStringRGB(notification.customColor);
+                    string formattedMessage = $"<color=#{colorHex}>[{notification.type}] {notification.title}</color>: {notification.message}";
+                    UnityEngine.Debug.Log(formattedMessage);
+                }
+                catch (System.Exception colorEx)
+                {
+                    LoggingSystem.Error("Notification", $"Exception formatting notification color: {colorEx.Message}");
+                    // Fallback to unformatted message
+                    UnityEngine.Debug.Log($"[{notification.type}] {notification.title}: {notification.message}");
+                }
+
+                // Start auto-dismiss coroutine
+                try
+                {
+                    StartCoroutine(AutoDismissNotification(notification));
+                }
+                catch (System.Exception coroutineEx)
+                {
+                    LoggingSystem.Error("Notification", $"Exception starting auto-dismiss coroutine: {coroutineEx.Message}");
+                }
+            }
+            catch (System.Exception ex)
+            {
+                LoggingSystem.Error("Notification", $"Exception in ShowNextNotification: {ex.Message}\nStack: {ex.StackTrace}");
+            }
         }
 
         private IEnumerator AutoDismissNotification(Notification notification)
@@ -342,18 +498,51 @@ namespace ACOTAR
         #region Notification Control
         /// <summary>
         /// Dismiss a specific notification
+        /// v2.6.6: Enhanced with comprehensive error handling and structured logging
         /// </summary>
+        /// <param name="notification">Notification to dismiss</param>
+        /// <remarks>
+        /// Removes notification from active list and invokes dismissal event.
+        /// Includes validation and event handler protection.
+        /// </remarks>
         public void DismissNotification(Notification notification)
         {
-            if (!activeNotifications.Contains(notification))
-                return;
+            try
+            {
+                if (notification == null)
+                {
+                    LoggingSystem.Warning("Notification", "Cannot dismiss null notification");
+                    return;
+                }
 
-            activeNotifications.Remove(notification);
-            notification.isRead = true;
+                if (activeNotifications == null)
+                {
+                    LoggingSystem.Warning("Notification", "Active notifications list is null");
+                    return;
+                }
 
-            LoggingSystem.Debug("Notification", $"Dismissed notification: {notification.id}");
-            
-            OnNotificationDismissed?.Invoke(notification);
+                if (!activeNotifications.Contains(notification))
+                    return;
+
+                activeNotifications.Remove(notification);
+                notification.isRead = true;
+
+                LoggingSystem.Debug("Notification", $"Dismissed notification: {notification.id}");
+                
+                // Invoke event with protection
+                try
+                {
+                    OnNotificationDismissed?.Invoke(notification);
+                }
+                catch (System.Exception eventEx)
+                {
+                    LoggingSystem.Error("Notification", $"Exception in OnNotificationDismissed event handler: {eventEx.Message}");
+                }
+            }
+            catch (System.Exception ex)
+            {
+                LoggingSystem.Error("Notification", $"Exception in DismissNotification: {ex.Message}\nStack: {ex.StackTrace}");
+            }
         }
 
         /// <summary>

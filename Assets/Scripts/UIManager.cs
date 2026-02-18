@@ -135,86 +135,166 @@ namespace ACOTAR
         /// Show a specific UI panel
         /// v2.5.3: Enhanced with defensive checks
         /// </summary>
+        /// <summary>
+        /// Show a specific UI panel
+        /// v2.5.3: Enhanced with defensive checks
+        /// v2.6.6: Enhanced with comprehensive error handling and structured logging
+        /// </summary>
+        /// <param name="panelName">Name of the panel to show</param>
+        /// <remarks>
+        /// This method activates the specified UI panel by name. It includes validation
+        /// for initialization state, panel name validity, and panel existence.
+        /// Used by other UI systems to display various game interfaces.
+        /// </remarks>
         public void ShowPanel(string panelName)
         {
-            // Defensive checks (v2.5.3)
-            if (!IsInitialized)
+            try
             {
-                Debug.LogWarning("UIManager: Cannot show panel - system not initialized");
-                return;
-            }
+                // Defensive checks (v2.5.3)
+                if (!IsInitialized)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "UIManager", "Cannot show panel - system not initialized");
+                    return;
+                }
 
-            if (string.IsNullOrEmpty(panelName))
-            {
-                Debug.LogWarning("UIManager: Cannot show panel with null or empty name");
-                return;
-            }
+                if (string.IsNullOrEmpty(panelName))
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "UIManager", "Cannot show panel with null or empty name");
+                    return;
+                }
 
-            if (activePanels.ContainsKey(panelName) && activePanels[panelName] != null)
-            {
-                activePanels[panelName].SetActive(true);
-                Debug.Log($"Showing panel: {panelName}");
+                if (activePanels == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "UIManager", "Active panels dictionary is null");
+                    return;
+                }
+
+                if (activePanels.ContainsKey(panelName) && activePanels[panelName] != null)
+                {
+                    activePanels[panelName].SetActive(true);
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Debug, 
+                        "UIManager", $"Showing panel: {panelName}");
+                }
+                else
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "UIManager", $"Panel not found: {panelName}");
+                }
             }
-            else
+            catch (System.Exception ex)
             {
-                Debug.LogWarning($"Panel not found: {panelName}");
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                    "UIManager", $"Exception in ShowPanel({panelName}): {ex.Message}\nStack: {ex.StackTrace}");
             }
         }
 
         /// <summary>
         /// Hide a specific UI panel
         /// v2.5.3: Enhanced with defensive checks
+        /// v2.6.6: Enhanced with comprehensive error handling and structured logging
         /// </summary>
+        /// <param name="panelName">Name of the panel to hide</param>
+        /// <remarks>
+        /// This method deactivates the specified UI panel by name. It includes validation
+        /// for initialization state, panel name validity, and panel existence.
+        /// </remarks>
         public void HidePanel(string panelName)
         {
-            // Defensive checks (v2.5.3)
-            if (!IsInitialized)
+            try
             {
-                Debug.LogWarning("UIManager: Cannot hide panel - system not initialized");
-                return;
-            }
+                // Defensive checks (v2.5.3)
+                if (!IsInitialized)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "UIManager", "Cannot hide panel - system not initialized");
+                    return;
+                }
 
-            if (string.IsNullOrEmpty(panelName))
-            {
-                Debug.LogWarning("UIManager: Cannot hide panel with null or empty name");
-                return;
-            }
+                if (string.IsNullOrEmpty(panelName))
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "UIManager", "Cannot hide panel with null or empty name");
+                    return;
+                }
 
-            if (activePanels.ContainsKey(panelName) && activePanels[panelName] != null)
+                if (activePanels == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "UIManager", "Active panels dictionary is null");
+                    return;
+                }
+
+                if (activePanels.ContainsKey(panelName) && activePanels[panelName] != null)
+                {
+                    activePanels[panelName].SetActive(false);
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Debug, 
+                        "UIManager", $"Hiding panel: {panelName}");
+                }
+            }
+            catch (System.Exception ex)
             {
-                activePanels[panelName].SetActive(false);
-                Debug.Log($"Hiding panel: {panelName}");
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                    "UIManager", $"Exception in HidePanel({panelName}): {ex.Message}\nStack: {ex.StackTrace}");
             }
         }
 
         /// <summary>
         /// Toggle a UI panel's visibility
         /// v2.5.3: Enhanced with defensive checks
+        /// v2.6.6: Enhanced with comprehensive error handling and structured logging
         /// </summary>
+        /// <param name="panelName">Name of the panel to toggle</param>
+        /// <remarks>
+        /// This method toggles the specified UI panel's visibility by name.
+        /// Commonly used for inventory and quest log panels via keyboard shortcuts.
+        /// Includes comprehensive validation and error handling.
+        /// </remarks>
         public void TogglePanel(string panelName)
         {
-            // Defensive checks (v2.5.3)
-            if (!IsInitialized)
+            try
             {
-                Debug.LogWarning("UIManager: Cannot toggle panel - system not initialized");
-                return;
-            }
+                // Defensive checks (v2.5.3)
+                if (!IsInitialized)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "UIManager", "Cannot toggle panel - system not initialized");
+                    return;
+                }
 
-            if (string.IsNullOrEmpty(panelName))
-            {
-                Debug.LogWarning("UIManager: Cannot toggle panel with null or empty name");
-                return;
-            }
+                if (string.IsNullOrEmpty(panelName))
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "UIManager", "Cannot toggle panel with null or empty name");
+                    return;
+                }
 
-            if (activePanels.ContainsKey(panelName) && activePanels[panelName] != null)
-            {
-                bool isActive = activePanels[panelName].activeSelf;
-                activePanels[panelName].SetActive(!isActive);
-                Debug.Log($"Toggling panel {panelName}: {!isActive}");
+                if (activePanels == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "UIManager", "Active panels dictionary is null");
+                    return;
+                }
+
+                if (activePanels.ContainsKey(panelName) && activePanels[panelName] != null)
+                {
+                    bool isActive = activePanels[panelName].activeSelf;
+                    activePanels[panelName].SetActive(!isActive);
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Debug, 
+                        "UIManager", $"Toggling panel {panelName}: {!isActive}");
+                }
+                else
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "UIManager", $"Panel not found: {panelName}");
+                }
             }
-            else
+            catch (System.Exception ex)
             {
-                Debug.LogWarning($"Panel not found: {panelName}");
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                    "UIManager", $"Exception in TogglePanel({panelName}): {ex.Message}\nStack: {ex.StackTrace}");
             }
         }
 
@@ -244,57 +324,111 @@ namespace ACOTAR
         /// Update HUD with character information
         /// v2.5.3: Enhanced with defensive checks
         /// </summary>
+        /// <summary>
+        /// Update HUD elements with current character information
+        /// v2.5.3: Enhanced with defensive checks
+        /// v2.6.6: Enhanced with comprehensive error handling and structured logging
+        /// </summary>
+        /// <param name="character">Character whose information to display</param>
+        /// <remarks>
+        /// CRITICAL: Updates all HUD elements including health bar, magic bar, level, XP, and location.
+        /// Failures in this method would prevent players from seeing their current game state.
+        /// Includes nested try-catch for each UI element to allow partial updates on failure.
+        /// </remarks>
         public void UpdateHUD(Character character)
         {
-            // Defensive checks (v2.5.3)
-            if (!IsInitialized)
+            try
             {
-                Debug.LogWarning("UIManager: Cannot update HUD - system not initialized");
-                return;
-            }
+                // Defensive checks (v2.5.3)
+                if (!IsInitialized)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "UIManager", "Cannot update HUD - system not initialized");
+                    return;
+                }
 
-            if (character == null)
-            {
-                Debug.LogWarning("UIManager: Cannot update HUD with null character");
-                return;
-            }
+                if (character == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "UIManager", "Cannot update HUD with null character");
+                    return;
+                }
 
-            if (character.stats == null)
-            {
-                Debug.LogWarning("UIManager: Cannot update HUD - character stats are null");
-                return;
-            }
+                if (character.stats == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "UIManager", "Cannot update HUD - character stats are null");
+                    return;
+                }
 
-            // Update health bar
-            if (healthBar != null)
-            {
-                healthBar.maxValue = character.stats.MaxHealth;
-                healthBar.value = character.stats.CurrentHealth;
-            }
+                // Update health bar
+                try
+                {
+                    if (healthBar != null)
+                    {
+                        healthBar.maxValue = character.stats.MaxHealth;
+                        healthBar.value = character.stats.CurrentHealth;
+                    }
+                }
+                catch (System.Exception healthEx)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "UIManager", $"Exception updating health bar: {healthEx.Message}");
+                }
 
-            // Update magic bar
-            if (magicBar != null)
-            {
-                magicBar.maxValue = character.stats.MaxMagicPower;
-                magicBar.value = character.magicPower;
-            }
+                // Update magic bar
+                try
+                {
+                    if (magicBar != null)
+                    {
+                        magicBar.maxValue = character.stats.MaxMagicPower;
+                        magicBar.value = character.magicPower;
+                    }
+                }
+                catch (System.Exception magicEx)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "UIManager", $"Exception updating magic bar: {magicEx.Message}");
+                }
 
-            // Update level and XP
-            if (levelText != null)
-            {
-                levelText.text = $"Level: {character.stats.Level}";
-            }
+                // Update level and XP
+                try
+                {
+                    if (levelText != null)
+                    {
+                        levelText.text = $"Level: {character.stats.Level}";
+                    }
 
-            if (xpText != null)
-            {
-                int nextLevelXP = character.stats.GetXPRequiredForNextLevel();
-                xpText.text = $"XP: {character.stats.Experience} / {nextLevelXP}";
-            }
+                    if (xpText != null)
+                    {
+                        int nextLevelXP = character.stats.GetXPRequiredForNextLevel();
+                        xpText.text = $"XP: {character.stats.Experience} / {nextLevelXP}";
+                    }
+                }
+                catch (System.Exception xpEx)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "UIManager", $"Exception updating level/XP text: {xpEx.Message}");
+                }
 
-            // Update location
-            if (locationText != null && GameManager.Instance != null)
+                // Update location
+                try
+                {
+                    if (locationText != null && GameManager.Instance != null)
+                    {
+                        locationText.text = $"Location: {GameManager.Instance.currentLocation}";
+                    }
+                }
+                catch (System.Exception locEx)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "UIManager", $"Exception updating location text: {locEx.Message}");
+                }
+            }
+            catch (System.Exception ex)
             {
-                locationText.text = $"Location: {GameManager.Instance.currentLocation}";
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                    "UIManager", $"Exception in UpdateHUD: {ex.Message}\nStack: {ex.StackTrace}");
             }
         }
 
@@ -420,19 +554,49 @@ namespace ACOTAR
         /// <summary>
         /// Toggle pause menu
         /// </summary>
+        /// <summary>
+        /// Toggle the pause menu and game time scale
+        /// v2.6.6: Enhanced with comprehensive error handling and structured logging
+        /// </summary>
+        /// <remarks>
+        /// CRITICAL: Controls game time scale (Time.timeScale). Failures could result in
+        /// the game being stuck paused or unable to pause. Includes validation to ensure
+        /// pause panel exists before modifying time scale.
+        /// </remarks>
         public void TogglePauseMenu()
         {
-            isGamePaused = !isGamePaused;
-            
-            if (isGamePaused)
+            try
             {
-                ShowPanel("PauseMenu");
-                Time.timeScale = 0f; // Pause game
+                if (!IsInitialized)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "UIManager", "Cannot toggle pause menu - system not initialized");
+                    return;
+                }
+
+                isGamePaused = !isGamePaused;
+                
+                if (isGamePaused)
+                {
+                    ShowPanel("PauseMenu");
+                    Time.timeScale = 0f; // Pause game
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, 
+                        "UIManager", "Game paused");
+                }
+                else
+                {
+                    HidePanel("PauseMenu");
+                    Time.timeScale = 1f; // Resume game
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, 
+                        "UIManager", "Game resumed");
+                }
             }
-            else
+            catch (System.Exception ex)
             {
-                HidePanel("PauseMenu");
-                Time.timeScale = 1f; // Resume game
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                    "UIManager", $"Exception in TogglePauseMenu: {ex.Message}\nStack: {ex.StackTrace}");
+                // Attempt to restore normal time scale if pause fails
+                Time.timeScale = 1f;
             }
         }
 
@@ -511,72 +675,147 @@ namespace ACOTAR
         /// <summary>
         /// Display a notification message with queue system
         /// </summary>
+        /// <summary>
+        /// Display a notification message to the player
+        /// v2.6.6: Enhanced with comprehensive error handling and structured logging
+        /// </summary>
+        /// <param name="message">The notification message to display</param>
+        /// <param name="duration">How long to show the notification (default: 3 seconds)</param>
+        /// <remarks>
+        /// Queues notification messages and displays them sequentially. Used throughout
+        /// the game for player feedback on actions, achievements, and events.
+        /// </remarks>
         public void ShowNotification(string message, float duration = 3f)
         {
-            Debug.Log($"Notification: {message}");
-            
-            // Add notification to queue
-            notificationQueue.Enqueue(message);
-            
-            // Start showing notifications if not already showing
-            if (!isShowingNotification)
+            try
             {
-                StartCoroutine(ShowNotificationCoroutine(duration));
+                if (string.IsNullOrEmpty(message))
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "UIManager", "Cannot show notification with null or empty message");
+                    return;
+                }
+
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, 
+                    "UIManager", $"Notification: {message}");
+                
+                // Validate notification queue
+                if (notificationQueue == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "UIManager", "Notification queue was null, initializing");
+                    notificationQueue = new Queue<string>();
+                }
+
+                // Add notification to queue
+                notificationQueue.Enqueue(message);
+                
+                // Start showing notifications if not already showing
+                if (!isShowingNotification)
+                {
+                    StartCoroutine(ShowNotificationCoroutine(duration));
+                }
+            }
+            catch (System.Exception ex)
+            {
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                    "UIManager", $"Exception in ShowNotification: {ex.Message}\nStack: {ex.StackTrace}");
             }
         }
 
+        /// <summary>
+        /// Coroutine that displays notifications from the queue sequentially
+        /// v2.6.6: Enhanced with comprehensive error handling and structured logging
+        /// </summary>
         private System.Collections.IEnumerator ShowNotificationCoroutine(float duration)
         {
             isShowingNotification = true;
             
-            while (notificationQueue.Count > 0)
+            try
             {
-                string message = notificationQueue.Dequeue();
-                
-                // If notification panel exists, use it
-                if (notificationPanel != null && notificationText != null)
+                while (notificationQueue != null && notificationQueue.Count > 0)
                 {
-                    notificationText.text = message;
-                    notificationPanel.SetActive(true);
+                    string message = notificationQueue.Dequeue();
                     
-                    // Get or add CanvasGroup for fading
-                    CanvasGroup canvasGroup = notificationPanel.GetComponent<CanvasGroup>();
-                    if (canvasGroup == null)
+                    try
                     {
-                        canvasGroup = notificationPanel.AddComponent<CanvasGroup>();
+                        // If notification panel exists, use it
+                        if (notificationPanel != null && notificationText != null)
+                        {
+                            notificationText.text = message;
+                            notificationPanel.SetActive(true);
+                            
+                            // Get or add CanvasGroup for fading
+                            CanvasGroup canvasGroup = notificationPanel.GetComponent<CanvasGroup>();
+                            if (canvasGroup == null)
+                            {
+                                try
+                                {
+                                    canvasGroup = notificationPanel.AddComponent<CanvasGroup>();
+                                }
+                                catch (System.Exception componentEx)
+                                {
+                                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                                        "UIManager", $"Exception adding CanvasGroup component: {componentEx.Message}");
+                                    canvasGroup = null;
+                                }
+                            }
+                            
+                            if (canvasGroup != null)
+                            {
+                                // Fade in
+                                float fadeTime = 0.3f;
+                                for (float t = 0; t < fadeTime; t += Time.deltaTime)
+                                {
+                                    canvasGroup.alpha = t / fadeTime;
+                                    yield return null;
+                                }
+                                canvasGroup.alpha = 1f;
+                                
+                                // Wait for display duration
+                                yield return new WaitForSeconds(duration);
+                                
+                                // Fade out
+                                for (float t = 0; t < fadeTime; t += Time.deltaTime)
+                                {
+                                    canvasGroup.alpha = 1f - (t / fadeTime);
+                                    yield return null;
+                                }
+                                canvasGroup.alpha = 0f;
+                            }
+                            else
+                            {
+                                // Fallback without fade if CanvasGroup unavailable
+                                yield return new WaitForSeconds(duration);
+                            }
+                            
+                            notificationPanel.SetActive(false);
+                        }
+                        else
+                        {
+                            // Fallback: just log and wait
+                            LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                                "UIManager", "Notification panel not configured in UIManager");
+                            yield return new WaitForSeconds(duration);
+                        }
                     }
-                    
-                    // Fade in
-                    float fadeTime = 0.3f;
-                    for (float t = 0; t < fadeTime; t += Time.deltaTime)
+                    catch (System.Exception notificationEx)
                     {
-                        canvasGroup.alpha = t / fadeTime;
-                        yield return null;
+                        LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                            "UIManager", $"Exception displaying notification '{message}': {notificationEx.Message}");
+                        yield return new WaitForSeconds(duration);
                     }
-                    canvasGroup.alpha = 1f;
-                    
-                    // Wait for display duration
-                    yield return new WaitForSeconds(duration);
-                    
-                    // Fade out
-                    for (float t = 0; t < fadeTime; t += Time.deltaTime)
-                    {
-                        canvasGroup.alpha = 1f - (t / fadeTime);
-                        yield return null;
-                    }
-                    canvasGroup.alpha = 0f;
-                    
-                    notificationPanel.SetActive(false);
-                }
-                else
-                {
-                    // Fallback: just log and wait
-                    Debug.LogWarning("Notification panel not configured in UIManager");
-                    yield return new WaitForSeconds(duration);
                 }
             }
-            
-            isShowingNotification = false;
+            catch (System.Exception ex)
+            {
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                    "UIManager", $"Exception in ShowNotificationCoroutine: {ex.Message}\nStack: {ex.StackTrace}");
+            }
+            finally
+            {
+                isShowingNotification = false;
+            }
         }
     }
 }
