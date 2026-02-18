@@ -129,51 +129,182 @@ namespace ACOTAR
         /// Set character reference (v2.3.3: NEW)
         /// Must be called after character creation
         /// </summary>
+        /// <summary>
+        /// Set the character reference for this progression system
+        /// Enhanced in v2.6.5: Added validation and logging
+        /// </summary>
+        /// <param name="character">The character to track progression for</param>
+        /// <remarks>
+        /// This method must be called before any bonuses can be applied.
+        /// Bonuses from titles and mastery require a valid character reference.
+        /// Setting a null character will be logged as a warning but not throw an error.
+        /// </remarks>
         public void SetCharacter(Character character)
         {
-            _character = character;
+            try
+            {
+                if (character == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "CharacterProgression", "Setting character reference to null - bonuses will not be applied");
+                }
+                else
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Debug, 
+                        "CharacterProgression", $"Character reference set: {character.name}");
+                }
+                
+                _character = character;
+            }
+            catch (System.Exception ex)
+            {
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                    "CharacterProgression", $"Exception in SetCharacter: {ex.Message}\nStack: {ex.StackTrace}");
+            }
         }
 
         /// <summary>
         /// Earn a new title
+        /// Enhanced in v2.6.5: Added comprehensive error handling and logging
         /// </summary>
+        /// <param name="title">The title to earn</param>
+        /// <remarks>
+        /// Titles are permanent achievements that grant stat bonuses.
+        /// The first earned title is automatically set as the active title.
+        /// Title bonuses are applied immediately through ApplyTitleBonus.
+        /// Duplicate titles are safely ignored without error.
+        /// If the title list is null, it will be initialized to prevent crashes.
+        /// </remarks>
         public void EarnTitle(CharacterTitle title)
         {
-            if (!earnedTitles.Contains(title))
+            try
             {
-                earnedTitles.Add(title);
-                Debug.Log($"<color=gold>TITLE EARNED: {GetTitleName(title)}</color>");
-                Debug.Log($"<color=yellow>{GetTitleDescription(title)}</color>");
-                
-                // Automatically set as active title if first one
-                if (earnedTitles.Count == 1)
+                // Ensure earned titles list is initialized
+                if (earnedTitles == null)
                 {
-                    activeTitle = title;
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "CharacterProgression", "Earned titles list was null, initializing");
+                    earnedTitles = new List<CharacterTitle>();
                 }
                 
-                // Grant title bonuses
-                ApplyTitleBonus(title);
+                if (!earnedTitles.Contains(title))
+                {
+                    earnedTitles.Add(title);
+                    
+                    string titleName = GetTitleName(title);
+                    string titleDesc = GetTitleDescription(title);
+                    
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, 
+                        "CharacterProgression", $"TITLE EARNED: {titleName}\n{titleDesc}");
+                    
+                    // Automatically set as active title if first one
+                    if (earnedTitles.Count == 1)
+                    {
+                        activeTitle = title;
+                        LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Debug, 
+                            "CharacterProgression", $"Set {titleName} as active title (first title earned)");
+                    }
+                    
+                    // Grant title bonuses with protection
+                    try
+                    {
+                        ApplyTitleBonus(title);
+                    }
+                    catch (System.Exception bonusEx)
+                    {
+                        LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                            "CharacterProgression", $"Exception applying title bonus for {title}: {bonusEx.Message}");
+                    }
+                }
+                else
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Debug, 
+                        "CharacterProgression", $"Title {title} already earned, skipping");
+                }
+            }
+            catch (System.Exception ex)
+            {
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                    "CharacterProgression", $"Exception in EarnTitle: {ex.Message}\nStack: {ex.StackTrace}");
             }
         }
 
         /// <summary>
         /// Gain experience in a skill category
+        /// Enhanced in v2.6.5: Added comprehensive error handling and logging
         /// </summary>
+        /// <param name="skill">The skill category to gain experience in</param>
+        /// <param name="amount">Amount of experience to gain</param>
+        /// <remarks>
+        /// Skill experience accumulates to increase mastery levels.
+        /// Mastery level ups grant stat bonuses appropriate to the skill category.
+        /// Experience amounts are validated to prevent negative values.
+        /// If the skill experience dictionary is null, it will be initialized.
+        /// Mastery bonuses are applied through ApplyMasteryBonus with error protection.
+        /// </remarks>
         public void GainSkillExperience(SkillCategory skill, int amount)
         {
-            int oldExperience = skillExperience[skill];
-            skillExperience[skill] += amount;
-            
-            SkillMastery oldMastery = GetSkillMastery(oldExperience);
-            SkillMastery newMastery = GetSkillMastery(skillExperience[skill]);
-            
-            if (newMastery > oldMastery)
+            try
             {
-                Debug.Log($"<color=cyan>SKILL MASTERY INCREASED!</color>");
-                Debug.Log($"{skill} is now {newMastery} level!");
+                // Ensure skill experience dictionary is initialized
+                if (skillExperience == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "CharacterProgression", "Skill experience dictionary was null, initializing");
+                    skillExperience = new Dictionary<SkillCategory, int>();
+                    // Initialize all skill categories
+                    foreach (SkillCategory category in System.Enum.GetValues(typeof(SkillCategory)))
+                    {
+                        skillExperience[category] = 0;
+                    }
+                }
                 
-                // Grant mastery bonus
-                ApplyMasteryBonus(skill, newMastery);
+                // Ensure this skill category is in the dictionary
+                if (!skillExperience.ContainsKey(skill))
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "CharacterProgression", $"Skill category {skill} not in dictionary, adding");
+                    skillExperience[skill] = 0;
+                }
+                
+                // Validate amount
+                if (amount < 0)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "CharacterProgression", $"Cannot gain negative skill experience: {amount}");
+                    return;
+                }
+                
+                int oldExperience = skillExperience[skill];
+                skillExperience[skill] += amount;
+                
+                SkillMastery oldMastery = GetSkillMastery(oldExperience);
+                SkillMastery newMastery = GetSkillMastery(skillExperience[skill]);
+                
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Debug, 
+                    "CharacterProgression", $"Gained {amount} {skill} experience (total: {skillExperience[skill]})");
+                
+                if (newMastery > oldMastery)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, 
+                        "CharacterProgression", $"SKILL MASTERY INCREASED! {skill} is now {newMastery} level!");
+                    
+                    // Grant mastery bonus with protection
+                    try
+                    {
+                        ApplyMasteryBonus(skill, newMastery);
+                    }
+                    catch (System.Exception bonusEx)
+                    {
+                        LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                            "CharacterProgression", $"Exception applying mastery bonus for {skill} {newMastery}: {bonusEx.Message}");
+                    }
+                }
+            }
+            catch (System.Exception ex)
+            {
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                    "CharacterProgression", $"Exception in GainSkillExperience: {ex.Message}\nStack: {ex.StackTrace}");
             }
         }
 
@@ -454,43 +585,162 @@ namespace ACOTAR
 
         /// <summary>
         /// Update a statistic
+        /// Enhanced in v2.6.5: Added comprehensive error handling and logging
         /// </summary>
+        /// <param name="statName">Name of the statistic to update (quest, enemy, craft, location, secret, companion, dialogue, death)</param>
+        /// <param name="value">Value to add to the statistic (default: 1)</param>
+        /// <remarks>
+        /// This method tracks player achievements and automatically grants skill experience.
+        /// All statistic updates are logged for debugging and analytics.
+        /// Invalid statistic names are safely ignored with a warning.
+        /// Skill experience gains are protected to prevent cascading failures.
+        /// CheckTitleProgress is called after quest completion to evaluate title unlocks.
+        /// </remarks>
         public void UpdateStatistic(string statName, int value = 1)
         {
-            switch (statName.ToLower())
+            try
             {
-                case "quest":
-                    questsCompleted += value;
-                    GainSkillExperience(SkillCategory.Exploration, 2);
-                    CheckTitleProgress();
-                    break;
-                case "enemy":
-                    enemiesDefeated += value;
-                    GainSkillExperience(SkillCategory.Combat, 1);
-                    break;
-                case "craft":
-                    itemsCrafted += value;
-                    GainSkillExperience(SkillCategory.Crafting, 1);
-                    break;
-                case "location":
-                    locationsDiscovered += value;
-                    GainSkillExperience(SkillCategory.Exploration, 3);
-                    break;
-                case "secret":
-                    secretsFound += value;
-                    GainSkillExperience(SkillCategory.Exploration, 5);
-                    break;
-                case "companion":
-                    companionsRecruited += value;
-                    GainSkillExperience(SkillCategory.Diplomacy, 5);
-                    break;
-                case "dialogue":
-                    dialoguesCompleted += value;
-                    GainSkillExperience(SkillCategory.Diplomacy, 1);
-                    break;
-                case "death":
-                    deaths += value;
-                    break;
+                // Input validation
+                if (string.IsNullOrEmpty(statName))
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "CharacterProgression", "Cannot update statistic: statName is null or empty");
+                    return;
+                }
+                
+                string normalizedStatName = statName.ToLower();
+                
+                switch (normalizedStatName)
+                {
+                    case "quest":
+                        questsCompleted += value;
+                        LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Debug, 
+                            "CharacterProgression", $"Quest completed. Total: {questsCompleted}");
+                        
+                        try
+                        {
+                            GainSkillExperience(SkillCategory.Exploration, 2);
+                            CheckTitleProgress();
+                        }
+                        catch (System.Exception ex)
+                        {
+                            LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                                "CharacterProgression", $"Exception in quest stat update: {ex.Message}");
+                        }
+                        break;
+                        
+                    case "enemy":
+                        enemiesDefeated += value;
+                        LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Debug, 
+                            "CharacterProgression", $"Enemy defeated. Total: {enemiesDefeated}");
+                        
+                        try
+                        {
+                            GainSkillExperience(SkillCategory.Combat, 1);
+                        }
+                        catch (System.Exception ex)
+                        {
+                            LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                                "CharacterProgression", $"Exception in enemy stat update: {ex.Message}");
+                        }
+                        break;
+                        
+                    case "craft":
+                        itemsCrafted += value;
+                        LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Debug, 
+                            "CharacterProgression", $"Item crafted. Total: {itemsCrafted}");
+                        
+                        try
+                        {
+                            GainSkillExperience(SkillCategory.Crafting, 1);
+                        }
+                        catch (System.Exception ex)
+                        {
+                            LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                                "CharacterProgression", $"Exception in craft stat update: {ex.Message}");
+                        }
+                        break;
+                        
+                    case "location":
+                        locationsDiscovered += value;
+                        LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Debug, 
+                            "CharacterProgression", $"Location discovered. Total: {locationsDiscovered}");
+                        
+                        try
+                        {
+                            GainSkillExperience(SkillCategory.Exploration, 3);
+                        }
+                        catch (System.Exception ex)
+                        {
+                            LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                                "CharacterProgression", $"Exception in location stat update: {ex.Message}");
+                        }
+                        break;
+                        
+                    case "secret":
+                        secretsFound += value;
+                        LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Debug, 
+                            "CharacterProgression", $"Secret found. Total: {secretsFound}");
+                        
+                        try
+                        {
+                            GainSkillExperience(SkillCategory.Exploration, 5);
+                        }
+                        catch (System.Exception ex)
+                        {
+                            LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                                "CharacterProgression", $"Exception in secret stat update: {ex.Message}");
+                        }
+                        break;
+                        
+                    case "companion":
+                        companionsRecruited += value;
+                        LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Debug, 
+                            "CharacterProgression", $"Companion recruited. Total: {companionsRecruited}");
+                        
+                        try
+                        {
+                            GainSkillExperience(SkillCategory.Diplomacy, 5);
+                        }
+                        catch (System.Exception ex)
+                        {
+                            LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                                "CharacterProgression", $"Exception in companion stat update: {ex.Message}");
+                        }
+                        break;
+                        
+                    case "dialogue":
+                        dialoguesCompleted += value;
+                        LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Debug, 
+                            "CharacterProgression", $"Dialogue completed. Total: {dialoguesCompleted}");
+                        
+                        try
+                        {
+                            GainSkillExperience(SkillCategory.Diplomacy, 1);
+                        }
+                        catch (System.Exception ex)
+                        {
+                            LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                                "CharacterProgression", $"Exception in dialogue stat update: {ex.Message}");
+                        }
+                        break;
+                        
+                    case "death":
+                        deaths += value;
+                        LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Debug, 
+                            "CharacterProgression", $"Death recorded. Total: {deaths}");
+                        break;
+                        
+                    default:
+                        LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                            "CharacterProgression", $"Unknown statistic name: {statName}");
+                        break;
+                }
+            }
+            catch (System.Exception ex)
+            {
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                    "CharacterProgression", $"Exception in UpdateStatistic: {ex.Message}\nStack: {ex.StackTrace}");
             }
         }
 

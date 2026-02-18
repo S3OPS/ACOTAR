@@ -136,34 +136,82 @@ namespace ACOTAR
         }
 
         /// <summary>
-        /// Complete a story arc and unlock next content
+        /// Complete a story arc and unlock related content
         /// v2.5.3: Enhanced with defensive checks
+        /// v2.6.5: Added comprehensive error handling and logging
         /// </summary>
+        /// <param name="arc">The story arc to complete</param>
+        /// <remarks>
+        /// Completing an arc unlocks new locations, characters, and quests.
+        /// The story automatically advances to the next arc after completion.
+        /// Duplicate completions are safely ignored without error.
+        /// Content unlocking is protected to allow partial success if needed.
+        /// This method is critical for story progression and must handle all edge cases.
+        /// </remarks>
         public void CompleteArc(StoryArc arc)
         {
-            // Defensive check (v2.5.3)
-            if (!IsInitialized)
+            try
             {
-                Debug.LogWarning("StoryManager: Cannot complete arc - system not initialized");
-                return;
-            }
+                // Defensive check (v2.5.3)
+                if (!IsInitialized)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "StoryManager", "Cannot complete arc - system not initialized");
+                    return;
+                }
 
-            if (!completedArcs.ContainsKey(arc))
-            {
-                Debug.LogWarning($"StoryManager: Story arc '{arc}' not found in dictionary");
-                return;
-            }
+                if (completedArcs == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "StoryManager", "Cannot complete arc - completedArcs dictionary is null");
+                    return;
+                }
 
-            if (!completedArcs[arc])
+                if (!completedArcs.ContainsKey(arc))
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "StoryManager", $"Story arc '{arc}' not found in dictionary");
+                    return;
+                }
+
+                if (!completedArcs[arc])
+                {
+                    completedArcs[arc] = true;
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, 
+                        "StoryManager", $"Story Arc Completed: {arc}");
+                    
+                    // Unlock content based on arc completion - protected
+                    try
+                    {
+                        UnlockContentForArc(arc);
+                    }
+                    catch (System.Exception contentEx)
+                    {
+                        LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                            "StoryManager", $"Exception unlocking content for arc {arc}: {contentEx.Message}");
+                    }
+                    
+                    // Move to next arc - protected
+                    try
+                    {
+                        AdvanceStory(arc);
+                    }
+                    catch (System.Exception advanceEx)
+                    {
+                        LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                            "StoryManager", $"Exception advancing story from arc {arc}: {advanceEx.Message}");
+                    }
+                }
+                else
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Debug, 
+                        "StoryManager", $"Story arc {arc} already completed, skipping");
+                }
+            }
+            catch (System.Exception ex)
             {
-                completedArcs[arc] = true;
-                Debug.Log($"Story Arc Completed: {arc}");
-                
-                // Unlock content based on arc completion
-                UnlockContentForArc(arc);
-                
-                // Move to next arc
-                AdvanceStory(arc);
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                    "StoryManager", $"Exception in CompleteArc: {ex.Message}\nStack: {ex.StackTrace}");
             }
         }
 
@@ -330,54 +378,118 @@ namespace ACOTAR
         }
 
         /// <summary>
-        /// Unlock a location for the player
+        /// Unlock a location for player access
         /// v2.5.3: Enhanced with defensive checks
+        /// v2.6.5: Added comprehensive error handling and logging
         /// </summary>
+        /// <param name="locationName">Name of the location to unlock</param>
+        /// <remarks>
+        /// Unlocking locations allows the player to travel to new areas.
+        /// Duplicate unlocks are safely ignored without error.
+        /// The unlocked locations list is automatically initialized if null.
+        /// Location names are case-sensitive and must match LocationManager names.
+        /// </remarks>
         public void UnlockLocation(string locationName)
         {
-            // Defensive checks (v2.5.3)
-            if (!IsInitialized)
+            try
             {
-                Debug.LogWarning("StoryManager: Cannot unlock location - system not initialized");
-                return;
-            }
+                // Defensive checks (v2.5.3)
+                if (!IsInitialized)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "StoryManager", "Cannot unlock location - system not initialized");
+                    return;
+                }
 
-            if (string.IsNullOrEmpty(locationName))
-            {
-                Debug.LogWarning("StoryManager: Cannot unlock location with null or empty name");
-                return;
-            }
+                if (string.IsNullOrEmpty(locationName))
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "StoryManager", "Cannot unlock location with null or empty name");
+                    return;
+                }
 
-            if (!unlockedLocations.Contains(locationName))
+                // Ensure list is initialized
+                if (unlockedLocations == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "StoryManager", "Unlocked locations list was null, initializing");
+                    unlockedLocations = new List<string>();
+                }
+
+                if (!unlockedLocations.Contains(locationName))
+                {
+                    unlockedLocations.Add(locationName);
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, 
+                        "StoryManager", $"Location Unlocked: {locationName}");
+                }
+                else
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Debug, 
+                        "StoryManager", $"Location {locationName} already unlocked, skipping");
+                }
+            }
+            catch (System.Exception ex)
             {
-                unlockedLocations.Add(locationName);
-                Debug.Log($"Location Unlocked: {locationName}");
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                    "StoryManager", $"Exception in UnlockLocation: {ex.Message}\nStack: {ex.StackTrace}");
             }
         }
 
         /// <summary>
         /// Track that player has met a character
         /// v2.5.3: Enhanced with defensive checks
+        /// v2.6.5: Added comprehensive error handling and logging
         /// </summary>
+        /// <param name="characterName">Name of the character met</param>
+        /// <remarks>
+        /// Meeting characters unlocks dialogue options and story paths.
+        /// Duplicate character meetings are safely ignored without error.
+        /// The met characters list is automatically initialized if null.
+        /// Character names are case-sensitive and must match quest data.
+        /// </remarks>
         public void UnlockCharacter(string characterName)
         {
-            // Defensive checks (v2.5.3)
-            if (!IsInitialized)
+            try
             {
-                Debug.LogWarning("StoryManager: Cannot unlock character - system not initialized");
-                return;
-            }
+                // Defensive checks (v2.5.3)
+                if (!IsInitialized)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "StoryManager", "Cannot unlock character - system not initialized");
+                    return;
+                }
 
-            if (string.IsNullOrEmpty(characterName))
-            {
-                Debug.LogWarning("StoryManager: Cannot unlock character with null or empty name");
-                return;
-            }
+                if (string.IsNullOrEmpty(characterName))
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "StoryManager", "Cannot unlock character with null or empty name");
+                    return;
+                }
 
-            if (!metCharacters.Contains(characterName))
+                // Ensure list is initialized
+                if (metCharacters == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                        "StoryManager", "Met characters list was null, initializing");
+                    metCharacters = new List<string>();
+                }
+
+                if (!metCharacters.Contains(characterName))
+                {
+                    metCharacters.Add(characterName);
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, 
+                        "StoryManager", $"Character Met: {characterName}");
+                }
+                else
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Debug, 
+                        "StoryManager", $"Character {characterName} already met, skipping");
+                }
+            }
+            catch (System.Exception ex)
             {
-                metCharacters.Add(characterName);
-                Debug.Log($"Character Met: {characterName}");
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                    "StoryManager", $"Exception in UnlockCharacter: {ex.Message}\nStack: {ex.StackTrace}");
             }
         }
 
