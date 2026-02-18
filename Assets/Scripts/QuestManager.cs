@@ -26,6 +26,9 @@ namespace ACOTAR
         public int bonusExperienceReward;  // Bonus XP for completing optional objectives
         public int bonusGoldReward;  // Bonus gold for completing optional objectives
         
+        // v2.6.7: Track optional objective completion
+        public List<bool> optionalObjectivesCompleted;
+        
         // v2.3.2: Combat preparation hints for boss fights
         public string preparationHint;  // Strategic hint for challenging encounters
 
@@ -43,6 +46,7 @@ namespace ACOTAR
             this.bonusExperienceReward = 0;
             this.bonusGoldReward = 0;
             this.preparationHint = "";  // v2.3.2
+            this.optionalObjectivesCompleted = new List<bool>();  // v2.6.7
         }
     }
 
@@ -319,9 +323,48 @@ namespace ACOTAR
                     // Grant experience to player if GameManager exists
                     if (GameManager.Instance != null && GameManager.Instance.playerCharacter != null)
                     {
-                        GameManager.Instance.playerCharacter.GainExperience(quest.experienceReward);
+                        int totalXP = quest.experienceReward;
+                        
+                        // v2.6.7: Check for optional objectives bonus
+                        if (quest.optionalObjectives != null && quest.optionalObjectives.Count > 0)
+                        {
+                            int completedOptionals = 0;
+                            if (quest.optionalObjectivesCompleted != null)
+                            {
+                                for (int i = 0; i < quest.optionalObjectivesCompleted.Count; i++)
+                                {
+                                    if (quest.optionalObjectivesCompleted[i]) completedOptionals++;
+                                }
+                            }
+                            
+                            // Award bonus if all optional objectives completed
+                            if (completedOptionals == quest.optionalObjectives.Count && completedOptionals > 0)
+                            {
+                                totalXP += quest.bonusExperienceReward;
+                                
+                                // Award bonus gold if applicable
+                                if (quest.bonusGoldReward > 0 && GameManager.Instance.playerCharacter.currencySystem != null)
+                                {
+                                    GameManager.Instance.playerCharacter.currencySystem.AddCurrency("Gold", quest.bonusGoldReward);
+                                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, "Quest", 
+                                        $"⭐ ALL OPTIONAL OBJECTIVES COMPLETE! ⭐ Bonus: +{quest.bonusExperienceReward} XP, +{quest.bonusGoldReward} Gold");
+                                }
+                                else
+                                {
+                                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, "Quest", 
+                                        $"⭐ ALL OPTIONAL OBJECTIVES COMPLETE! ⭐ Bonus: +{quest.bonusExperienceReward} XP");
+                                }
+                            }
+                            else if (completedOptionals > 0)
+                            {
+                                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, "Quest", 
+                                    $"Optional objectives: {completedOptionals}/{quest.optionalObjectives.Count} completed");
+                            }
+                        }
+                        
+                        GameManager.Instance.playerCharacter.GainExperience(totalXP);
                         LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, "Quest", 
-                            $"Quest Completed: {quest.title} - Granted {quest.experienceReward} XP to {GameManager.Instance.playerCharacter.name}");
+                            $"Quest Completed: {quest.title} - Granted {totalXP} XP to {GameManager.Instance.playerCharacter.name}");
                     }
                     else
                     {
@@ -396,6 +439,100 @@ namespace ACOTAR
                 }
             }
             return baseQuests;
+        }
+        
+        /// <summary>
+        /// Complete an optional objective for a quest
+        /// v2.6.7: NEW - Track optional objective completion for bonus rewards
+        /// </summary>
+        /// <param name="questId">ID of the quest</param>
+        /// <param name="objectiveIndex">Index of the optional objective (0-based)</param>
+        public void CompleteOptionalObjective(string questId, int objectiveIndex)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(questId))
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, "Quest", 
+                        "CompleteOptionalObjective called with null or empty questId");
+                    return;
+                }
+                
+                if (!quests.ContainsKey(questId))
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, "Quest", 
+                        $"Quest not found: {questId}");
+                    return;
+                }
+                
+                Quest quest = quests[questId];
+                
+                // Ensure optional objectives list exists
+                if (quest.optionalObjectives == null || quest.optionalObjectives.Count == 0)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, "Quest", 
+                        $"Quest {questId} has no optional objectives");
+                    return;
+                }
+                
+                // Ensure completion tracking list exists and is sized correctly
+                if (quest.optionalObjectivesCompleted == null)
+                {
+                    quest.optionalObjectivesCompleted = new List<bool>();
+                }
+                
+                // Initialize completion tracking if needed
+                while (quest.optionalObjectivesCompleted.Count < quest.optionalObjectives.Count)
+                {
+                    quest.optionalObjectivesCompleted.Add(false);
+                }
+                
+                // Validate index
+                if (objectiveIndex < 0 || objectiveIndex >= quest.optionalObjectives.Count)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, "Quest", 
+                        $"Invalid optional objective index {objectiveIndex} for quest {questId}");
+                    return;
+                }
+                
+                // Mark as completed
+                if (!quest.optionalObjectivesCompleted[objectiveIndex])
+                {
+                    quest.optionalObjectivesCompleted[objectiveIndex] = true;
+                    
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, "Quest", 
+                        $"✓ Optional Objective Complete: {quest.optionalObjectives[objectiveIndex]}");
+                    
+                    // Check if all optional objectives are complete
+                    bool allComplete = true;
+                    foreach (bool completed in quest.optionalObjectivesCompleted)
+                    {
+                        if (!completed)
+                        {
+                            allComplete = false;
+                            break;
+                        }
+                    }
+                    
+                    if (allComplete)
+                    {
+                        LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, "Quest", 
+                            $"⭐ ALL Optional Objectives Complete! Complete quest for bonus rewards! ⭐");
+                        
+                        if (UIManager.Instance != null)
+                        {
+                            UIManager.Instance.ShowNotification(
+                                $"All Optional Objectives Complete!\nComplete quest for +{quest.bonusExperienceReward} XP bonus!", 
+                                3f);
+                        }
+                    }
+                }
+            }
+            catch (System.Exception ex)
+            {
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, "Quest", 
+                    $"Exception in CompleteOptionalObjective({questId}, {objectiveIndex}): {ex.Message}\nStack: {ex.StackTrace}");
+            }
         }
 
         /// <summary>
