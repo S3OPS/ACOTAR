@@ -32,6 +32,7 @@ namespace ACOTAR
 
     /// <summary>
     /// Represents an item in the game world
+    /// v2.6.7: Enhanced with equipment set support and mana cost reduction
     /// </summary>
     [Serializable]
     public class Item
@@ -49,6 +50,13 @@ namespace ACOTAR
         public int magicPowerBonus;
         public int strengthBonus;
         public int agilityBonus;
+        
+        // v2.6.7: NEW - Equipment set system
+        public string equipmentSetId;  // e.g., "SpringCourt", "NightCourt", "Illyrian"
+        
+        // v2.6.7: NEW - Mana cost reduction
+        public int manaCostReduction;  // Reduces mana cost by this amount (flat reduction)
+        public float manaCostReductionPercent;  // Reduces mana cost by this percentage (0.0 to 1.0)
 
         public Item(string id, string name, string desc, ItemType type, ItemRarity rarity)
         {
@@ -59,6 +67,9 @@ namespace ACOTAR
             this.rarity = rarity;
             this.maxStackSize = type == ItemType.Consumable ? 99 : 1;
             this.isQuestItem = type == ItemType.QuestItem;
+            this.equipmentSetId = "";  // v2.6.7
+            this.manaCostReduction = 0;  // v2.6.7
+            this.manaCostReductionPercent = 0f;  // v2.6.7
         }
     }
 
@@ -1140,6 +1151,114 @@ namespace ACOTAR
         public string GetEquippedArmor()
         {
             return equippedArmor?.itemId;
+        }
+        
+        /// <summary>
+        /// Get all equipped items
+        /// v2.6.7: NEW - Returns list of all equipped items for set bonus calculation
+        /// </summary>
+        public List<Item> GetAllEquippedItems()
+        {
+            List<Item> equipped = new List<Item>();
+            if (equippedWeapon != null) equipped.Add(equippedWeapon);
+            if (equippedArmor != null) equipped.Add(equippedArmor);
+            
+            // Add any other equipped items from inventory
+            foreach (var slot in inventory)
+            {
+                if (slot.isEquipped && slot.item != null)
+                {
+                    equipped.Add(slot.item);
+                }
+            }
+            
+            return equipped;
+        }
+        
+        /// <summary>
+        /// Calculate equipment set bonuses
+        /// v2.6.7: NEW - Counts matching equipment sets and returns bonus multiplier
+        /// </summary>
+        /// <returns>Dictionary mapping set IDs to piece counts</returns>
+        public Dictionary<string, int> GetEquipmentSetCounts()
+        {
+            Dictionary<string, int> setCounts = new Dictionary<string, int>();
+            List<Item> equipped = GetAllEquippedItems();
+            
+            foreach (var item in equipped)
+            {
+                if (!string.IsNullOrEmpty(item.equipmentSetId))
+                {
+                    if (!setCounts.ContainsKey(item.equipmentSetId))
+                    {
+                        setCounts[item.equipmentSetId] = 0;
+                    }
+                    setCounts[item.equipmentSetId]++;
+                }
+            }
+            
+            return setCounts;
+        }
+        
+        /// <summary>
+        /// Get active equipment set bonuses
+        /// v2.6.7: NEW - Returns bonus multiplier based on equipped set pieces
+        /// </summary>
+        /// <returns>Multiplier to apply to stats (1.0 = no bonus, 1.5 = 50% bonus)</returns>
+        public float GetEquipmentSetBonus()
+        {
+            Dictionary<string, int> setCounts = GetEquipmentSetCounts();
+            float maxBonus = 1.0f;
+            
+            foreach (var setCount in setCounts.Values)
+            {
+                float bonus = 1.0f;
+                
+                if (setCount >= GameConfig.Equipment.SET_BONUS_4_PIECES)
+                {
+                    bonus = GameConfig.Equipment.SET_BONUS_4_PIECE_MULTIPLIER;
+                }
+                else if (setCount >= GameConfig.Equipment.SET_BONUS_3_PIECES)
+                {
+                    bonus = GameConfig.Equipment.SET_BONUS_3_PIECE_MULTIPLIER;
+                }
+                else if (setCount >= GameConfig.Equipment.SET_BONUS_2_PIECES)
+                {
+                    bonus = GameConfig.Equipment.SET_BONUS_2_PIECE_MULTIPLIER;
+                }
+                
+                // Use the highest bonus if multiple sets are active
+                if (bonus > maxBonus)
+                {
+                    maxBonus = bonus;
+                }
+            }
+            
+            return maxBonus;
+        }
+        
+        /// <summary>
+        /// Get total mana cost reduction from equipment
+        /// v2.6.7: NEW - Calculates total mana cost reduction from all equipped items
+        /// </summary>
+        /// <returns>Tuple of (flat reduction, percent reduction)</returns>
+        public (int flatReduction, float percentReduction) GetManaCostReduction()
+        {
+            List<Item> equipped = GetAllEquippedItems();
+            int totalFlat = 0;
+            float totalPercent = 0f;
+            
+            foreach (var item in equipped)
+            {
+                totalFlat += item.manaCostReduction;
+                totalPercent += item.manaCostReductionPercent;
+            }
+            
+            // Apply caps
+            totalFlat = Mathf.Min(totalFlat, GameConfig.Equipment.MAX_FLAT_MANA_REDUCTION);
+            totalPercent = Mathf.Min(totalPercent, GameConfig.Equipment.MAX_PERCENT_MANA_REDUCTION);
+            
+            return (totalFlat, totalPercent);
         }
 
         /// <summary>

@@ -260,6 +260,27 @@ namespace ACOTAR
         }
 
         // =====================================================
+        // EQUIPMENT AND ITEMS
+        // =====================================================
+        public static class Equipment
+        {
+            // v2.6.7: Equipment set bonuses
+            // Sets require 2, 3, or 4 pieces to activate bonuses
+            public const int SET_BONUS_2_PIECES = 2;
+            public const int SET_BONUS_3_PIECES = 3;
+            public const int SET_BONUS_4_PIECES = 4;
+            
+            // Set bonus multipliers
+            public const float SET_BONUS_2_PIECE_MULTIPLIER = 1.1f;  // 10% bonus
+            public const float SET_BONUS_3_PIECE_MULTIPLIER = 1.25f;  // 25% bonus
+            public const float SET_BONUS_4_PIECE_MULTIPLIER = 1.5f;   // 50% bonus
+            
+            // Mana cost reduction caps
+            public const int MAX_FLAT_MANA_REDUCTION = 20;  // Maximum flat reduction
+            public const float MAX_PERCENT_MANA_REDUCTION = 0.5f;  // Maximum 50% reduction
+        }
+
+        // =====================================================
         // DEBUG/DEVELOPMENT
         // =====================================================
         public static class DebugSettings

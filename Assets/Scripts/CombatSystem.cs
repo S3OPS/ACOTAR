@@ -244,8 +244,8 @@ namespace ACOTAR
                 return new CombatResult(0, DamageType.Magical, $"{attacker.name} doesn't know {magicType}!");
             }
 
-            // v2.3.3: Check and consume mana
-            int manaCost = ManaSystem.GetManaCost(magicType);
+            // v2.3.3: Check and consume mana (v2.6.7: with equipment cost reduction)
+            int manaCost = ManaSystem.GetManaCost(magicType, attacker);
             if (!attacker.manaSystem.HasEnoughMana(manaCost))
             {
                 return new CombatResult(0, DamageType.Magical, $"{attacker.name} doesn't have enough mana! Need {manaCost}, have {attacker.manaSystem.CurrentMana}");
