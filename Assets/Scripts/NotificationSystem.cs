@@ -255,9 +255,6 @@ namespace ACOTAR
         }
 
         /// <summary>
-        /// Show a custom notification
-        /// </summary>
-        /// <summary>
         /// Show a notification with specified properties (static convenience method)
         /// v2.6.6: Enhanced with comprehensive error handling and structured logging
         /// </summary>
