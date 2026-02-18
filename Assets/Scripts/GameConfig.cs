@@ -80,9 +80,12 @@ namespace ACOTAR
             public const float MIN_FLEE_CHANCE = 0.1f;
             public const float MAX_FLEE_CHANCE = 0.9f;
             
-            // Combo system
+            // Combo system (v2.6.7: Enhanced with cascade bonuses)
             public const int MAX_COMBO_COUNT = 5;
             public const float COMBO_DAMAGE_BONUS_PER_HIT = 0.1f;  // 10% per combo hit
+            public const int COMBO_CASCADE_THRESHOLD = 5;  // NEW: Trigger cascade every 5 hits
+            public const float COMBO_CASCADE_BONUS = 0.5f;  // NEW: 50% bonus on cascade
+            public const float COMBO_CASCADE_XP_BONUS = 1.25f;  // NEW: 25% bonus XP on cascade
             
             // Status effects
             public const int DEFAULT_EFFECT_DURATION = 3;
