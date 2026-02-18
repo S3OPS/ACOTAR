@@ -80,9 +80,12 @@ namespace ACOTAR
             public const float MIN_FLEE_CHANCE = 0.1f;
             public const float MAX_FLEE_CHANCE = 0.9f;
             
-            // Combo system
+            // Combo system (v2.6.7: Enhanced with cascade bonuses)
             public const int MAX_COMBO_COUNT = 5;
             public const float COMBO_DAMAGE_BONUS_PER_HIT = 0.1f;  // 10% per combo hit
+            public const int COMBO_CASCADE_THRESHOLD = 5;  // NEW: Trigger cascade every 5 hits
+            public const float COMBO_CASCADE_BONUS = 0.5f;  // NEW: 50% bonus on cascade
+            public const float COMBO_CASCADE_XP_BONUS = 1.25f;  // NEW: 25% bonus XP on cascade
             
             // Status effects
             public const int DEFAULT_EFFECT_DURATION = 3;
@@ -254,6 +257,27 @@ namespace ACOTAR
             // Trail effect
             public const float TRAIL_EFFECT_DURATION = 0.3f;
             public const float PROJECTILE_SPEED = 10f;
+        }
+
+        // =====================================================
+        // EQUIPMENT AND ITEMS
+        // =====================================================
+        public static class Equipment
+        {
+            // v2.6.7: Equipment set bonuses
+            // Sets require 2, 3, or 4 pieces to activate bonuses
+            public const int SET_BONUS_2_PIECES = 2;
+            public const int SET_BONUS_3_PIECES = 3;
+            public const int SET_BONUS_4_PIECES = 4;
+            
+            // Set bonus multipliers
+            public const float SET_BONUS_2_PIECE_MULTIPLIER = 1.1f;  // 10% bonus
+            public const float SET_BONUS_3_PIECE_MULTIPLIER = 1.25f;  // 25% bonus
+            public const float SET_BONUS_4_PIECE_MULTIPLIER = 1.5f;   // 50% bonus
+            
+            // Mana cost reduction caps
+            public const int MAX_FLAT_MANA_REDUCTION = 20;  // Maximum flat reduction
+            public const float MAX_PERCENT_MANA_REDUCTION = 0.5f;  // Maximum 50% reduction
         }
 
         // =====================================================

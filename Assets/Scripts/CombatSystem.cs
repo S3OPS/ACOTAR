@@ -76,9 +76,11 @@ namespace ACOTAR
         private static float AGILITY_DODGE_FACTOR => GameConfig.CombatSettings.AGILITY_DODGE_FACTOR;
         private static float DEFEND_DAMAGE_REDUCTION => GameConfig.CombatSettings.DEFEND_DAMAGE_REDUCTION;
 
-        // Combo system tracking
+        // Combo system tracking (v2.6.7: Enhanced with cascade support)
         private static int currentCombo = 0;
+        private static int totalCombos = 0;  // NEW: Track total hits for cascade
         private static Character lastAttacker = null;
+        private static bool lastAttackWasCascade = false;  // NEW: Track cascade state
 
         /// <summary>
         /// Calculate physical attack damage with difficulty and elemental modifiers
@@ -161,7 +163,20 @@ namespace ACOTAR
             // Increment combo
             UpdateCombo(attacker);
 
-            string comboText = currentCombo > 1 ? $" [{currentCombo}x COMBO!]" : "";
+            // v2.6.7: Enhanced combo display with cascade notification
+            string comboText = "";
+            if (currentCombo > 1)
+            {
+                if (lastAttackWasCascade)
+                {
+                    comboText = $" [⚡{totalCombos}x COMBO CASCADE!⚡ +{GameConfig.CombatSettings.COMBO_CASCADE_BONUS*100}% POWER!]";
+                }
+                else
+                {
+                    comboText = $" [{currentCombo}x COMBO!]";
+                }
+            }
+            
             string description = isCritical 
                 ? $"{attacker.name} landed a CRITICAL HIT for {finalDamage} damage!{comboText}"
                 : $"{attacker.name} attacked {defender.name} for {finalDamage} damage{comboText}";
@@ -229,8 +244,8 @@ namespace ACOTAR
                 return new CombatResult(0, DamageType.Magical, $"{attacker.name} doesn't know {magicType}!");
             }
 
-            // v2.3.3: Check and consume mana
-            int manaCost = ManaSystem.GetManaCost(magicType);
+            // v2.3.3: Check and consume mana (v2.6.7: with equipment cost reduction)
+            int manaCost = ManaSystem.GetManaCost(magicType, attacker);
             if (!attacker.manaSystem.HasEnoughMana(manaCost))
             {
                 return new CombatResult(0, DamageType.Magical, $"{attacker.name} doesn't have enough mana! Need {manaCost}, have {attacker.manaSystem.CurrentMana}");
@@ -290,7 +305,20 @@ namespace ACOTAR
             // Increment combo
             UpdateCombo(attacker);
 
-            string comboText = currentCombo > 1 ? $" [{currentCombo}x COMBO!]" : "";
+            // v2.6.7: Enhanced combo display with cascade notification
+            string comboText = "";
+            if (currentCombo > 1)
+            {
+                if (lastAttackWasCascade)
+                {
+                    comboText = $" [⚡{totalCombos}x COMBO CASCADE!⚡ +{GameConfig.CombatSettings.COMBO_CASCADE_BONUS*100}% POWER!]";
+                }
+                else
+                {
+                    comboText = $" [{currentCombo}x COMBO!]";
+                }
+            }
+            
             string description = isCritical
                 ? $"{attacker.name} unleashed {magicType} - CRITICAL HIT for {finalDamage} damage!{comboText}"
                 : $"{attacker.name} used {magicType} on {defender.name} for {finalDamage} damage{comboText}";
@@ -472,39 +500,67 @@ namespace ACOTAR
 
         /// <summary>
         /// Get combo multiplier based on consecutive hits
+        /// v2.6.7: Enhanced with cascade bonuses - every 5 hits triggers a power surge
         /// </summary>
         private static float GetComboMultiplier(Character attacker)
         {
             if (attacker == lastAttacker && currentCombo > 0)
             {
-                return 1.0f + (currentCombo * GameConfig.CombatSettings.COMBO_DAMAGE_BONUS_PER_HIT);
+                float baseMultiplier = 1.0f + (currentCombo * GameConfig.CombatSettings.COMBO_DAMAGE_BONUS_PER_HIT);
+                
+                // v2.6.7: Apply cascade bonus if we hit the threshold
+                if (lastAttackWasCascade)
+                {
+                    baseMultiplier += GameConfig.CombatSettings.COMBO_CASCADE_BONUS;
+                }
+                
+                return baseMultiplier;
             }
             return 1.0f;
         }
 
         /// <summary>
         /// Update combo counter
+        /// v2.6.7: Enhanced to track cascades for extra rewards
         /// </summary>
         private static void UpdateCombo(Character attacker)
         {
             if (attacker == lastAttacker)
             {
                 currentCombo = Mathf.Min(currentCombo + 1, GameConfig.CombatSettings.MAX_COMBO_COUNT);
+                totalCombos++;
+                
+                // v2.6.7: Check for cascade - every CASCADE_THRESHOLD hits
+                if (totalCombos > 0 && totalCombos % GameConfig.CombatSettings.COMBO_CASCADE_THRESHOLD == 0)
+                {
+                    lastAttackWasCascade = true;
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, "Combat", 
+                        $"COMBO CASCADE! {attacker.name} triggered power surge at {totalCombos} consecutive hits!");
+                }
+                else
+                {
+                    lastAttackWasCascade = false;
+                }
             }
             else
             {
                 currentCombo = 1;
+                totalCombos = 1;
                 lastAttacker = attacker;
+                lastAttackWasCascade = false;
             }
         }
 
         /// <summary>
         /// Reset combo counter (on miss, flee, or turn change)
+        /// v2.6.7: Also resets cascade tracking
         /// </summary>
         public static void ResetCombo()
         {
             currentCombo = 0;
+            totalCombos = 0;
             lastAttacker = null;
+            lastAttackWasCascade = false;
         }
 
         /// <summary>
@@ -513,6 +569,24 @@ namespace ACOTAR
         public static int GetCurrentCombo()
         {
             return currentCombo;
+        }
+        
+        /// <summary>
+        /// Get total combo hits (for cascade tracking)
+        /// v2.6.7: NEW - Returns total hits in current combo chain
+        /// </summary>
+        public static int GetTotalComboHits()
+        {
+            return totalCombos;
+        }
+        
+        /// <summary>
+        /// Check if last attack was a cascade
+        /// v2.6.7: NEW - Used for visual effects and bonus XP
+        /// </summary>
+        public static bool WasLastAttackCascade()
+        {
+            return lastAttackWasCascade;
         }
 
         /// <summary>

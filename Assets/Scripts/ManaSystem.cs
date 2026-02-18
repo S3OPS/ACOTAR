@@ -127,54 +127,81 @@ namespace ACOTAR
 
         /// <summary>
         /// Get mana cost for a magic type
+        /// v2.6.7: Enhanced with equipment-based cost reduction support
         /// </summary>
-        public static int GetManaCost(MagicType magicType)
+        /// <param name="magicType">Type of magic ability</param>
+        /// <param name="character">Optional character for equipment-based cost reduction</param>
+        /// <returns>Mana cost after equipment reductions</returns>
+        public static int GetManaCost(MagicType magicType, Character character = null)
         {
+            int baseCost;
             switch (magicType)
             {
                 // Basic magic - low cost
                 case MagicType.Healing:
-                    return 15;
+                    baseCost = 15; break;
                 case MagicType.ShieldCreation:
-                    return 20;
+                    baseCost = 20; break;
                 case MagicType.LightManipulation:
-                    return 10;
+                    baseCost = 10; break;
 
                 // Elemental magic - medium cost
                 case MagicType.FireManipulation:
-                    return 25;
+                    baseCost = 25; break;
                 case MagicType.WaterManipulation:
-                    return 25;
+                    baseCost = 25; break;
                 case MagicType.WindManipulation:
-                    return 25;
+                    baseCost = 25; break;
                 case MagicType.IceManipulation:
-                    return 25;
+                    baseCost = 25; break;
                 case MagicType.DarknessManipulation:
-                    return 30;
+                    baseCost = 30; break;
 
                 // Advanced magic - high cost
                 case MagicType.Shapeshifting:
-                    return 40;
+                    baseCost = 40; break;
                 case MagicType.Winnowing:
-                    return 35;
+                    baseCost = 35; break;
                 case MagicType.Daemati:
-                    return 50;
+                    baseCost = 50; break;
                 case MagicType.Shadowsinger:
-                    return 45;
+                    baseCost = 45; break;
                 case MagicType.TruthTelling:
-                    return 30;
+                    baseCost = 30; break;
 
                 // Legendary magic - very high cost
                 case MagicType.DeathManifestation:
-                    return 60;
+                    baseCost = 60; break;
                 case MagicType.Seer:
-                    return 40;
+                    baseCost = 40; break;
                 case MagicType.MatingBond:
-                    return 50;
+                    baseCost = 50; break;
 
                 default:
-                    return 20; // Default cost
+                    baseCost = 20; break; // Default cost
             }
+            
+            // v2.6.7: Apply equipment-based cost reduction
+            if (character != null && character.inventory != null)
+            {
+                var (flatReduction, percentReduction) = character.inventory.GetManaCostReduction();
+                
+                // Apply percent reduction first
+                int costAfterPercent = Mathf.RoundToInt(baseCost * (1.0f - percentReduction));
+                
+                // Then apply flat reduction
+                int finalCost = Mathf.Max(1, costAfterPercent - flatReduction); // Minimum cost of 1
+                
+                if (finalCost < baseCost)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Debug, "ManaSystem", 
+                        $"Mana cost reduced: {baseCost} → {finalCost} (Equipment: -{flatReduction} flat, -{percentReduction*100}% percent)");
+                }
+                
+                return finalCost;
+            }
+            
+            return baseCost;
         }
 
         /// <summary>

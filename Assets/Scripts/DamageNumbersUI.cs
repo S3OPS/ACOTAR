@@ -239,15 +239,23 @@ namespace ACOTAR
                 case DamageType.Light:
                     baseColor = new Color(1f, 1f, 0.8f); // Bright yellow
                     break;
+                case DamageType.Nature:
+                    baseColor = new Color(0.4f, 0.9f, 0.4f); // Bright green
+                    break;
+                case DamageType.Death:
+                    baseColor = new Color(0.3f, 0.3f, 0.3f); // Dark gray
+                    break;
                 default:
                     baseColor = Color.white;
                     break;
             }
 
-            // Make critical hits brighter
+            // v2.6.7: Make critical hits brighter and more vibrant
             if (isCritical)
             {
                 baseColor = Color.Lerp(baseColor, Color.white, 0.3f);
+                baseColor.a = 1f;
+            }
             }
 
             return baseColor;
@@ -283,6 +291,47 @@ namespace ACOTAR
             {
                 Vector3 screenPos = Camera.main.WorldToScreenPoint(worldPosition);
                 rectTransform.position = screenPos + new Vector3(0, verticalOffset - 20, 0);
+            }
+
+            StartCoroutine(AnimateDamageNumber(numberObj, numberText));
+        }
+        
+        /// <summary>
+        /// Show combo cascade notification
+        /// v2.6.7: NEW - Visual feedback for combo cascade bonuses
+        /// </summary>
+        /// <param name="comboCount">Total combo hits that triggered cascade</param>
+        /// <param name="worldPosition">Position in world space</param>
+        public void ShowComboCascade(int comboCount, Vector3 worldPosition)
+        {
+            if (damageNumberPrefab == null || damageNumbersContainer == null)
+            {
+                return;
+            }
+
+            GameObject numberObj = Instantiate(damageNumberPrefab, damageNumbersContainer);
+            Text numberText = numberObj.GetComponent<Text>();
+            
+            if (numberText == null)
+            {
+                Destroy(numberObj);
+                return;
+            }
+
+            // Format as cascade
+            numberText.text = $"⚡ CASCADE {comboCount}x! ⚡";
+            numberText.color = new Color(1f, 0.9f, 0.2f); // Bright gold
+            numberText.fontSize += 8; // Make it bigger than normal
+            
+            // Apply bold style if possible
+            numberText.fontStyle = FontStyle.Bold;
+
+            // Position on screen
+            RectTransform rectTransform = numberObj.GetComponent<RectTransform>();
+            if (rectTransform != null)
+            {
+                Vector3 screenPos = Camera.main.WorldToScreenPoint(worldPosition);
+                rectTransform.position = screenPos + new Vector3(0, verticalOffset + 20, 0); // Higher than normal
             }
 
             StartCoroutine(AnimateDamageNumber(numberObj, numberText));
