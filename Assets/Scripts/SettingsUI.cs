@@ -181,39 +181,95 @@ namespace ACOTAR
 
         #region Audio Settings
         
+        /// <summary>
+        /// Handle master volume slider changes
+        /// v2.6.6: Enhanced with error handling to prevent Mathf.Log10(0) issues
+        /// </summary>
         private void OnMasterVolumeChanged(float value)
         {
-            currentSettings.masterVolume = value;
-            if (audioMixer != null)
+            try
             {
-                audioMixer.SetFloat("MasterVolume", Mathf.Log10(value) * 20);
+                currentSettings.masterVolume = value;
+                if (audioMixer != null)
+                {
+                    // Clamp value to prevent Log10(0) which returns -Infinity
+                    float clampedValue = Mathf.Max(value, 0.0001f);
+                    audioMixer.SetFloat("MasterVolume", Mathf.Log10(clampedValue) * 20);
+                }
+            }
+            catch (System.Exception ex)
+            {
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                    "SettingsUI", $"Exception in OnMasterVolumeChanged: {ex.Message}");
             }
         }
 
+        /// <summary>
+        /// Handle music volume slider changes
+        /// v2.6.6: Enhanced with error handling to prevent Mathf.Log10(0) issues
+        /// </summary>
         private void OnMusicVolumeChanged(float value)
         {
-            currentSettings.musicVolume = value;
-            if (audioMixer != null)
+            try
             {
-                audioMixer.SetFloat("MusicVolume", Mathf.Log10(value) * 20);
+                currentSettings.musicVolume = value;
+                if (audioMixer != null)
+                {
+                    // Clamp value to prevent Log10(0) which returns -Infinity
+                    float clampedValue = Mathf.Max(value, 0.0001f);
+                    audioMixer.SetFloat("MusicVolume", Mathf.Log10(clampedValue) * 20);
+                }
+            }
+            catch (System.Exception ex)
+            {
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                    "SettingsUI", $"Exception in OnMusicVolumeChanged: {ex.Message}");
             }
         }
 
+        /// <summary>
+        /// Handle SFX volume slider changes
+        /// v2.6.6: Enhanced with error handling to prevent Mathf.Log10(0) issues
+        /// </summary>
         private void OnSFXVolumeChanged(float value)
         {
-            currentSettings.sfxVolume = value;
-            if (audioMixer != null)
+            try
             {
-                audioMixer.SetFloat("SFXVolume", Mathf.Log10(value) * 20);
+                currentSettings.sfxVolume = value;
+                if (audioMixer != null)
+                {
+                    // Clamp value to prevent Log10(0) which returns -Infinity
+                    float clampedValue = Mathf.Max(value, 0.0001f);
+                    audioMixer.SetFloat("SFXVolume", Mathf.Log10(clampedValue) * 20);
+                }
+            }
+            catch (System.Exception ex)
+            {
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                    "SettingsUI", $"Exception in OnSFXVolumeChanged: {ex.Message}");
             }
         }
 
+        /// <summary>
+        /// Handle ambient volume slider changes
+        /// v2.6.6: Enhanced with error handling to prevent Mathf.Log10(0) issues
+        /// </summary>
         private void OnAmbientVolumeChanged(float value)
         {
-            currentSettings.ambientVolume = value;
-            if (audioMixer != null)
+            try
             {
-                audioMixer.SetFloat("AmbientVolume", Mathf.Log10(value) * 20);
+                currentSettings.ambientVolume = value;
+                if (audioMixer != null)
+                {
+                    // Clamp value to prevent Log10(0) which returns -Infinity
+                    float clampedValue = Mathf.Max(value, 0.0001f);
+                    audioMixer.SetFloat("AmbientVolume", Mathf.Log10(clampedValue) * 20);
+                }
+            }
+            catch (System.Exception ex)
+            {
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                    "SettingsUI", $"Exception in OnAmbientVolumeChanged: {ex.Message}");
             }
         }
 
@@ -477,19 +533,81 @@ namespace ACOTAR
             }
         }
 
+        /// <summary>
+        /// Apply current settings to the game
+        /// v2.6.6: Enhanced with comprehensive error handling and structured logging
+        /// </summary>
+        /// <remarks>
+        /// CRITICAL: Applies graphics and quality settings, then saves them to PlayerPrefs.
+        /// Failures here could result in unsupported resolutions or corrupted settings.
+        /// Includes validation and exception handling for each settings operation.
+        /// </remarks>
         private void ApplySettings()
         {
-            // Apply graphics settings
-            QualitySettings.SetQualityLevel(currentSettings.qualityLevel);
-            Screen.SetResolution(currentSettings.resolutionWidth, currentSettings.resolutionHeight, currentSettings.fullscreen);
-            QualitySettings.vSyncCount = currentSettings.vsync ? 1 : 0;
-            Application.targetFrameRate = currentSettings.fpsLimit;
+            try
+            {
+                // Apply graphics settings with validation
+                try
+                {
+                    // Validate quality level
+                    int maxQualityLevel = QualitySettings.names.Length - 1;
+                    if (currentSettings.qualityLevel < 0 || currentSettings.qualityLevel > maxQualityLevel)
+                    {
+                        LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                            "SettingsUI", $"Invalid quality level {currentSettings.qualityLevel}, clamping to valid range");
+                        currentSettings.qualityLevel = Mathf.Clamp(currentSettings.qualityLevel, 0, maxQualityLevel);
+                    }
+                    
+                    QualitySettings.SetQualityLevel(currentSettings.qualityLevel);
+                }
+                catch (System.Exception qualityEx)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "SettingsUI", $"Exception setting quality level: {qualityEx.Message}");
+                }
 
-            // Save settings
-            SaveSettings(currentSettings);
-            
-            Debug.Log("Settings applied and saved");
-            HidePanel();
+                try
+                {
+                    // Validate resolution before applying
+                    if (currentSettings.resolutionWidth <= 0 || currentSettings.resolutionHeight <= 0)
+                    {
+                        LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                            "SettingsUI", $"Invalid resolution: {currentSettings.resolutionWidth}x{currentSettings.resolutionHeight}, using current");
+                    }
+                    else
+                    {
+                        Screen.SetResolution(currentSettings.resolutionWidth, currentSettings.resolutionHeight, currentSettings.fullscreen);
+                    }
+                }
+                catch (System.Exception resEx)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "SettingsUI", $"Exception setting resolution: {resEx.Message}");
+                }
+
+                try
+                {
+                    QualitySettings.vSyncCount = currentSettings.vsync ? 1 : 0;
+                    Application.targetFrameRate = currentSettings.fpsLimit;
+                }
+                catch (System.Exception fpsEx)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "SettingsUI", $"Exception setting VSync/FPS: {fpsEx.Message}");
+                }
+
+                // Save settings
+                SaveSettings(currentSettings);
+                
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, 
+                    "SettingsUI", "Settings applied and saved");
+                HidePanel();
+            }
+            catch (System.Exception ex)
+            {
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                    "SettingsUI", $"Exception in ApplySettings: {ex.Message}\nStack: {ex.StackTrace}");
+            }
         }
 
         private void CancelSettings()
@@ -504,21 +622,115 @@ namespace ACOTAR
 
         #region Save/Load Settings
 
+        /// <summary>
+        /// Load settings from PlayerPrefs
+        /// v2.6.6: Enhanced with comprehensive error handling and structured logging
+        /// </summary>
+        /// <returns>Loaded settings or defaults if loading fails</returns>
+        /// <remarks>
+        /// CRITICAL: Deserializes settings from JSON stored in PlayerPrefs.
+        /// Failures here would result in loss of user preferences and potential crashes.
+        /// Includes exception handling for JSON deserialization errors.
+        /// </remarks>
         private SettingsData LoadSettings()
         {
-            if (PlayerPrefs.HasKey("GameSettings"))
+            try
             {
-                string json = PlayerPrefs.GetString("GameSettings");
-                return JsonUtility.FromJson<SettingsData>(json);
+                if (PlayerPrefs.HasKey("GameSettings"))
+                {
+                    try
+                    {
+                        string json = PlayerPrefs.GetString("GameSettings");
+                        
+                        if (string.IsNullOrEmpty(json))
+                        {
+                            LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                                "SettingsUI", "Settings JSON was empty, using defaults");
+                            return SettingsData.GetDefaults();
+                        }
+                        
+                        SettingsData settings = JsonUtility.FromJson<SettingsData>(json);
+                        
+                        if (settings == null)
+                        {
+                            LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, 
+                                "SettingsUI", "JSON deserialization returned null, using defaults");
+                            return SettingsData.GetDefaults();
+                        }
+                        
+                        LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, 
+                            "SettingsUI", "Settings loaded successfully from PlayerPrefs");
+                        return settings;
+                    }
+                    catch (System.Exception jsonEx)
+                    {
+                        LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                            "SettingsUI", $"Exception deserializing settings JSON: {jsonEx.Message}");
+                        return SettingsData.GetDefaults();
+                    }
+                }
+                
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, 
+                    "SettingsUI", "No saved settings found, using defaults");
+                return SettingsData.GetDefaults();
             }
-            return SettingsData.GetDefaults();
+            catch (System.Exception ex)
+            {
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                    "SettingsUI", $"Exception in LoadSettings: {ex.Message}\nStack: {ex.StackTrace}");
+                return SettingsData.GetDefaults();
+            }
         }
 
+        /// <summary>
+        /// Save settings to PlayerPrefs
+        /// v2.6.6: Enhanced with comprehensive error handling and structured logging
+        /// </summary>
+        /// <param name="settings">Settings data to save</param>
+        /// <remarks>
+        /// CRITICAL: Serializes settings to JSON and saves to PlayerPrefs.
+        /// Failures here would result in loss of user preferences between sessions.
+        /// Includes exception handling for JSON serialization and PlayerPrefs operations.
+        /// </remarks>
         private void SaveSettings(SettingsData settings)
         {
-            string json = JsonUtility.ToJson(settings);
-            PlayerPrefs.SetString("GameSettings", json);
-            PlayerPrefs.Save();
+            try
+            {
+                if (settings == null)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "SettingsUI", "Cannot save null settings");
+                    return;
+                }
+
+                try
+                {
+                    string json = JsonUtility.ToJson(settings);
+                    
+                    if (string.IsNullOrEmpty(json))
+                    {
+                        LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                            "SettingsUI", "JSON serialization produced empty string");
+                        return;
+                    }
+                    
+                    PlayerPrefs.SetString("GameSettings", json);
+                    PlayerPrefs.Save();
+                    
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, 
+                        "SettingsUI", "Settings saved successfully to PlayerPrefs");
+                }
+                catch (System.Exception saveEx)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "SettingsUI", $"Exception during PlayerPrefs save operation: {saveEx.Message}");
+                }
+            }
+            catch (System.Exception ex)
+            {
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                    "SettingsUI", $"Exception in SaveSettings: {ex.Message}\nStack: {ex.StackTrace}");
+            }
         }
 
         #endregion

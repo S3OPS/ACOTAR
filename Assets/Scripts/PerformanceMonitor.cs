@@ -250,16 +250,76 @@ namespace ACOTAR
             }
         }
 
+        /// <summary>
+        /// Update memory metrics from Unity Profiler
+        /// v2.6.6: Enhanced with comprehensive error handling and structured logging
+        /// </summary>
+        /// <remarks>
+        /// CRITICAL: Calls Unity Profiler APIs to collect memory statistics.
+        /// Profiler operations can fail in certain Unity states (e.g., build mode).
+        /// Includes nested error handling for each profiler call to allow partial metrics collection.
+        /// </remarks>
         private void UpdateMemoryMetrics()
         {
-            // Unity memory stats (in MB)
-            metrics.totalAllocatedMemory = Profiler.GetTotalAllocatedMemoryLong() / (1024f * 1024f);
-            metrics.totalReservedMemory = Profiler.GetTotalReservedMemoryLong() / (1024f * 1024f);
-            metrics.totalUnusedReservedMemory = Profiler.GetTotalUnusedReservedMemoryLong() / (1024f * 1024f);
-            
-            // Mono memory stats (in MB)
-            metrics.monoHeapSize = Profiler.GetMonoHeapSizeLong() / (1024f * 1024f);
-            metrics.monoUsedSize = Profiler.GetMonoUsedSizeLong() / (1024f * 1024f);
+            try
+            {
+                // Unity memory stats (in MB)
+                try
+                {
+                    metrics.totalAllocatedMemory = Profiler.GetTotalAllocatedMemoryLong() / (1024f * 1024f);
+                }
+                catch (System.Exception allocEx)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "PerformanceMonitor", $"Exception getting total allocated memory: {allocEx.Message}");
+                }
+
+                try
+                {
+                    metrics.totalReservedMemory = Profiler.GetTotalReservedMemoryLong() / (1024f * 1024f);
+                }
+                catch (System.Exception reservedEx)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "PerformanceMonitor", $"Exception getting total reserved memory: {reservedEx.Message}");
+                }
+
+                try
+                {
+                    metrics.totalUnusedReservedMemory = Profiler.GetTotalUnusedReservedMemoryLong() / (1024f * 1024f);
+                }
+                catch (System.Exception unusedEx)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "PerformanceMonitor", $"Exception getting unused reserved memory: {unusedEx.Message}");
+                }
+                
+                // Mono memory stats (in MB)
+                try
+                {
+                    metrics.monoHeapSize = Profiler.GetMonoHeapSizeLong() / (1024f * 1024f);
+                }
+                catch (System.Exception heapEx)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "PerformanceMonitor", $"Exception getting mono heap size: {heapEx.Message}");
+                }
+
+                try
+                {
+                    metrics.monoUsedSize = Profiler.GetMonoUsedSizeLong() / (1024f * 1024f);
+                }
+                catch (System.Exception monoEx)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                        "PerformanceMonitor", $"Exception getting mono used size: {monoEx.Message}");
+                }
+            }
+            catch (System.Exception ex)
+            {
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
+                    "PerformanceMonitor", $"Exception in UpdateMemoryMetrics: {ex.Message}\nStack: {ex.StackTrace}");
+            }
         }
 
         private void CheckPerformanceThresholds()
@@ -290,49 +350,127 @@ namespace ACOTAR
 
         /// <summary>
         /// Start timing a code section
+        /// v2.6.6: Enhanced with comprehensive error handling and structured logging
         /// </summary>
+        /// <param name="name">Name of the timer</param>
+        /// <remarks>
+        /// Creates and starts a stopwatch for performance profiling.
+        /// Includes validation for null/empty names and duplicate timer detection.
+        /// </remarks>
         public static void StartTimer(string name)
         {
-            if (!Instance.enableMonitoring)
-                return;
-
-            if (Instance.activeTimers.ContainsKey(name))
+            try
             {
-                LoggingSystem.Warning("Performance", $"Timer '{name}' is already running");
-                return;
-            }
+                if (Instance == null)
+                {
+                    LoggingSystem.Warning("Performance", "PerformanceMonitor instance is null");
+                    return;
+                }
 
-            var stopwatch = new Stopwatch();
-            stopwatch.Start();
-            Instance.activeTimers[name] = stopwatch;
+                if (!Instance.enableMonitoring)
+                    return;
+
+                if (string.IsNullOrEmpty(name))
+                {
+                    LoggingSystem.Warning("Performance", "Cannot start timer with null or empty name");
+                    return;
+                }
+
+                if (Instance.activeTimers == null)
+                {
+                    LoggingSystem.Warning("Performance", "Active timers dictionary was null, initializing");
+                    Instance.activeTimers = new Dictionary<string, Stopwatch>();
+                }
+
+                if (Instance.activeTimers.ContainsKey(name))
+                {
+                    LoggingSystem.Warning("Performance", $"Timer '{name}' is already running");
+                    return;
+                }
+
+                var stopwatch = new Stopwatch();
+                stopwatch.Start();
+                Instance.activeTimers[name] = stopwatch;
+            }
+            catch (System.Exception ex)
+            {
+                LoggingSystem.Error("Performance", $"Exception in StartTimer({name}): {ex.Message}");
+            }
         }
 
         /// <summary>
         /// Stop timing a code section and record the result
+        /// v2.6.6: Enhanced with comprehensive error handling and structured logging
         /// </summary>
+        /// <param name="name">Name of the timer to stop</param>
+        /// <remarks>
+        /// Stops the stopwatch and records execution time to performance profile.
+        /// Includes validation for timer existence and protection against corrupted stopwatch state.
+        /// </remarks>
         public static void StopTimer(string name)
         {
-            if (!Instance.enableMonitoring)
-                return;
-
-            if (!Instance.activeTimers.ContainsKey(name))
+            try
             {
-                LoggingSystem.Warning("Performance", $"Timer '{name}' was not started");
-                return;
+                if (Instance == null)
+                {
+                    LoggingSystem.Warning("Performance", "PerformanceMonitor instance is null");
+                    return;
+                }
+
+                if (!Instance.enableMonitoring)
+                    return;
+
+                if (string.IsNullOrEmpty(name))
+                {
+                    LoggingSystem.Warning("Performance", "Cannot stop timer with null or empty name");
+                    return;
+                }
+
+                if (Instance.activeTimers == null)
+                {
+                    LoggingSystem.Warning("Performance", "Active timers dictionary is null");
+                    return;
+                }
+
+                if (!Instance.activeTimers.ContainsKey(name))
+                {
+                    LoggingSystem.Warning("Performance", $"Timer '{name}' was not started");
+                    return;
+                }
+
+                var stopwatch = Instance.activeTimers[name];
+                
+                if (stopwatch == null)
+                {
+                    LoggingSystem.Error("Performance", $"Stopwatch for timer '{name}' is null");
+                    Instance.activeTimers.Remove(name);
+                    return;
+                }
+
+                try
+                {
+                    stopwatch.Stop();
+                    Instance.activeTimers.Remove(name);
+
+                    // Record the profile
+                    long elapsedMs = stopwatch.ElapsedMilliseconds;
+                    Instance.RecordProfile(name, elapsedMs);
+
+                    // Log if it took too long
+                    if (elapsedMs > 10)
+                    {
+                        LoggingSystem.Debug("Performance", $"Timer '{name}' took {elapsedMs}ms");
+                    }
+                }
+                catch (System.Exception stopEx)
+                {
+                    LoggingSystem.Error("Performance", $"Exception stopping timer '{name}': {stopEx.Message}");
+                    Instance.activeTimers.Remove(name);
+                }
             }
-
-            var stopwatch = Instance.activeTimers[name];
-            stopwatch.Stop();
-            Instance.activeTimers.Remove(name);
-
-            // Record the profile
-            long elapsedMs = stopwatch.ElapsedMilliseconds;
-            Instance.RecordProfile(name, elapsedMs);
-
-            // Log if it took too long
-            if (elapsedMs > 10)
+            catch (System.Exception ex)
             {
-                LoggingSystem.Debug("Performance", $"Timer '{name}' took {elapsedMs}ms");
+                LoggingSystem.Error("Performance", $"Exception in StopTimer({name}): {ex.Message}\nStack: {ex.StackTrace}");
             }
         }
 
@@ -385,24 +523,63 @@ namespace ACOTAR
 
         /// <summary>
         /// Get all performance profiles
+        /// v2.6.6: Enhanced with comprehensive error handling and structured logging
         /// </summary>
+        /// <returns>Formatted string with all performance profiles</returns>
+        /// <remarks>
+        /// Iterates through all recorded performance profiles to generate a report.
+        /// Includes protection against concurrent modification and null values.
+        /// </remarks>
         public static string GetAllProfiles()
         {
-            if (Instance.profiles.Count == 0)
-                return "No performance profiles recorded";
-
-            StringBuilder sb = new StringBuilder();
-            sb.AppendLine("=== Performance Profiles ===");
-            
-            foreach (var profile in Instance.profiles.Values)
+            try
             {
-                sb.AppendLine($"\n{profile.name}:");
-                sb.AppendLine($"  Executions: {profile.totalExecutions}");
-                sb.AppendLine($"  Average: {profile.averageTimeMs:F2}ms");
-                sb.AppendLine($"  Min: {profile.minTimeMs}ms | Max: {profile.maxTimeMs}ms");
+                if (Instance == null)
+                {
+                    return "PerformanceMonitor instance is null";
+                }
+
+                if (Instance.profiles == null || Instance.profiles.Count == 0)
+                    return "No performance profiles recorded";
+
+                StringBuilder sb = new StringBuilder();
+                sb.AppendLine("=== Performance Profiles ===");
+                
+                try
+                {
+                    foreach (var profile in Instance.profiles.Values)
+                    {
+                        try
+                        {
+                            if (profile == null)
+                            {
+                                LoggingSystem.Warning("Performance", "Encountered null profile in profiles dictionary");
+                                continue;
+                            }
+
+                            sb.AppendLine($"\n{profile.name}:");
+                            sb.AppendLine($"  Executions: {profile.totalExecutions}");
+                            sb.AppendLine($"  Average: {profile.averageTimeMs:F2}ms");
+                            sb.AppendLine($"  Min: {profile.minTimeMs}ms | Max: {profile.maxTimeMs}ms");
+                        }
+                        catch (System.Exception profileEx)
+                        {
+                            LoggingSystem.Error("Performance", $"Exception processing profile: {profileEx.Message}");
+                        }
+                    }
+                }
+                catch (System.Exception iterEx)
+                {
+                    LoggingSystem.Error("Performance", $"Exception iterating profiles: {iterEx.Message}");
+                }
+                
+                return sb.ToString();
             }
-            
-            return sb.ToString();
+            catch (System.Exception ex)
+            {
+                LoggingSystem.Error("Performance", $"Exception in GetAllProfiles: {ex.Message}\nStack: {ex.StackTrace}");
+                return "Error generating performance profiles";
+            }
         }
 
         /// <summary>
@@ -416,19 +593,57 @@ namespace ACOTAR
 
         /// <summary>
         /// Export performance report
+        /// v2.6.6: Enhanced with comprehensive error handling and structured logging
         /// </summary>
+        /// <returns>Comprehensive performance report</returns>
+        /// <remarks>
+        /// Generates a complete performance report including metrics and profiles.
+        /// Includes error handling for report generation failures.
+        /// </remarks>
         public static string ExportReport()
         {
-            StringBuilder sb = new StringBuilder();
-            sb.AppendLine("=== ACOTAR RPG Performance Report ===");
-            sb.AppendLine($"Generated: {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
-            sb.AppendLine();
-            sb.AppendLine("=== Performance Metrics ===");
-            sb.AppendLine(Instance.metrics.ToString());
-            sb.AppendLine();
-            sb.AppendLine(GetAllProfiles());
-            
-            return sb.ToString();
+            try
+            {
+                if (Instance == null)
+                {
+                    return "PerformanceMonitor instance is null";
+                }
+
+                StringBuilder sb = new StringBuilder();
+                sb.AppendLine("=== ACOTAR RPG Performance Report ===");
+                sb.AppendLine($"Generated: {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
+                sb.AppendLine();
+                
+                try
+                {
+                    sb.AppendLine("=== Performance Metrics ===");
+                    sb.AppendLine(Instance.metrics.ToString());
+                    sb.AppendLine();
+                }
+                catch (System.Exception metricsEx)
+                {
+                    LoggingSystem.Error("Performance", $"Exception exporting metrics: {metricsEx.Message}");
+                    sb.AppendLine("Error: Could not export performance metrics");
+                    sb.AppendLine();
+                }
+
+                try
+                {
+                    sb.AppendLine(GetAllProfiles());
+                }
+                catch (System.Exception profilesEx)
+                {
+                    LoggingSystem.Error("Performance", $"Exception exporting profiles: {profilesEx.Message}");
+                    sb.AppendLine("Error: Could not export performance profiles");
+                }
+                
+                return sb.ToString();
+            }
+            catch (System.Exception ex)
+            {
+                LoggingSystem.Error("Performance", $"Exception in ExportReport: {ex.Message}\nStack: {ex.StackTrace}");
+                return "Error generating performance report";
+            }
         }
         #endregion
 
