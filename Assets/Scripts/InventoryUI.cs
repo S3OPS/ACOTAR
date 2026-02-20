@@ -28,6 +28,17 @@ namespace ACOTAR
         public Button dropItemButton;
         public Button equipItemButton;
 
+        [Header("Equipment Comparison")]
+        public GameObject comparisonPanel;
+        public Text comparisonHeaderText;
+        public Text comparisonStatsText;
+
+        [Header("Confirmation Dialog")]
+        public GameObject confirmationPanel;
+        public Text confirmationMessageText;
+        public Button confirmYesButton;
+        public Button confirmNoButton;
+
         [Header("Sorting")]
         public Dropdown sortDropdown;
         public Button sortButton;
@@ -35,6 +46,7 @@ namespace ACOTAR
         private InventorySystem inventorySystem;
         private List<GameObject> itemSlots = new List<GameObject>();
         private InventoryItem selectedItem;
+        private System.Action pendingConfirmAction;
 
         void Start()
         {
@@ -58,6 +70,17 @@ namespace ACOTAR
             if (itemDetailsPanel != null)
             {
                 itemDetailsPanel.SetActive(false);
+            }
+
+            // v2.6.8: Hide comparison and confirmation panels initially
+            if (comparisonPanel != null)
+            {
+                comparisonPanel.SetActive(false);
+            }
+
+            if (confirmationPanel != null)
+            {
+                confirmationPanel.SetActive(false);
             }
         }
 
@@ -84,6 +107,17 @@ namespace ACOTAR
             if (sortButton != null)
             {
                 sortButton.onClick.AddListener(OnSortClicked);
+            }
+
+            // v2.6.8: Confirmation dialog buttons
+            if (confirmYesButton != null)
+            {
+                confirmYesButton.onClick.AddListener(OnConfirmYes);
+            }
+
+            if (confirmNoButton != null)
+            {
+                confirmNoButton.onClick.AddListener(OnConfirmNo);
             }
         }
 
@@ -229,7 +263,91 @@ namespace ACOTAR
             // Show/hide buttons based on item type
             UpdateItemButtons(item);
 
+            // v2.6.8: Show equipment comparison for weapons and armor
+            if (item.itemType == ItemType.Weapon || item.itemType == ItemType.Armor)
+            {
+                ShowEquipmentComparison(item);
+            }
+            else if (comparisonPanel != null)
+            {
+                comparisonPanel.SetActive(false);
+            }
+
             Debug.Log($"Showing details for: {item.name}");
+        }
+
+        /// <summary>
+        /// Display a stat comparison between the selected item and the currently equipped item
+        /// v2.6.8: NEW - Equipment comparison tooltips
+        /// </summary>
+        private void ShowEquipmentComparison(InventoryItem item)
+        {
+            if (comparisonPanel == null || comparisonStatsText == null || inventorySystem == null)
+                return;
+
+            Item currentlyEquipped = null;
+
+            if (item.itemType == ItemType.Weapon)
+            {
+                currentlyEquipped = inventorySystem.GetEquippedWeaponItem();
+            }
+            else if (item.itemType == ItemType.Armor)
+            {
+                currentlyEquipped = inventorySystem.GetEquippedArmorItem();
+            }
+
+            if (currentlyEquipped == null || currentlyEquipped.itemId == item.itemId)
+            {
+                // Nothing equipped in that slot (or same item selected)
+                comparisonPanel.SetActive(false);
+                return;
+            }
+
+            // Build comparison string with delta indicators
+            int powerDiff = item.power - (currentlyEquipped.strengthBonus + currentlyEquipped.magicPowerBonus);
+            int valueDiff = item.value - CalculateItemValue(currentlyEquipped);
+
+            string compText = $"vs. {currentlyEquipped.name}\n";
+            compText += $"Power: {FormatDiff(powerDiff)}\n";
+            compText += $"Value: {FormatDiff(valueDiff)}";
+
+            if (comparisonHeaderText != null)
+            {
+                comparisonHeaderText.text = "Comparison";
+            }
+
+            comparisonStatsText.text = compText;
+            comparisonPanel.SetActive(true);
+        }
+
+        /// <summary>
+        /// Format a stat difference with +/- prefix and color indicator
+        /// v2.6.8: NEW
+        /// </summary>
+        private string FormatDiff(int diff)
+        {
+            if (diff > 0) return $"<color=green>+{diff}</color>";
+            if (diff < 0) return $"<color=red>{diff}</color>";
+            return "=";
+        }
+
+        /// <summary>
+        /// Calculate value of an Item (matches InventoryItem.CalculateValue logic)
+        /// v2.6.8: NEW
+        /// </summary>
+        private int CalculateItemValue(Item item)
+        {
+            int baseValue = 10;
+            switch (item.rarity)
+            {
+                case ItemRarity.Common:   return baseValue;
+                case ItemRarity.Uncommon: return baseValue * 3;
+                case ItemRarity.Rare:     return baseValue * 10;
+                case ItemRarity.Epic:     return baseValue * 25;
+                case ItemRarity.Legendary: return baseValue * 50;
+                case ItemRarity.Artifact: return baseValue * 100;
+                default: return baseValue;
+            }
         }
 
         /// <summary>
@@ -292,9 +410,25 @@ namespace ACOTAR
         }
 
         /// <summary>
-        /// Drop selected item
+        /// Drop selected item - shows confirmation dialog first
+        /// v2.6.8: Enhanced with confirmation dialog
         /// </summary>
         private void OnDropItemClicked()
+        {
+            if (selectedItem == null || inventorySystem == null)
+                return;
+
+            if (selectedItem.itemType != ItemType.QuestItem)
+            {
+                ShowConfirmation($"Drop {selectedItem.name}? This cannot be undone.", ExecuteDrop);
+            }
+        }
+
+        /// <summary>
+        /// Execute the drop action after confirmation
+        /// v2.6.8: NEW
+        /// </summary>
+        private void ExecuteDrop()
         {
             if (selectedItem == null || inventorySystem == null)
                 return;
@@ -322,6 +456,61 @@ namespace ACOTAR
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Show a confirmation dialog with message and callback for yes/no
+        /// v2.6.8: NEW - Confirmation dialogs for critical inventory actions
+        /// </summary>
+        private void ShowConfirmation(string message, System.Action onConfirm)
+        {
+            if (confirmationPanel == null)
+            {
+                // No confirmation panel configured - execute directly
+                onConfirm?.Invoke();
+                return;
+            }
+
+            pendingConfirmAction = onConfirm;
+
+            if (confirmationMessageText != null)
+            {
+                confirmationMessageText.text = message;
+            }
+
+            confirmationPanel.SetActive(true);
+            Debug.Log($"InventoryUI: Showing confirmation dialog - {message}");
+        }
+
+        /// <summary>
+        /// Handle confirmation dialog Yes button
+        /// v2.6.8: NEW
+        /// </summary>
+        private void OnConfirmYes()
+        {
+            if (confirmationPanel != null)
+            {
+                confirmationPanel.SetActive(false);
+            }
+
+            System.Action action = pendingConfirmAction;
+            pendingConfirmAction = null;
+            action?.Invoke();
+        }
+
+        /// <summary>
+        /// Handle confirmation dialog No button
+        /// v2.6.8: NEW
+        /// </summary>
+        private void OnConfirmNo()
+        {
+            if (confirmationPanel != null)
+            {
+                confirmationPanel.SetActive(false);
+            }
+
+            pendingConfirmAction = null;
+            Debug.Log("InventoryUI: Drop cancelled");
         }
 
         /// <summary>
@@ -475,6 +664,13 @@ namespace ACOTAR
             {
                 itemDetailsPanel.SetActive(false);
             }
+
+            // v2.6.8: Also hide comparison panel
+            if (comparisonPanel != null)
+            {
+                comparisonPanel.SetActive(false);
+            }
+
             selectedItem = null;
         }
     }

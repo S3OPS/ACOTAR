@@ -1154,6 +1154,24 @@ namespace ACOTAR
         }
         
         /// <summary>
+        /// Get the equipped weapon Item object for stat comparison
+        /// v2.6.8: NEW - Returns the full Item object for equipment comparison tooltips
+        /// </summary>
+        public Item GetEquippedWeaponItem()
+        {
+            return equippedWeapon;
+        }
+
+        /// <summary>
+        /// Get the equipped armor Item object for stat comparison
+        /// v2.6.8: NEW - Returns the full Item object for equipment comparison tooltips
+        /// </summary>
+        public Item GetEquippedArmorItem()
+        {
+            return equippedArmor;
+        }
+        
+        /// <summary>
         /// Get all equipped items
         /// v2.6.7: NEW - Returns list of all equipped items for set bonus calculation
         /// </summary>

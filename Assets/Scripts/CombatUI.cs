@@ -48,9 +48,21 @@ namespace ACOTAR
         public GameObject defeatPanel;
         public Text victoryRewardsText;
 
+        [Header("Quest Preparation Hint")]
+        public GameObject questHintPanel;
+        public Text questHintText;
+        public Button dismissHintButton;
+
+        [Header("Confirmation Dialog")]
+        public GameObject confirmationPanel;
+        public Text confirmationMessageText;
+        public Button confirmYesButton;
+        public Button confirmNoButton;
+
         private CombatEncounter currentEncounter;
         private List<GameObject> enemyPanels = new List<GameObject>();
         private Character playerCharacter;
+        private System.Action pendingConfirmAction;
 
         void Start()
         {
@@ -81,6 +93,32 @@ namespace ACOTAR
             if (defeatPanel != null)
             {
                 defeatPanel.SetActive(false);
+            }
+
+            if (questHintPanel != null)
+            {
+                questHintPanel.SetActive(false);
+            }
+
+            if (confirmationPanel != null)
+            {
+                confirmationPanel.SetActive(false);
+            }
+
+            // Setup confirmation dialog buttons
+            if (dismissHintButton != null)
+            {
+                dismissHintButton.onClick.AddListener(DismissQuestHint);
+            }
+
+            if (confirmYesButton != null)
+            {
+                confirmYesButton.onClick.AddListener(OnConfirmYes);
+            }
+
+            if (confirmNoButton != null)
+            {
+                confirmNoButton.onClick.AddListener(OnConfirmNo);
             }
 
             Debug.Log("CombatUI initialized");
@@ -140,10 +178,60 @@ namespace ACOTAR
             // Setup enemy displays
             CreateEnemyPanels(encounter.GetEnemies());
 
+            // v2.6.8: Show quest preparation hint if available
+            ShowActiveQuestPreparationHint();
+
             // Initial log entry
             AddCombatLogEntry("Combat Started!");
             
             Debug.Log("Combat UI started");
+        }
+
+        /// <summary>
+        /// Show preparation hint for the currently active quest with a hint defined
+        /// v2.6.8: NEW - Displays combat tips from the quest's preparationHint field
+        /// </summary>
+        private void ShowActiveQuestPreparationHint()
+        {
+            if (questHintPanel == null || questHintText == null)
+                return;
+
+            // Find the first active quest that has a preparation hint
+            if (GameManager.Instance == null)
+                return;
+
+            QuestManager questManager = GameManager.Instance.GetComponent<QuestManager>();
+            if (questManager == null)
+                return;
+
+            string hint = null;
+            foreach (Quest quest in questManager.GetActiveQuests())
+            {
+                if (!string.IsNullOrEmpty(quest.preparationHint))
+                {
+                    hint = quest.preparationHint;
+                    break;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(hint))
+            {
+                questHintText.text = hint;
+                questHintPanel.SetActive(true);
+                Debug.Log("CombatUI: Showing quest preparation hint");
+            }
+        }
+
+        /// <summary>
+        /// Dismiss the quest preparation hint panel
+        /// v2.6.8: NEW
+        /// </summary>
+        public void DismissQuestHint()
+        {
+            if (questHintPanel != null)
+            {
+                questHintPanel.SetActive(false);
+            }
         }
 
         /// <summary>
@@ -449,9 +537,20 @@ namespace ACOTAR
         }
 
         /// <summary>
-        /// Handle flee button click
+        /// Handle flee button click - shows confirmation dialog first
+        /// v2.6.8: Enhanced with confirmation dialog
         /// </summary>
         private void OnFleeClicked()
+        {
+            ShowConfirmation("Flee from combat? You may lose progress!", ExecuteFlee);
+            Debug.Log("Flee action selected - awaiting confirmation");
+        }
+
+        /// <summary>
+        /// Execute the flee action after confirmation
+        /// v2.6.8: NEW
+        /// </summary>
+        private void ExecuteFlee()
         {
             if (currentEncounter != null)
             {
@@ -469,7 +568,65 @@ namespace ACOTAR
                 }
             }
 
-            Debug.Log("Flee action selected");
+            Debug.Log("Flee executed");
+        }
+
+        /// <summary>
+        /// Show a confirmation dialog with a message and callback for yes/no
+        /// v2.6.8: NEW - Confirmation dialog for critical combat actions
+        /// </summary>
+        /// <param name="message">Message to display in the dialog</param>
+        /// <param name="onConfirm">Action to execute if player confirms</param>
+        public void ShowConfirmation(string message, System.Action onConfirm)
+        {
+            if (confirmationPanel == null)
+            {
+                // No confirmation panel configured - execute directly
+                onConfirm?.Invoke();
+                return;
+            }
+
+            pendingConfirmAction = onConfirm;
+
+            if (confirmationMessageText != null)
+            {
+                confirmationMessageText.text = message;
+            }
+
+            confirmationPanel.SetActive(true);
+            Debug.Log($"CombatUI: Showing confirmation dialog - {message}");
+        }
+
+        /// <summary>
+        /// Handle confirmation dialog Yes button
+        /// v2.6.8: NEW
+        /// </summary>
+        private void OnConfirmYes()
+        {
+            if (confirmationPanel != null)
+            {
+                confirmationPanel.SetActive(false);
+            }
+
+            System.Action action = pendingConfirmAction;
+            pendingConfirmAction = null;
+            action?.Invoke();
+        }
+
+        /// <summary>
+        /// Handle confirmation dialog No button
+        /// v2.6.8: NEW
+        /// </summary>
+        private void OnConfirmNo()
+        {
+            if (confirmationPanel != null)
+            {
+                confirmationPanel.SetActive(false);
+            }
+
+            pendingConfirmAction = null;
+            AddCombatLogEntry("Action cancelled.");
+            Debug.Log("CombatUI: Confirmation cancelled");
         }
 
         /// <summary>
