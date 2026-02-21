@@ -271,6 +271,8 @@ namespace ACOTAR
             firstBattle.objectives.Add("Survive the first engagement");
             firstBattle.experienceReward = 600;
             firstBattle.nextQuestId = "book3_016";
+            // v2.6.9: Preparation hint for large-scale battle
+            firstBattle.preparationHint = "⚔️ LARGE-SCALE BATTLE\nEnemy: Hybern Army\nLevel: 14-15 | Type: Mixed Forces\nTips: Coordinate with all court allies. Do not fight alone - use team abilities. The Night Court's Illyrian warriors are your strongest asset. Prioritize staying alive over offense.";
             quests[firstBattle.questId] = firstBattle;
 
             // Cauldron Strike
@@ -285,6 +287,8 @@ namespace ACOTAR
             cauldronStrike.objectives.Add("Use Nesta's power to nullify it");
             cauldronStrike.experienceReward = 700;
             cauldronStrike.nextQuestId = "book3_017";
+            // v2.6.9: Preparation hint for stealth strike mission
+            cauldronStrike.preparationHint = "🕵️ STRIKE MISSION\nObjective: Nullify the Cauldron\nDanger: Hybern elite guards, the Cauldron's power\nTips: Nesta's power is essential - keep her protected. Move fast through the camp. Azriel's shadows will provide cover. Abort if the King appears directly.";
             quests[cauldronStrike.questId] = cauldronStrike;
 
             // Amren's Sacrifice
@@ -313,6 +317,8 @@ namespace ACOTAR
             finalBattle.objectives.Add("Fight for the future of your world");
             finalBattle.experienceReward = 800;
             finalBattle.nextQuestId = "book3_019";
+            // v2.6.9: Preparation hint for the climactic final battle
+            finalBattle.preparationHint = "⚔️ FINAL BOSS ENCOUNTER\nEnemy: King of Hybern + Army\nLevel: 17-18 | Type: All Types\nTips: This is it - the final battle. Use every ability, every synergy, every companion. The unified courts fight alongside you. Watch for the King's Cauldron-enhanced attacks. Victory requires sacrifice.";
             quests[finalBattle.questId] = finalBattle;
 
             // Rhysand's Death
@@ -341,6 +347,8 @@ namespace ACOTAR
             killKing.objectives.Add("Watch Nesta take his head");
             killKing.experienceReward = 1000;
             killKing.nextQuestId = "book3_021";
+            // v2.6.9: Preparation hint for King of Hybern boss fight
+            killKing.preparationHint = "⚔️ BOSS FIGHT: KING OF HYBERN\nEnemy: King of Hybern (Cauldron-Empowered)\nLevel: 18 | Type: Dark Magic + Physical\nTips: The King draws power from the Cauldron - Nesta can weaken him. He uses area attacks; spread your party. Nesta and Elain together can deliver the killing blow. Stay focused through the chaos of battle around you.";
             quests[killKing.questId] = killKing;
 
             // Victory

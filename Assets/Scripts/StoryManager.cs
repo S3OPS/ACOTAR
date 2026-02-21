@@ -313,6 +313,56 @@ namespace ACOTAR
                     Debug.Log("You have finished the complete ACOTAR trilogy!");
                     break;
             }
+
+            // v2.6.9: Notify QuestManager of milestone objective completion for this arc
+            NotifyArcQuestProgress(arc);
+
+        /// <summary>
+        /// Notify QuestManager of milestone objective completion when a story arc finishes.
+        /// v2.6.9: Wires UpdateQuestObjectiveProgress into StoryManager for automatic tracking.
+        /// </summary>
+        /// <param name="arc">The story arc that just completed</param>
+        private void NotifyArcQuestProgress(StoryArc arc)
+        {
+            if (GameManager.Instance == null) return;
+
+            QuestManager questManager = GameManager.Instance.GetComponent<QuestManager>();
+            if (questManager == null) return;
+
+            // Map each arc to its milestone quest and the objective index that marks arc completion
+            switch (arc)
+            {
+                case StoryArc.Book1_HumanLands:
+                    questManager.UpdateQuestObjectiveProgress("main_001", 1);
+                    break;
+                case StoryArc.Book1_SpringCourt:
+                    questManager.UpdateQuestObjectiveProgress("main_004", 1);
+                    break;
+                case StoryArc.Book1_UnderTheMountain:
+                    questManager.UpdateQuestObjectiveProgress("main_011", 2);
+                    break;
+                case StoryArc.Book1_Aftermath:
+                    questManager.UpdateQuestObjectiveProgress("main_014", 2);
+                    break;
+                case StoryArc.Book2_NightCourt:
+                    questManager.UpdateQuestObjectiveProgress("book2_010", 2);
+                    break;
+                case StoryArc.Book2_WarPreparations:
+                    questManager.UpdateQuestObjectiveProgress("book2_015", 2);
+                    break;
+                case StoryArc.Book2_Hybern:
+                    questManager.UpdateQuestObjectiveProgress("book2_022", 3);
+                    break;
+                case StoryArc.Book3_Alliance:
+                    questManager.UpdateQuestObjectiveProgress("book3_009", 2);
+                    break;
+                case StoryArc.Book3_War:
+                    questManager.UpdateQuestObjectiveProgress("book3_014", 2);
+                    break;
+                case StoryArc.Book3_Resolution:
+                    questManager.UpdateQuestObjectiveProgress("book3_021", 3);
+                    break;
+            }
         }
 
         /// <summary>

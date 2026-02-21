@@ -284,6 +284,8 @@ namespace ACOTAR
                     
                     // v2.6.8: Notify player of new quest
                     NotificationSystem.ShowQuest("New Quest", quest.title);
+                    // v2.6.9: Sound feedback for quest start
+                    AudioManager.Instance?.PlayUISFXByName("quest_start");
                 }
             }
             else
@@ -379,6 +381,8 @@ namespace ACOTAR
 
                     // v2.6.8: Notify player of quest completion
                     NotificationSystem.ShowSuccess($"Quest Complete: {quest.title}! +{quest.experienceReward} XP", 4f);
+                    // v2.6.9: Sound feedback for quest completion
+                    AudioManager.Instance?.PlayUISFXByName("quest_complete");
 
                     // Start next quest if available (and not DLC locked)
                     if (!string.IsNullOrEmpty(quest.nextQuestId))
@@ -644,6 +648,8 @@ namespace ACOTAR
                 NotificationSystem.ShowQuest(
                     $"Quest Progress: {quest.title}",
                     $"✓ {objectiveText} ({currentObjectiveNumber}/{totalCount})");
+                // v2.6.9: Sound feedback for objective progress
+                AudioManager.Instance?.PlayUISFXByName("quest_progress");
             }
             catch (System.Exception ex)
             {

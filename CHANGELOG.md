@@ -7,7 +7,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [2.6.8] - 2026-02-20
+## [2.6.9] - 2026-02-21
+
+### 🎮 Polish & Integration Update - Hints, Arc Tracking, Sound & Cascade VFX
+
+This release delivers the "What's Next" items from v2.6.8: expanded preparation hints, automatic story-arc quest tracking, sound effect hooks for UI events, and cascade combo visual feedback.
+
+#### **Expanded Quest Preparation Hints** 📜
+- Added preparation hints to 8 additional quests across Books 1–3:
+  - `side_013_book1` (Wall Between Worlds) — exploration danger warning
+  - `side_015_book1` (Survival Under Stone) — stealth/political survival tips
+  - `book2_018` (Into the Enemy's Lair) — Hybern infiltration briefing
+  - `book2_019` (The Cauldron) — ancient power encounter warning
+  - `book3_015` (The First Clash) — large-scale battle preparation
+  - `book3_016` (Into the Heart) — Cauldron strike mission briefing
+  - `book3_018` (The Final Battle) — final boss encounter tips
+  - `book3_020` (The King Falls) — King of Hybern boss fight tactics
+
+#### **Automatic Quest Tracking via StoryManager** 🗺️
+- Added `NotifyArcQuestProgress(StoryArc)` to `StoryManager` — maps each of the 10 story arcs to a milestone quest/objective and calls `QuestManager.UpdateQuestObjectiveProgress()` automatically
+- `UnlockContentForArc()` now calls `NotifyArcQuestProgress()` at completion, firing progress notifications and sound without any manual wiring
+
+#### **Sound Effects for UI Events** 🔊
+- `CombatUI` confirmation dialog: plays `"confirm_open"` on show, `"confirm_yes"` on confirm, `"confirm_no"` on cancel
+- `InventoryUI` confirmation dialog: same three sound hooks
+- `QuestManager.StartQuest()`: plays `"quest_start"` when a new quest begins
+- `QuestManager.CompleteQuest()`: plays `"quest_complete"` on quest completion
+- `QuestManager.UpdateQuestObjectiveProgress()`: plays `"quest_progress"` on objective tracking
+- All calls use `AudioManager.Instance?.PlayUISFXByName()` — null-safe, no audio required
+
+#### **Cascade Combo Visual + Audio Feedback** ⚡
+- `CombatUI.OnEnemyTargeted()` now checks `CombatSystem.WasLastAttackCascade()` after each physical attack
+- On cascade: fires `ScreenEffectsManager.Instance?.AlertPulse()` for screen visual and `AudioManager.Instance?.PlayUISFXByName("combo_cascade")` for audio
+
+---
+
 
 ### 🎮 UI/UX Enhancements - Quest Hints, Comparisons & Confirmations
 
