@@ -300,6 +300,8 @@ namespace ACOTAR
             hybernJourney.objectives.Add("Locate the Cauldron");
             hybernJourney.experienceReward = 500;
             hybernJourney.nextQuestId = "book2_019";
+            // v2.6.9: Preparation hint for stealth infiltration
+            hybernJourney.preparationHint = "🕵️ INFILTRATION MISSION\nLocation: Hybern (Enemy Territory)\nDanger: King's guards, Cauldron wards\nTips: Go in as a small team. Use stealth first, force only as a last resort. Trust Rhysand's plan - your group's powers must stay concealed until the critical moment.";
             quests[hybernJourney.questId] = hybernJourney;
 
             // The Cauldron
@@ -314,6 +316,8 @@ namespace ACOTAR
             cauldron.objectives.Add("Feel the Cauldron's recognition");
             cauldron.experienceReward = 600;
             cauldron.nextQuestId = "book2_020";
+            // v2.6.9: Preparation hint for the Cauldron confrontation
+            cauldron.preparationHint = "⚗️ ANCIENT POWER ENCOUNTER\nLocation: Hybern Throne Room - The Cauldron\nDanger: Overwhelming magical force, King of Hybern\nTips: You cannot fight the Cauldron directly. Protect Nesta and Elain at all costs. The Cauldron sees everything - keep your mind shielded. Escape is the priority.";
             quests[cauldron.questId] = cauldron;
 
             // Sisters Made

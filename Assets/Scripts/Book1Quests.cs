@@ -333,6 +333,8 @@ namespace ACOTAR
             wallSecrets.objectives.Add("Learn about its creation");
             wallSecrets.objectives.Add("Discover hidden passages");
             wallSecrets.experienceReward = 200;
+            // v2.6.9: Preparation hint for dangerous exploration
+            wallSecrets.preparationHint = "🔍 EXPLORATION DANGER\nLocation: The Wall (Border Zone)\nHazards: Fae patrols, magical wards\nTips: Move quietly. Do not use magic near the Wall - it may alert guards. Study from a distance first.";
             quests[wallSecrets.questId] = wallSecrets;
 
             // The Hunter's Legacy
@@ -359,6 +361,8 @@ namespace ACOTAR
             utmSurvival.objectives.Add("Avoid Amarantha's attention when possible");
             utmSurvival.objectives.Add("Find sources of food and rest");
             utmSurvival.experienceReward = 250;
+            // v2.6.9: Preparation hint for stealth/political survival
+            utmSurvival.preparationHint = "⚠️ HIGH RISK ENVIRONMENT\nLocation: Under the Mountain\nDanger: Amarantha's spies everywhere\nTips: Trust no one at first. Rhysand may seem like a threat but watch carefully. Keep a low profile - drawing attention is deadly.";
             quests[utmSurvival.questId] = utmSurvival;
         }
 

@@ -1,6 +1,6 @@
 # ACOTAR Fantasy RPG
 
-**Version 2.6.5** | **Code Quality & Robustness Update (Wave 5)** ✨
+**Version 2.6.9** | **Polish & Integration Update** ✨
 
 A lore-accurate Fantasy RPG based on Sarah J. Maas's *A Court of Thorns and Roses* series, built with Unity and Docker.
 

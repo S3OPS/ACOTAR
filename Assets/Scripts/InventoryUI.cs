@@ -479,6 +479,7 @@ namespace ACOTAR
             }
 
             confirmationPanel.SetActive(true);
+            AudioManager.Instance?.PlayUISFXByName("confirm_open");
             Debug.Log($"InventoryUI: Showing confirmation dialog - {message}");
         }
 
@@ -493,6 +494,7 @@ namespace ACOTAR
                 confirmationPanel.SetActive(false);
             }
 
+            AudioManager.Instance?.PlayUISFXByName("confirm_yes");
             System.Action action = pendingConfirmAction;
             pendingConfirmAction = null;
             action?.Invoke();
@@ -509,6 +511,7 @@ namespace ACOTAR
                 confirmationPanel.SetActive(false);
             }
 
+            AudioManager.Instance?.PlayUISFXByName("confirm_no");
             pendingConfirmAction = null;
             Debug.Log("InventoryUI: Drop cancelled");
         }

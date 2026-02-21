@@ -422,7 +422,14 @@ namespace ACOTAR
             {
                 currentEncounter.PlayerPhysicalAttack(enemy);
                 AddCombatLogEntry($"You attack {enemy.characterName}!");
-                
+
+                // v2.6.9: Visual feedback for cascade combo
+                if (CombatSystem.WasLastAttackCascade())
+                {
+                    ScreenEffectsManager.Instance?.AlertPulse();
+                    AudioManager.Instance?.PlayUISFXByName("combo_cascade");
+                }
+
                 UpdatePlayerDisplay();
                 UpdateEnemyDisplays();
 
@@ -594,6 +601,7 @@ namespace ACOTAR
             }
 
             confirmationPanel.SetActive(true);
+            AudioManager.Instance?.PlayUISFXByName("confirm_open");
             Debug.Log($"CombatUI: Showing confirmation dialog - {message}");
         }
 
@@ -608,6 +616,7 @@ namespace ACOTAR
                 confirmationPanel.SetActive(false);
             }
 
+            AudioManager.Instance?.PlayUISFXByName("confirm_yes");
             System.Action action = pendingConfirmAction;
             pendingConfirmAction = null;
             action?.Invoke();
@@ -624,6 +633,7 @@ namespace ACOTAR
                 confirmationPanel.SetActive(false);
             }
 
+            AudioManager.Instance?.PlayUISFXByName("confirm_no");
             pendingConfirmAction = null;
             AddCombatLogEntry("Action cancelled.");
             Debug.Log("CombatUI: Confirmation cancelled");
