@@ -105,7 +105,7 @@ After the events Under the Mountain, Feyre struggles with trauma and a growing d
 21. The Wall Falls - War begins
 22. High Lady of the Night Court - Become the first
 
-#### Side Quests (9 quests)
+#### Side Quests (15 quests)
 - Starfall - Experience the festival
 - A Night at Rita's - Velaris nightlife
 - Return to the Hewn City - Court of Nightmares
@@ -115,6 +115,12 @@ After the events Under the Mountain, Feyre struggles with trauma and a growing d
 - The Truth of Mor - Companion quest
 - Shadows and Secrets - Azriel's story
 - The Ancient One - Amren's nature
+- Rainbow of Velaris - Explore the artist district
+- The Ten Thousand Steps - Master the House of Wind climb
+- Wings of War - Advanced Illyrian combat training
+- The Library Below - Discover the underground library
+- Court of Dreams - Navigate Night Court dual politics
+- By the Summer Sea - Explore Adriata before the heist
 
 #### Story Arcs
 - **Book2_NightCourt**: Velaris discovery, Inner Circle
@@ -142,7 +148,7 @@ After the events Under the Mountain, Feyre struggles with trauma and a growing d
 - King of Hybern (Antagonist)
 
 #### Experience Available
-11,350 XP total
+12,800 XP total
 
 ---
 
@@ -183,7 +189,7 @@ War has come to Prythian. Return to the Spring Court as a spy, unite all seven H
 20. The King Falls - Victory
 21. A Court of Wings and Ruin - Aftermath
 
-#### Side Quests (9 quests)
+#### Side Quests (15 quests)
 - The Autumn Prince - Lucien's parentage
 - Forged in Fire - Bond with Nesta
 - The Garden Seer - Help Elain adjust
@@ -193,6 +199,12 @@ War has come to Prythian. Return to the Spring Court as a spy, unite all seven H
 - Rallying the Legions - Unite Illyrians
 - The Human General - Investigate Jurian
 - The Cursed Queen - Meet Vassa
+- Halls of Enlightenment - Explore Day Court libraries
+- Ice and Honor - Deepen the Winter Court alliance
+- Flames of Ambition - Uncover Eris's hidden agenda
+- The Prison Beneath the Mountain - Explore ancient inmates
+- Queens of Ice and Truth - Mor and Viviane's friendship
+- Chasing the Cauldron - Track and neutralize it
 
 #### Story Arcs
 - **Book3_Alliance**: Spring infiltration, court alliances
@@ -222,7 +234,7 @@ War has come to Prythian. Return to the Spring Court as a spy, unite all seven H
 - Jurian (Resurrected human general)
 
 #### Experience Available
-12,900 XP total
+15,075 XP total
 
 ---
 
