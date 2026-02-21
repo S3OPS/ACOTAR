@@ -63,6 +63,7 @@ namespace ACOTAR
         private List<GameObject> enemyPanels = new List<GameObject>();
         private Character playerCharacter;
         private System.Action pendingConfirmAction;
+        private MagicType? pendingMagicAbility = null; // v2.6.10: Track selected magic ability for targeting
 
         void Start()
         {
@@ -420,14 +421,33 @@ namespace ACOTAR
 
             if (enemy.stats.CurrentHealth > 0)
             {
-                currentEncounter.PlayerPhysicalAttack(enemy);
-                AddCombatLogEntry($"You attack {enemy.characterName}!");
-
-                // v2.6.9: Visual feedback for cascade combo
-                if (CombatSystem.WasLastAttackCascade())
+                if (pendingMagicAbility.HasValue)
                 {
-                    ScreenEffectsManager.Instance?.AlertPulse();
-                    AudioManager.Instance?.PlayUISFXByName("combo_cascade");
+                    // v2.6.10: Execute queued magic attack and check for cascade
+                    MagicType ability = pendingMagicAbility.Value;
+                    pendingMagicAbility = null;
+
+                    currentEncounter.PlayerMagicAttack(enemy, ability);
+                    AddCombatLogEntry($"You cast {ability} at {enemy.characterName}!");
+
+                    // v2.6.10: Visual feedback for cascade combo on magic attacks
+                    if (CombatSystem.WasLastAttackCascade())
+                    {
+                        ScreenEffectsManager.Instance?.AlertPulse();
+                        AudioManager.Instance?.PlayUISFXByName("combo_cascade");
+                    }
+                }
+                else
+                {
+                    currentEncounter.PlayerPhysicalAttack(enemy);
+                    AddCombatLogEntry($"You attack {enemy.characterName}!");
+
+                    // v2.6.9: Visual feedback for cascade combo
+                    if (CombatSystem.WasLastAttackCascade())
+                    {
+                        ScreenEffectsManager.Instance?.AlertPulse();
+                        AudioManager.Instance?.PlayUISFXByName("combo_cascade");
+                    }
                 }
 
                 UpdatePlayerDisplay();
@@ -503,7 +523,10 @@ namespace ACOTAR
         {
             AddCombatLogEntry($"Select a target for {ability}...");
             Debug.Log($"Magic ability selected: {ability}");
-            
+
+            // v2.6.10: Store the ability so OnEnemyTargeted can execute it on the chosen target
+            pendingMagicAbility = ability;
+
             // Hide magic panel
             if (magicPanel != null)
             {
@@ -516,6 +539,7 @@ namespace ACOTAR
         /// </summary>
         private void OnDefendClicked()
         {
+            pendingMagicAbility = null; // v2.6.10: Cancel any pending magic selection
             if (currentEncounter != null)
             {
                 currentEncounter.PlayerDefend();

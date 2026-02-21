@@ -7,6 +7,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.6.10] - 2026-02-21
+
+### 🎮 Magic Combat & Synergy Feedback Update
+
+This release delivers the "What's Next" items from v2.6.9: character-meet quest objective tracking, cascade combo feedback for magic attacks, named sound clip validation, and party synergy audio/visual feedback.
+
+#### **Character-Meet Quest Objective Tracking** 👥
+- Added `NotifyCharacterMeetObjective(string)` private method to `StoryManager`
+- `UnlockCharacter()` now calls this method when a character is met for the first time
+- Mapped 8 key characters to their quest objectives:
+  - `Tamlin`, `Lucien`, `Alis` → `main_003` obj 1 (Spring Court members)
+  - `Cassian` → `book2_003` obj 0, `Azriel` → obj 1, `Mor` → obj 2, `Amren` → obj 3 (Inner Circle)
+  - `Tarquin` → `book2_012` obj 1 (Summer Court alliance)
+
+#### **Cascade Combo Feedback for Magic Attacks** ⚡
+- Added `pendingMagicAbility` field to `CombatUI` to track the selected magic ability
+- `OnMagicAbilitySelected()` now stores the chosen ability in `pendingMagicAbility`
+- `OnEnemyTargeted()` checks `pendingMagicAbility` first; if set, executes `PlayerMagicAttack()` instead of `PlayerPhysicalAttack()`
+- Cascade pulse + audio (`"combo_cascade"`) now fires for magic attacks just as it does for physical attacks
+- `OnDefendClicked()` clears `pendingMagicAbility` to prevent stale state
+
+#### **Named Sound Clip Validation** 🔊
+- Added `ValidateExpectedSoundClips()` to `AudioManager`, called in `Start()`
+- Logs a `Debug.LogWarning` for each of the 8 expected UI sound clips missing from `SoundLibrary.uiSounds`: `confirm_open`, `confirm_yes`, `confirm_no`, `quest_start`, `quest_complete`, `quest_progress`, `combo_cascade`, `synergy_trigger`
+- Makes it easy for designers to spot unregistered clips in the Unity Console
+
+#### **Party Synergy Audio/Visual Feedback** ✨
+- `PartySynergySystem.TriggerSynergy()` now calls `ScreenEffectsManager.Instance?.AlertPulse()` and `AudioManager.Instance?.PlayUISFXByName("synergy_trigger")` when a synergy fires
+- Matches the multi-sense feedback style introduced for cascade combos in v2.6.9
+
+### Technical
+- ~75 lines of new code across 4 files
+- 0 breaking changes — all new calls are null-safe
+
+---
+
 ## [2.6.9] - 2026-02-21
 
 ### 🎮 Polish & Integration Update - Hints, Arc Tracking, Sound & Cascade VFX

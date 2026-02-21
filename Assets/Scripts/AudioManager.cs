@@ -111,6 +111,40 @@ namespace ACOTAR
         {
             LoadAudioSettings();
             ApplyVolumeSettings();
+            ValidateExpectedSoundClips();
+        }
+
+        /// <summary>
+        /// Validate that all named UI sound clips referenced in gameplay code are present in the SoundLibrary.
+        /// v2.6.10: Designer-facing warning so missing clips are easy to spot in the Unity Console.
+        /// </summary>
+        private void ValidateExpectedSoundClips()
+        {
+            if (soundLibrary == null)
+            {
+                Debug.LogWarning("[AudioManager] SoundLibrary is not assigned. Named sound clips will be silent.");
+                return;
+            }
+
+            string[] expectedUISounds = new string[]
+            {
+                "confirm_open",    // CombatUI / InventoryUI confirmation dialog opens
+                "confirm_yes",     // Player accepts a confirmation dialog
+                "confirm_no",      // Player cancels a confirmation dialog
+                "quest_start",     // New quest started
+                "quest_complete",  // Quest completed
+                "quest_progress",  // Quest objective advanced
+                "combo_cascade",   // Physical or magic cascade combo milestone
+                "synergy_trigger", // Party synergy combo activated
+            };
+
+            foreach (string clipName in expectedUISounds)
+            {
+                if (soundLibrary.GetUISFXClip(clipName) == null)
+                {
+                    Debug.LogWarning($"[AudioManager] Expected UI sound clip '{clipName}' is not registered in SoundLibrary.uiSounds.");
+                }
+            }
         }
 
         /// <summary>
