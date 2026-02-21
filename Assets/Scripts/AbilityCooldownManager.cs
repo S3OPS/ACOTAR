@@ -61,7 +61,7 @@ namespace ACOTAR
             defaultCooldowns[MagicType.EarthManipulation] = 12f;
             defaultCooldowns[MagicType.Healing] = 15f;
             defaultCooldowns[MagicType.ShieldCreation] = 20f;
-            defaultCooldowns[MagicType.ShadowSinging] = 25f;
+            defaultCooldowns[MagicType.Shadowsinger] = 25f;
             defaultCooldowns[MagicType.Seer] = 60f;
             defaultCooldowns[MagicType.SpellCleaving] = 18f;
             defaultCooldowns[MagicType.TruthTelling] = 30f;
@@ -79,7 +79,7 @@ namespace ACOTAR
             manaCosts[MagicType.EarthManipulation] = 25;
             manaCosts[MagicType.Healing] = 30;
             manaCosts[MagicType.ShieldCreation] = 35;
-            manaCosts[MagicType.ShadowSinging] = 40;
+            manaCosts[MagicType.Shadowsinger] = 40;
             manaCosts[MagicType.Seer] = 50;
             manaCosts[MagicType.SpellCleaving] = 30;
             manaCosts[MagicType.TruthTelling] = 45;

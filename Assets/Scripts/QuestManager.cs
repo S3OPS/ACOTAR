@@ -572,32 +572,6 @@ namespace ACOTAR
         }
 
         /// <summary>
-        /// Get quests from a specific DLC
-        /// </summary>
-        /// <param name="package">The DLC package to filter by</param>
-        /// <returns>List of quests belonging to the specified DLC</returns>
-        /// <remarks>
-        /// Returns quests that are part of the specified DLC package.
-        /// Empty list if DLC is not installed or no quests found.
-        /// Requires DLCManager to be initialized.
-        /// </remarks>
-        public List<Quest> GetDLCQuests(DLCPackage package)
-        {
-            List<Quest> dlcQuests = new List<Quest>();
-            if (DLCManager.Instance != null && DLCManager.Instance.IsDLCInstalled(package))
-            {
-                foreach (var quest in quests.Values)
-                {
-                    if (DLCManager.Instance.GetQuestDLCPackage(quest.questId) == package)
-                    {
-                        dlcQuests.Add(quest);
-                    }
-                }
-            }
-            return dlcQuests;
-        }
-
-        /// <summary>
         /// Mark a quest objective as complete and send a progress notification
         /// v2.6.8: NEW - Mid-quest progress tracking with notifications
         /// </summary>

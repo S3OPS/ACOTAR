@@ -697,10 +697,10 @@ namespace ACOTAR
                 return null;
             }
 
-            Enemy strongest = enemies[0];
+            Enemy strongest = null;
             foreach (Enemy enemy in enemies)
             {
-                if (enemy != null && enemy.IsAlive() && enemy.strength > strongest.strength)
+                if (enemy != null && enemy.IsAlive() && (strongest == null || enemy.strength > strongest.strength))
                 {
                     strongest = enemy;
                 }

@@ -1333,9 +1333,10 @@ namespace ACOTAR
             int sellValue = CalculateSellValue(slot.item) * quantity;
 
             // Add gold to player
-            if (CurrencySystem.Instance != null)
+            CurrencySystem currency = GameManager.Instance?.GetCurrencySystem();
+            if (currency != null)
             {
-                CurrencySystem.Instance.AddGold(sellValue);
+                currency.AddGold(sellValue);
                 Debug.Log($"Sold {quantity}x {slot.item.name} for {sellValue} gold");
                 
                 if (UIManager.Instance != null)
