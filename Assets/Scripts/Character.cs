@@ -52,7 +52,9 @@ namespace ACOTAR
         Shadowsinger,       // Azriel's unique shadow ability
         TruthTelling,       // Mor's ability to detect and compel truth
         DeathManifestation, // Nesta's power taken from the Cauldron
-        MatingBond          // Ability to sense/strengthen mate connection
+        MatingBond,         // Ability to sense/strengthen mate connection
+        EarthManipulation,  // Control over earth and stone
+        SpellCleaving       // Ability to cleave through magical protections
     }
 
     /// <summary>

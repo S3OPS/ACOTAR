@@ -118,23 +118,20 @@ public class AutoSaveSystem : MonoBehaviour
             CreateBackup();
             
             // Perform actual save
-            if (SaveSystem.Instance != null)
-            {
-                bool success = SaveSystem.SaveGame();
+            bool success = SaveSystem.SaveGame();
                 
-                if (success)
-                {
-                    Debug.Log($"Auto-save successful at {DateTime.Now:HH:mm:ss}");
+            if (success)
+            {
+                Debug.Log($"Auto-save successful at {DateTime.Now:HH:mm:ss}");
                     
-                    if (UIManager.Instance != null)
-                    {
-                        UIManager.Instance.ShowNotification("Game auto-saved", 2f);
-                    }
-                }
-                else
+                if (UIManager.Instance != null)
                 {
-                    Debug.LogWarning("Auto-save failed");
+                    UIManager.Instance.ShowNotification("Game auto-saved", 2f);
                 }
+            }
+            else
+            {
+                Debug.LogWarning("Auto-save failed");
             }
         }
         catch (Exception ex)
@@ -211,18 +208,15 @@ public class AutoSaveSystem : MonoBehaviour
         
         try
         {
-            if (SaveSystem.Instance != null)
-            {
-                bool success = SaveSystem.SaveGame(); // Could use a specific quick-save slot
+            bool success = SaveSystem.SaveGame(); // Could use a specific quick-save slot
                 
-                if (success)
-                {
-                    Debug.Log("Quick-save successful");
+            if (success)
+            {
+                Debug.Log("Quick-save successful");
                     
-                    if (UIManager.Instance != null)
-                    {
-                        UIManager.Instance.ShowNotification("Quick-saved (F5)", 2f);
-                    }
+                if (UIManager.Instance != null)
+                {
+                    UIManager.Instance.ShowNotification("Quick-saved (F5)", 2f);
                 }
             }
         }
@@ -239,18 +233,15 @@ public class AutoSaveSystem : MonoBehaviour
     {
         try
         {
-            if (SaveSystem.Instance != null)
-            {
-                bool success = SaveSystem.LoadGame(); // Could use a specific quick-save slot
+            bool success = SaveSystem.LoadGame(); // Could use a specific quick-save slot
                 
-                if (success)
-                {
-                    Debug.Log("Quick-load successful");
+            if (success)
+            {
+                Debug.Log("Quick-load successful");
                     
-                    if (UIManager.Instance != null)
-                    {
-                        UIManager.Instance.ShowNotification("Quick-loaded (F9)", 2f);
-                    }
+                if (UIManager.Instance != null)
+                {
+                    UIManager.Instance.ShowNotification("Quick-loaded (F9)", 2f);
                 }
             }
         }

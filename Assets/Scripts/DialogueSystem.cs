@@ -457,6 +457,8 @@ namespace ACOTAR
         /// </summary>
         public void Continue()
         {
+            try
+            {
             if (currentNode == null || string.IsNullOrEmpty(currentNode.nextNodeId))
             {
                 EndDialogue();

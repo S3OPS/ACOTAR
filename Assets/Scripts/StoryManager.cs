@@ -600,22 +600,6 @@ namespace ACOTAR
         }
 
         /// <summary>
-        /// Get all unlocked locations
-        /// </summary>
-        public List<string> GetUnlockedLocations()
-        {
-            return new List<string>(unlockedLocations);
-        }
-
-        /// <summary>
-        /// Get all met characters
-        /// </summary>
-        public List<string> GetMetCharacters()
-        {
-            return new List<string>(metCharacters);
-        }
-
-        /// <summary>
         /// Display story progress
         /// </summary>
         public void DisplayStoryProgress()

@@ -176,6 +176,10 @@ namespace ACOTAR
                     baseCost = 40; break;
                 case MagicType.MatingBond:
                     baseCost = 50; break;
+                case MagicType.EarthManipulation:
+                    baseCost = 25; break;
+                case MagicType.SpellCleaving:
+                    baseCost = 35; break;
 
                 default:
                     baseCost = 20; break; // Default cost

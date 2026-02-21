@@ -256,7 +256,6 @@ namespace ACOTAR
                 baseColor = Color.Lerp(baseColor, Color.white, 0.3f);
                 baseColor.a = 1f;
             }
-            }
 
             return baseColor;
         }

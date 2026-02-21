@@ -398,9 +398,10 @@ namespace ACOTAR
                     _character.stats.maxHealth += 100;
                     _character.health = _character.maxHealth; // Heal to full
                     
-                    if (CurrencySystem.Instance != null)
+                    CurrencySystem currencySystem = GameManager.Instance?.GetCurrencySystem();
+                    if (currencySystem != null)
                     {
-                        CurrencySystem.Instance.AddGold(1000);
+                        currencySystem.AddGold(1000);
                     }
                     
                     Debug.Log("+100 to all stats!");
@@ -456,9 +457,10 @@ namespace ACOTAR
                     _character.stats.magicPower += 150;
                     _character.stats.maxHealth += 150;
                     
-                    if (CurrencySystem.Instance != null)
+                    CurrencySystem currencySystem = GameManager.Instance?.GetCurrencySystem();
+                    if (currencySystem != null)
                     {
-                        CurrencySystem.Instance.AddGold(5000);
+                        currencySystem.AddGold(5000);
                     }
                     
                     Debug.Log("+150 to all stats!");

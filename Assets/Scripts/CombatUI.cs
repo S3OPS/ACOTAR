@@ -450,11 +450,11 @@ namespace ACOTAR
             if (magicPanel != null)
             {
                 magicPanel.SetActive(!magicPanel.activeSelf);
-            }
 
-            if (magicPanel.activeSelf)
-            {
-                DisplayMagicAbilities();
+                if (magicPanel.activeSelf)
+                {
+                    DisplayMagicAbilities();
+                }
             }
 
             Debug.Log("Magic panel toggled");
