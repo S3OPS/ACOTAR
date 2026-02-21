@@ -123,8 +123,8 @@ namespace ACOTAR
                 "and learns the truth about Rhysand. Face new challenges including the theft from " +
                 "the Summer Court and the first encounter with Hybern. Become the first High Lady in Prythian history."
             );
-            acomaf.questCount = 31;
-            acomaf.experienceAvailable = 11350;
+            acomaf.questCount = 36;
+            acomaf.experienceAvailable = 12800;
             acomaf.newLocations.AddRange(new[] { 
                 "Velaris", "House of Wind", "Hewn City", "Illyrian Mountains",
                 "Summer Court", "Adriata", "Hybern", "Mortal Lands"
@@ -151,10 +151,11 @@ namespace ACOTAR
                 "against Hybern, and lead the final battle for the fate of the world. Experience the epic " +
                 "conclusion to the original trilogy."
             );
-            acowar.questCount = 30;
-            acowar.experienceAvailable = 12900;
+            acowar.questCount = 36;
+            acowar.experienceAvailable = 15075;
             acowar.newLocations.AddRange(new[] {
-                "Dawn Court", "Day Court", "The Battlefield", "The Prison",
+                "Dawn Court", "Day Court", "Autumn Court", "Winter Court",
+                "The Battlefield", "The Prison",
                 "Rebuilt Velaris", "New Prythian"
             });
             acowar.newCharacters.AddRange(new[] {
@@ -317,13 +318,13 @@ namespace ACOTAR
             }
 
             // Book 2 quests are explicitly DLC 1
-            if (questId.StartsWith("book2_"))
+            if (questId.StartsWith("book2_") || questId.EndsWith("_book2"))
             {
                 return DLCPackage.ACOMAF_MistAndFury;
             }
             
             // Book 3 quests are explicitly DLC 2
-            if (questId.StartsWith("book3_"))
+            if (questId.StartsWith("book3_") || questId.EndsWith("_book3"))
             {
                 return DLCPackage.ACOWAR_WingsAndRuin;
             }

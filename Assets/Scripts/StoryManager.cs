@@ -316,6 +316,7 @@ namespace ACOTAR
 
             // v2.6.9: Notify QuestManager of milestone objective completion for this arc
             NotifyArcQuestProgress(arc);
+        }
 
         /// <summary>
         /// Notify QuestManager of milestone objective completion when a story arc finishes.
@@ -585,6 +586,40 @@ namespace ACOTAR
                 // Book 2 - Summer Court (book2_012 obj 1: "Meet High Lord Tarquin")
                 case "Tarquin":
                     questManager.UpdateQuestObjectiveProgress("book2_012", 1);
+                    break;
+
+                // v2.6.11: Book 3 - High Lords' Meeting (book3_005 obj 1: "Host the meeting in the Dawn Court")
+                case "Thesan":
+                    questManager.UpdateQuestObjectiveProgress("book3_005", 1);
+                    break;
+
+                // v2.6.11: Book 3 - Autumn Court (book3_006)
+                case "Beron":
+                    questManager.UpdateQuestObjectiveProgress("book3_006", 0);
+                    break;
+                case "Eris":
+                    questManager.UpdateQuestObjectiveProgress("book3_006", 1);
+                    break;
+
+                // v2.6.11: Book 3 - Day Court (book3_007 obj 0: "Meet High Lord Helion")
+                case "Helion":
+                    questManager.UpdateQuestObjectiveProgress("book3_007", 0);
+                    break;
+
+                // v2.6.11: Book 3 - Winter Court (book3_008 obj 1: "Meet High Lord Kallias and Lady Viviane")
+                case "Kallias":
+                case "Viviane":
+                    questManager.UpdateQuestObjectiveProgress("book3_008", 1);
+                    break;
+
+                // v2.6.11: Book 3 - Prison liberation (book3_014 obj 1: "Release Bryaxis")
+                case "Bryaxis":
+                    questManager.UpdateQuestObjectiveProgress("book3_014", 1);
+                    break;
+
+                // v2.6.11: Book 3 - The Cursed Queen (side_021 obj 0: "Find the firebird queen")
+                case "Vassa":
+                    questManager.UpdateQuestObjectiveProgress("side_021", 0);
                     break;
             }
         }
