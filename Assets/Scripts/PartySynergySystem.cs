@@ -329,6 +329,9 @@ namespace ACOTAR
                     ScreenEffectsManager.Instance?.AlertPulse();
                     AudioManager.Instance?.PlayUISFXByName("synergy_trigger");
 
+                    // v2.6.11: Show synergy name as on-screen notification
+                    NotificationSystem.ShowCombat($"⚡ {activeSyn.synergy.synergyName}!");
+
                     // Track for achievements
                     string synergyKey = $"{activeSyn.synergy.companion1Name}_{activeSyn.synergy.companion2Name}";
                     if (synergyAchievementProgress.ContainsKey(synergyKey))
