@@ -281,6 +281,9 @@ namespace ACOTAR
                     LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, "Quest", 
                         $"Quest Started: {quest.title}");
                     GameEvents.TriggerQuestStarted(quest);
+                    
+                    // v2.6.8: Notify player of new quest
+                    NotificationSystem.ShowQuest("New Quest", quest.title);
                 }
             }
             else
@@ -373,6 +376,9 @@ namespace ACOTAR
                     }
 
                     GameEvents.TriggerQuestCompleted(quest);
+
+                    // v2.6.8: Notify player of quest completion
+                    NotificationSystem.ShowSuccess($"Quest Complete: {quest.title}! +{quest.experienceReward} XP", 4f);
 
                     // Start next quest if available (and not DLC locked)
                     if (!string.IsNullOrEmpty(quest.nextQuestId))
@@ -559,6 +565,91 @@ namespace ACOTAR
                 }
             }
             return dlcQuests;
+        }
+
+        /// <summary>
+        /// Get quests from a specific DLC
+        /// </summary>
+        /// <param name="package">The DLC package to filter by</param>
+        /// <returns>List of quests belonging to the specified DLC</returns>
+        /// <remarks>
+        /// Returns quests that are part of the specified DLC package.
+        /// Empty list if DLC is not installed or no quests found.
+        /// Requires DLCManager to be initialized.
+        /// </remarks>
+        public List<Quest> GetDLCQuests(DLCPackage package)
+        {
+            List<Quest> dlcQuests = new List<Quest>();
+            if (DLCManager.Instance != null && DLCManager.Instance.IsDLCInstalled(package))
+            {
+                foreach (var quest in quests.Values)
+                {
+                    if (DLCManager.Instance.GetQuestDLCPackage(quest.questId) == package)
+                    {
+                        dlcQuests.Add(quest);
+                    }
+                }
+            }
+            return dlcQuests;
+        }
+
+        /// <summary>
+        /// Mark a quest objective as complete and send a progress notification
+        /// v2.6.8: NEW - Mid-quest progress tracking with notifications
+        /// </summary>
+        /// <param name="questId">ID of the quest</param>
+        /// <param name="objectiveIndex">Zero-based index of the objective to mark complete</param>
+        public void UpdateQuestObjectiveProgress(string questId, int objectiveIndex)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(questId))
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, "Quest",
+                        "UpdateQuestObjectiveProgress called with null or empty questId");
+                    return;
+                }
+
+                if (!quests.ContainsKey(questId))
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, "Quest",
+                        $"Quest not found: {questId}");
+                    return;
+                }
+
+                Quest quest = quests[questId];
+
+                if (!quest.isActive)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, "Quest",
+                        $"Quest {questId} is not active, cannot update objective progress");
+                    return;
+                }
+
+                if (quest.objectives == null || objectiveIndex < 0 || objectiveIndex >= quest.objectives.Count)
+                {
+                    LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Warning, "Quest",
+                        $"Invalid objective index {objectiveIndex} for quest {questId}");
+                    return;
+                }
+
+                string objectiveText = quest.objectives[objectiveIndex];
+                int currentObjectiveNumber = objectiveIndex + 1;
+                int totalCount = quest.objectives.Count;
+
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, "Quest",
+                    $"✓ Objective Complete [{currentObjectiveNumber}/{totalCount}]: {objectiveText}");
+
+                // v2.6.8: Send progress notification via NotificationSystem
+                NotificationSystem.ShowQuest(
+                    $"Quest Progress: {quest.title}",
+                    $"✓ {objectiveText} ({currentObjectiveNumber}/{totalCount})");
+            }
+            catch (System.Exception ex)
+            {
+                LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, "Quest",
+                    $"Exception in UpdateQuestObjectiveProgress({questId}, {objectiveIndex}): {ex.Message}\nStack: {ex.StackTrace}");
+            }
         }
 
         public Quest GetQuest(string questId)

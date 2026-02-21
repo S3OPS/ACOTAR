@@ -7,6 +7,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.6.8] - 2026-02-20
+
+### 🎮 UI/UX Enhancements - Quest Hints, Comparisons & Confirmations
+
+This release focuses on improving the player-facing UI experience with four targeted improvements: combat preparation hints, mid-quest progress notifications, equipment comparison tooltips, and confirmation dialogs for critical actions.
+
+#### **Quest Preparation Hints in CombatUI** ⚔️
+- Added `questHintPanel`, `questHintText`, and `dismissHintButton` fields to `CombatUI`
+- Added `ShowActiveQuestPreparationHint()` – finds the first active quest with a `preparationHint` and displays it when combat starts
+- Added `DismissQuestHint()` – hides the hint panel when player clicks dismiss
+- Boss fight hints already defined in `Book1Quests.cs` (Middengard Wyrm, Naga) are now visible to players
+
+#### **Mid-Quest Progress Notifications via QuestManager** 📜
+- Added `UpdateQuestObjectiveProgress(questId, objectiveIndex)` to `QuestManager` – marks an objective as done and sends a `NotificationSystem.ShowQuest()` notification showing current progress (e.g., "✓ Defeat the Wyrm (1/3)")
+- `StartQuest()` now fires `NotificationSystem.ShowQuest("New Quest", quest.title)` when a quest begins
+- `CompleteQuest()` now fires `NotificationSystem.ShowSuccess(...)` with XP reward info on completion
+
+#### **Equipment Comparison Tooltips in InventoryUI** 🔍
+- Added `comparisonPanel`, `comparisonHeaderText`, and `comparisonStatsText` fields to `InventoryUI`
+- Added `ShowEquipmentComparison(item)` – shown automatically when selecting a Weapon or Armor item; compares Power and Value vs. currently equipped item with color-coded +/- deltas
+- Added `FormatDiff(int)` helper that formats stat diffs as `<color=green>+N</color>` / `<color=red>-N</color>`
+- Added `GetEquippedWeaponItem()` and `GetEquippedArmorItem()` to `InventorySystem` – return the full `Item` object for comparison (previously only the ID was accessible)
+
+#### **Confirmation Dialogs for Critical Actions** ✅
+- **CombatUI**: Flee action now opens a confirmation dialog ("Flee from combat? You may lose progress!") before executing. New fields: `confirmationPanel`, `confirmationMessageText`, `confirmYesButton`, `confirmNoButton`. New methods: `ShowConfirmation()`, `OnConfirmYes()`, `OnConfirmNo()`, `ExecuteFlee()`
+- **InventoryUI**: Drop item action now opens a confirmation dialog ("Drop [item]? This cannot be undone.") before executing. Same pattern with new fields and methods: `ShowConfirmation()`, `ExecuteDrop()`, `OnConfirmYes()`, `OnConfirmNo()`
+- Both dialogs fall back to direct execution if no confirmation panel is assigned in the Inspector
+
+#### **Files Modified**
+- `Assets/Scripts/CombatUI.cs` – quest hints, confirmation dialog
+- `Assets/Scripts/QuestManager.cs` – progress notifications, quest start/complete notifications
+- `Assets/Scripts/InventoryUI.cs` – equipment comparison, drop confirmation
+- `Assets/Scripts/InventorySystem.cs` – new `GetEquippedWeaponItem()` / `GetEquippedArmorItem()` methods
+
+#### **Backward Compatibility** ✅
+- All new UI fields are optional with null checks; game works without them assigned
+- `UpdateQuestObjectiveProgress()` is a new method that callers can opt into
+- `GetEquippedWeaponItem()` / `GetEquippedArmorItem()` are additive APIs
+- No breaking changes to existing method signatures
+
+---
+
 ## [2.6.5] - 2026-02-17
 
 ### 🔧 Code Quality & Robustness Enhancements (Wave 5)
