@@ -324,7 +324,11 @@ namespace ACOTAR
                 if (activeSyn.isActive && activeSyn.synergy.AppliesTo(companion1Name, companion2Name))
                 {
                     activeSyn.timesTriggered++;
-                    
+
+                    // v2.6.10: Multi-sense feedback for synergy combo — matching cascade style
+                    ScreenEffectsManager.Instance?.AlertPulse();
+                    AudioManager.Instance?.PlayUISFXByName("synergy_trigger");
+
                     // Track for achievements
                     string synergyKey = $"{activeSyn.synergy.companion1Name}_{activeSyn.synergy.companion2Name}";
                     if (synergyAchievementProgress.ContainsKey(synergyKey))

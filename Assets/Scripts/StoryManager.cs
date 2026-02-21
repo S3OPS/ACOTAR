@@ -529,6 +529,9 @@ namespace ACOTAR
                     metCharacters.Add(characterName);
                     LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Info, 
                         "StoryManager", $"Character Met: {characterName}");
+
+                    // v2.6.10: Notify QuestManager of character-meet objective progress
+                    NotifyCharacterMeetObjective(characterName);
                 }
                 else
                 {
@@ -540,6 +543,49 @@ namespace ACOTAR
             {
                 LoggingSystem.Instance?.Log(LoggingSystem.LogLevel.Error, 
                     "StoryManager", $"Exception in UnlockCharacter: {ex.Message}\nStack: {ex.StackTrace}");
+            }
+        }
+
+        /// <summary>
+        /// Notify QuestManager when a character is first met, advancing the relevant quest objective.
+        /// v2.6.10: Wires character-meet events into quest objective tracking.
+        /// </summary>
+        /// <param name="characterName">The name of the character just met</param>
+        private void NotifyCharacterMeetObjective(string characterName)
+        {
+            if (GameManager.Instance == null) return;
+
+            QuestManager questManager = GameManager.Instance.GetComponent<QuestManager>();
+            if (questManager == null) return;
+
+            // Map character names to the quest objective that tracks meeting them
+            switch (characterName)
+            {
+                // Book 1 - Spring Court (main_003 obj 1: "Meet the court members: Lucien, Alis, and others")
+                case "Tamlin":
+                case "Lucien":
+                case "Alis":
+                    questManager.UpdateQuestObjectiveProgress("main_003", 1);
+                    break;
+
+                // Book 2 - Inner Circle (book2_003, one objective per companion)
+                case "Cassian":
+                    questManager.UpdateQuestObjectiveProgress("book2_003", 0);
+                    break;
+                case "Azriel":
+                    questManager.UpdateQuestObjectiveProgress("book2_003", 1);
+                    break;
+                case "Mor":
+                    questManager.UpdateQuestObjectiveProgress("book2_003", 2);
+                    break;
+                case "Amren":
+                    questManager.UpdateQuestObjectiveProgress("book2_003", 3);
+                    break;
+
+                // Book 2 - Summer Court (book2_012 obj 1: "Meet High Lord Tarquin")
+                case "Tarquin":
+                    questManager.UpdateQuestObjectiveProgress("book2_012", 1);
+                    break;
             }
         }
 
