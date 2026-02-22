@@ -341,11 +341,17 @@ namespace ACOTAR
                         // Achievement milestone checks
                         if (synergyAchievementProgress[synergyKey] == 10)
                         {
-                            Debug.Log($"🏆 Achievement Progress: '{activeSyn.synergy.synergyName}' triggered 10 times!");
+                            // v2.6.12: Milestone synergy notification via achievement panel
+                            NotificationSystem.ShowAchievement(
+                                $"⚡ {activeSyn.synergy.synergyName} Veteran",
+                                $"Triggered '{activeSyn.synergy.synergyName}' 10 times!");
                         }
                         else if (synergyAchievementProgress[synergyKey] == 50)
                         {
-                            Debug.Log($"🏆 Achievement Unlocked: '{activeSyn.synergy.synergyName}' Master - triggered 50 times!");
+                            // v2.6.12: Master milestone synergy notification via achievement panel
+                            NotificationSystem.ShowAchievement(
+                                $"⚡ {activeSyn.synergy.synergyName} Master",
+                                $"You have mastered the '{activeSyn.synergy.synergyName}' synergy — triggered 50 times!");
                         }
                     }
                     break;

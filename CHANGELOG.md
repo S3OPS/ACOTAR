@@ -7,6 +7,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.6.12] - 2026-02-22
+
+### 🎮 Synergy Achievement UI & Spell Indicator Polish
+
+This release delivers the "What's Next" items from v2.6.11: milestone synergy triggers now surface as achievement pop-ups, the spell-queue HUD indicator uses per-magic-type colour coding, and a 0.3-second fade-in animation draws the player's eye when a spell is queued.
+
+#### **Synergy Milestone Achievement Notifications** 🏆
+- `PartySynergySystem.TriggerSynergy()` now calls `NotificationSystem.ShowAchievement()` at 10× ("Veteran") and 50× ("Master") milestones instead of logging to the console
+- Players see a proper achievement pop-up with high priority and 5-second display duration
+
+#### **Per-Magic-Type Colour Coding on Spell-Queue Indicator** 🎨
+- Added `GetSpellColor(MagicType)` static method to `CombatUI` — maps 14 magic types to thematic colours (e.g., Fire → orange-red, Ice → icy blue, Death → crimson, Healing → green)
+- `UpdatePendingMagicIndicator()` sets `pendingSpellText.color` via `GetSpellColor` when a spell is queued; resets to `Color.white` on cancel
+
+#### **Fade-In Animation on Spell-Queue Indicator** ✨
+- Added `FadeInPendingSpellText()` coroutine to `CombatUI` — animates alpha from 0 to 1 over 0.3 seconds when a spell is queued
+- Added `SPELL_FADE_IN_DURATION = 0.3f` constant as a single tuning point
+
+### Added
+- `GetSpellColor(MagicType)` static method in `CombatUI`
+- `FadeInPendingSpellText()` coroutine in `CombatUI`
+- `SPELL_FADE_IN_DURATION` constant in `CombatUI`
+
+### Enhanced
+- `CombatUI.UpdatePendingMagicIndicator()` — colour coding and fade-in on spell queue; colour reset on cancel
+- `PartySynergySystem.TriggerSynergy()` — milestone checks now call `NotificationSystem.ShowAchievement`
+
+### Technical
+- ~70 lines of new code across 2 files
+- 0 breaking changes
+- 100% backward compatible
+
+---
+
 ## [2.6.11] - 2026-02-21
 
 ### 🎮 Feedback Polish & Audio Infrastructure Update

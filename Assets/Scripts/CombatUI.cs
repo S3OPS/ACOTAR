@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace ACOTAR
@@ -67,6 +68,7 @@ namespace ACOTAR
         private Character playerCharacter;
         private System.Action pendingConfirmAction;
         private MagicType? pendingMagicAbility = null; // v2.6.10: Track selected magic ability for targeting
+        private const float SPELL_FADE_IN_DURATION = 0.3f; // v2.6.12: Fade-in duration for spell queue indicator
 
         void Start()
         {
@@ -542,13 +544,71 @@ namespace ACOTAR
         /// <summary>
         /// Update the HUD indicator that shows which magic ability is currently queued.
         /// v2.6.11: Gives players clear visual confirmation of their spell selection.
+        /// v2.6.12: Adds per-magic-type colour coding and a fade-in animation.
         /// </summary>
         private void UpdatePendingMagicIndicator()
         {
             if (pendingSpellText == null) return;
-            pendingSpellText.text = pendingMagicAbility.HasValue
-                ? $"⚡ Spell Queued: {pendingMagicAbility.Value}"
-                : string.Empty;
+            if (pendingMagicAbility.HasValue)
+            {
+                pendingSpellText.text = $"⚡ Spell Queued: {pendingMagicAbility.Value}";
+                pendingSpellText.color = GetSpellColor(pendingMagicAbility.Value); // v2.6.12
+                StartCoroutine(FadeInPendingSpellText()); // v2.6.12
+            }
+            else
+            {
+                pendingSpellText.text = string.Empty;
+                pendingSpellText.color = Color.white; // reset colour for next spell
+            }
+        }
+
+        /// <summary>
+        /// Map magic type to a thematic colour for the spell-queue HUD indicator.
+        /// v2.6.12: NEW — called by UpdatePendingMagicIndicator().
+        /// </summary>
+        private static Color GetSpellColor(MagicType ability)
+        {
+            switch (ability)
+            {
+                case MagicType.FireManipulation:   return new Color(1f,    0.35f, 0.1f);  // Vivid orange-red
+                case MagicType.IceManipulation:    return new Color(0.5f,  0.85f, 1f);    // Icy blue
+                case MagicType.WaterManipulation:  return new Color(0.2f,  0.55f, 1f);    // Deep water blue
+                case MagicType.WindManipulation:   return new Color(0.8f,  1f,    0.8f);  // Soft green-white
+                case MagicType.EarthManipulation:  return new Color(0.6f,  0.4f,  0.2f);  // Earthy brown
+                case MagicType.DarknessManipulation: return new Color(0.55f, 0.1f, 0.9f); // Deep violet
+                case MagicType.LightManipulation:  return new Color(1f,    1f,    0.5f);  // Bright gold
+                case MagicType.Healing:            return new Color(0.2f,  1f,    0.5f);  // Healing green
+                case MagicType.ShieldCreation:     return new Color(0.4f,  0.7f,  1f);    // Shield blue
+                case MagicType.Daemati:            return new Color(1f,    0.2f,  0.8f);  // Mind magic magenta
+                case MagicType.DeathManifestation: return new Color(0.7f,  0f,    0.2f);  // Death crimson
+                case MagicType.Shadowsinger:       return new Color(0.3f,  0.2f,  0.5f);  // Shadow indigo
+                case MagicType.TruthTelling:       return new Color(1f,    0.9f,  0.3f);  // Truth gold
+                case MagicType.SpellCleaving:      return new Color(0.9f,  0.5f,  1f);    // Arcane purple
+                default:                           return Color.white;
+            }
+        }
+
+        /// <summary>
+        /// Fade the pendingSpellText from transparent to fully opaque over SPELL_FADE_IN_DURATION seconds.
+        /// v2.6.12: NEW — draws the player's eye when a spell is queued.
+        /// </summary>
+        private IEnumerator FadeInPendingSpellText()
+        {
+            if (pendingSpellText == null) yield break;
+
+            Color targetColor = pendingSpellText.color;
+            pendingSpellText.color = new Color(targetColor.r, targetColor.g, targetColor.b, 0f);
+
+            float elapsed = 0f;
+            while (elapsed < SPELL_FADE_IN_DURATION)
+            {
+                elapsed += Time.deltaTime;
+                float alpha = Mathf.Clamp01(elapsed / SPELL_FADE_IN_DURATION);
+                pendingSpellText.color = new Color(targetColor.r, targetColor.g, targetColor.b, alpha);
+                yield return null;
+            }
+
+            pendingSpellText.color = targetColor; // ensure final alpha is exactly 1
         }
 
         /// <summary>
