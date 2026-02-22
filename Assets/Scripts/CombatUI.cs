@@ -59,6 +59,9 @@ namespace ACOTAR
         public Button confirmYesButton;
         public Button confirmNoButton;
 
+        [Header("Spell Queue Indicator")]
+        public Text pendingSpellText; // v2.6.11: Shows currently queued magic ability
+
         private CombatEncounter currentEncounter;
         private List<GameObject> enemyPanels = new List<GameObject>();
         private Character playerCharacter;
@@ -426,6 +429,7 @@ namespace ACOTAR
                     // v2.6.10: Execute queued magic attack and check for cascade
                     MagicType ability = pendingMagicAbility.Value;
                     pendingMagicAbility = null;
+                    UpdatePendingMagicIndicator(); // v2.6.11
 
                     currentEncounter.PlayerMagicAttack(enemy, ability);
                     AddCombatLogEntry($"You cast {ability} at {enemy.characterName}!");
@@ -526,6 +530,7 @@ namespace ACOTAR
 
             // v2.6.10: Store the ability so OnEnemyTargeted can execute it on the chosen target
             pendingMagicAbility = ability;
+            UpdatePendingMagicIndicator(); // v2.6.11
 
             // Hide magic panel
             if (magicPanel != null)
@@ -535,11 +540,24 @@ namespace ACOTAR
         }
 
         /// <summary>
+        /// Update the HUD indicator that shows which magic ability is currently queued.
+        /// v2.6.11: Gives players clear visual confirmation of their spell selection.
+        /// </summary>
+        private void UpdatePendingMagicIndicator()
+        {
+            if (pendingSpellText == null) return;
+            pendingSpellText.text = pendingMagicAbility.HasValue
+                ? $"⚡ Spell Queued: {pendingMagicAbility.Value}"
+                : string.Empty;
+        }
+
+        /// <summary>
         /// Handle defend button click
         /// </summary>
         private void OnDefendClicked()
         {
             pendingMagicAbility = null; // v2.6.10: Cancel any pending magic selection
+            UpdatePendingMagicIndicator(); // v2.6.11
             if (currentEncounter != null)
             {
                 currentEncounter.PlayerDefend();

@@ -111,6 +111,7 @@ namespace ACOTAR
         {
             LoadAudioSettings();
             ApplyVolumeSettings();
+            soundLibrary?.EnsureDefaultUISoundEntries(); // v2.6.11: pre-populate expected clip slots
             ValidateExpectedSoundClips();
         }
 
@@ -142,7 +143,10 @@ namespace ACOTAR
             {
                 if (soundLibrary.GetUISFXClip(clipName) == null)
                 {
-                    Debug.LogWarning($"[AudioManager] Expected UI sound clip '{clipName}' is not registered in SoundLibrary.uiSounds.");
+                    string msg = soundLibrary.HasUISoundEntry(clipName)
+                        ? $"[AudioManager] UI sound clip '{clipName}' is registered but has no AudioClip assigned in SoundLibrary.uiSounds."
+                        : $"[AudioManager] Expected UI sound clip '{clipName}' is not registered in SoundLibrary.uiSounds.";
+                    Debug.LogWarning(msg);
                 }
             }
         }
@@ -916,6 +920,49 @@ namespace ACOTAR
         public AudioClip GetUISFXClip(string name)
         {
             return GetClipByName(uiSounds, name);
+        }
+
+        /// <summary>
+        /// Returns true if a UI sound entry with the given name exists in the library,
+        /// regardless of whether its AudioClip has been assigned.
+        /// v2.6.11: Used by AudioManager to give more precise validation messages.
+        /// </summary>
+        public bool HasUISoundEntry(string name)
+        {
+            foreach (var namedClip in uiSounds)
+            {
+                if (namedClip.name == name) return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Ensures all expected UI sound clip entries exist in the library.
+        /// Adds placeholder entries (null AudioClip) for any that are missing so
+        /// designers can see every required slot in the Unity Inspector.
+        /// v2.6.11: Called from AudioManager.Start() before clip validation.
+        /// </summary>
+        public void EnsureDefaultUISoundEntries()
+        {
+            string[] expectedUIClipNames = new string[]
+            {
+                "confirm_open",    // CombatUI / InventoryUI confirmation dialog opens
+                "confirm_yes",     // Player accepts a confirmation dialog
+                "confirm_no",      // Player cancels a confirmation dialog
+                "quest_start",     // New quest started
+                "quest_complete",  // Quest completed
+                "quest_progress",  // Quest objective advanced
+                "combo_cascade",   // Physical or magic cascade combo milestone
+                "synergy_trigger", // Party synergy combo activated
+            };
+
+            foreach (string clipName in expectedUIClipNames)
+            {
+                if (!HasUISoundEntry(clipName))
+                {
+                    uiSounds.Add(new NamedAudioClip { name = clipName, clip = null });
+                }
+            }
         }
 
         private AudioClip GetClipByName(List<NamedAudioClip> list, string name)

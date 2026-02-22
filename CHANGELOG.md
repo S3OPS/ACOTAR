@@ -7,6 +7,52 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.6.11] - 2026-02-21
+
+### 🎮 Feedback Polish & Audio Infrastructure Update
+
+This release delivers the "What's Next" items from v2.6.10: synergy name on-screen notifications, a persistent pending-magic HUD indicator, default SoundLibrary slot pre-population, and improved audio validation messages.
+
+#### **Synergy Name On-Screen Notification** ✨
+- `PartySynergySystem.TriggerSynergy()` now calls `NotificationSystem.ShowCombat($"⚡ {synergyName}!")` after the visual pulse and audio
+- Players see the synergy name (e.g., `"⚡ Brothers in Arms!"`) every time a synergy fires
+
+#### **Pending Magic Ability HUD Indicator** ⚡
+- Added `pendingSpellText` (`public Text`) inspector field to `CombatUI` under a new `[Header("Spell Queue Indicator")]`
+- Added `UpdatePendingMagicIndicator()` private method — sets the text to `"⚡ Spell Queued: {ability}"` or clears it
+- Called at all three state-change sites: `OnMagicAbilitySelected()`, `OnEnemyTargeted()` (magic branch), `OnDefendClicked()`
+
+#### **Default SoundLibrary Slot Pre-Population** 🔊
+- Added `SoundLibrary.HasUISoundEntry(string name)` — checks if a named entry exists regardless of clip assignment
+- Added `SoundLibrary.EnsureDefaultUISoundEntries()` — pre-populates all 8 expected UI sound slots as `null`-clip placeholders so designers see every required slot in the Inspector immediately
+- `AudioManager.Start()` now calls `soundLibrary?.EnsureDefaultUISoundEntries()` before `ValidateExpectedSoundClips()`
+
+#### **Improved Audio Validation Messages** 🔧
+- `ValidateExpectedSoundClips()` now uses `HasUISoundEntry()` to emit two distinct warnings:
+  - `"registered but has no AudioClip assigned"` — entry exists, clip not yet wired
+  - `"is not registered in SoundLibrary.uiSounds"` — entry absent entirely
+
+### Added
+- `UpdatePendingMagicIndicator()` private method in `CombatUI`
+- `pendingSpellText` inspector field in `CombatUI`
+- `SoundLibrary.EnsureDefaultUISoundEntries()` method
+- `SoundLibrary.HasUISoundEntry(string name)` method
+
+### Enhanced
+- `PartySynergySystem.TriggerSynergy()` — synergy name notification
+- `CombatUI.OnMagicAbilitySelected()` — calls `UpdatePendingMagicIndicator()`
+- `CombatUI.OnEnemyTargeted()` — calls `UpdatePendingMagicIndicator()` on magic branch clear
+- `CombatUI.OnDefendClicked()` — calls `UpdatePendingMagicIndicator()` on cancel
+- `AudioManager.Start()` — pre-populates SoundLibrary before validation
+- `AudioManager.ValidateExpectedSoundClips()` — two-tier warning messages
+
+### Technical
+- ~60 lines of new code across 3 files
+- 0 breaking changes
+- 100% backward compatible
+
+---
+
 ## [2.6.10] - 2026-02-21
 
 ### 🎮 Magic Combat & Synergy Feedback Update
