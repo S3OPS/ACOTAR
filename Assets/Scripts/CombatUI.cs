@@ -69,6 +69,7 @@ namespace ACOTAR
         private System.Action pendingConfirmAction;
         private MagicType? pendingMagicAbility = null; // v2.6.10: Track selected magic ability for targeting
         private const float SPELL_FADE_IN_DURATION = 0.3f; // v2.6.12: Fade-in duration for spell queue indicator
+        private const float SPELL_SCALE_START = 0.75f;    // v2.6.14: Starting scale for the spell-queue indicator punch animation
         private Coroutine spellFadeCoroutine = null; // v2.6.13: Track running fade so we can stop it before restarting
 
         void Start()
@@ -561,8 +562,10 @@ namespace ACOTAR
             }
             else
             {
+                if (spellFadeCoroutine != null) { StopCoroutine(spellFadeCoroutine); spellFadeCoroutine = null; } // v2.6.14: cancel fade when clearing
                 pendingSpellText.text = string.Empty;
                 pendingSpellText.color = Color.white; // reset colour for next spell
+                if (pendingSpellText.rectTransform != null) pendingSpellText.rectTransform.localScale = Vector3.one; // v2.6.14: reset scale
             }
         }
 
@@ -591,6 +594,7 @@ namespace ACOTAR
                 case MagicType.Winnowing:          return new Color(0.5f,  0.3f,  0.9f);  // v2.6.13: Portal blue-violet
                 case MagicType.Seer:               return new Color(0.85f, 0.9f,  1f);    // v2.6.13: Prophetic silver
                 case MagicType.MatingBond:         return new Color(1f,    0.6f,  0.7f);  // v2.6.13: Mate rose-gold
+                case MagicType.Shapeshifting:      return new Color(1f,    0.65f, 0.1f);  // v2.6.14: Shifting amber
                 default:                           return Color.white;
             }
         }
@@ -598,6 +602,7 @@ namespace ACOTAR
         /// <summary>
         /// Fade the pendingSpellText from transparent to fully opaque over SPELL_FADE_IN_DURATION seconds.
         /// v2.6.12: NEW — draws the player's eye when a spell is queued.
+        /// v2.6.14: Also animates a scale-up "punch" from SPELL_SCALE_START to 1 for extra visual impact.
         /// </summary>
         private IEnumerator FadeInPendingSpellText()
         {
@@ -606,16 +611,27 @@ namespace ACOTAR
             Color targetColor = pendingSpellText.color;
             pendingSpellText.color = new Color(targetColor.r, targetColor.g, targetColor.b, 0f);
 
+            // v2.6.14: Initialise scale to the punch-start size
+            RectTransform rt = pendingSpellText.rectTransform;
+            if (rt != null) rt.localScale = new Vector3(SPELL_SCALE_START, SPELL_SCALE_START, 1f);
+
             float elapsed = 0f;
             while (elapsed < SPELL_FADE_IN_DURATION)
             {
                 elapsed += Time.deltaTime;
-                float alpha = Mathf.Clamp01(elapsed / SPELL_FADE_IN_DURATION);
-                pendingSpellText.color = new Color(targetColor.r, targetColor.g, targetColor.b, alpha);
+                float t = Mathf.Clamp01(elapsed / SPELL_FADE_IN_DURATION);
+                pendingSpellText.color = new Color(targetColor.r, targetColor.g, targetColor.b, t);
+
+                // v2.6.14: Scale from SPELL_SCALE_START to 1 using smooth-step easing
+                float scale = Mathf.Lerp(SPELL_SCALE_START, 1f, Mathf.SmoothStep(0f, 1f, t));
+                if (rt != null) rt.localScale = new Vector3(scale, scale, 1f);
+
                 yield return null;
             }
 
             pendingSpellText.color = targetColor; // ensure final alpha is exactly 1
+            if (rt != null) rt.localScale = Vector3.one; // v2.6.14: ensure final scale is exactly 1
+            spellFadeCoroutine = null; // v2.6.14: clear handle when complete
         }
 
         /// <summary>
