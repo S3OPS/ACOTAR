@@ -7,6 +7,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.6.13] - 2026-02-23
+
+### 🎮 Spell Selector Polish & Audio Completeness Update
+
+This release implements the "What's Next" items from v2.6.12: full colour coverage for all MagicType values in the spell-queue indicator, coroutine safety on rapid spell re-selection, and `"ability_select"` audio feedback when a magic ability is queued.
+
+#### **Extended Spell Colour Mapping** 🎨
+- `GetSpellColor()` in `CombatUI` now maps `MagicType.Winnowing` (portal blue-violet), `MagicType.Seer` (prophetic silver), and `MagicType.MatingBond` (mate rose-gold) — all 18 `MagicType` values now return a themed colour (no more `Color.white` fallback for named types)
+
+#### **Coroutine Safety on Rapid Spell Re-Selection** 🛡️
+- `UpdatePendingMagicIndicator()` now stops any running `FadeInPendingSpellText` coroutine (tracked via `spellFadeCoroutine`) before starting a new one
+- Prevents overlapping fade coroutines when a player quickly re-selects a different ability, eliminating the stale-colour flicker edge case
+
+#### **`"ability_select"` UI Sound** 🔊
+- `OnMagicAbilitySelected()` in `CombatUI` now calls `AudioManager.Instance?.PlayUISFXByName("ability_select")` immediately when the player commits to a magic ability
+- `"ability_select"` added to `ValidateExpectedSoundClips()` expected list in `AudioManager` — designers are warned if the clip is missing
+- `"ability_select"` added to `EnsureDefaultUISoundEntries()` in `SoundLibrary` — slot pre-populated in the Inspector so it is immediately visible and wirable
+
+### Added
+- `spellFadeCoroutine` private field in `CombatUI` — tracks the active fade coroutine handle
+
+### Enhanced
+- `CombatUI.GetSpellColor()` — `Winnowing`, `Seer`, and `MatingBond` now have dedicated colours
+- `CombatUI.UpdatePendingMagicIndicator()` — stops stale fade coroutine before starting a new one
+- `CombatUI.OnMagicAbilitySelected()` — plays `"ability_select"` audio on spell commit
+- `AudioManager.ValidateExpectedSoundClips()` — `"ability_select"` added to expected clip list
+- `SoundLibrary.EnsureDefaultUISoundEntries()` — `"ability_select"` pre-populated as Inspector slot
+
+### Technical
+- ~25 lines of new code across 2 files
+- 0 breaking changes
+- 100% backward compatible
+
+---
+
+
 ## [2.6.12] - 2026-02-22
 
 ### 🎮 Synergy Achievement UI & Spell Indicator Polish
