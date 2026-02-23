@@ -329,15 +329,19 @@ namespace ACOTAR
                 return DLCPackage.ACOWAR_WingsAndRuin;
             }
 
-            // Side quests: side_010 to side_015 are DLC 1, side_016+ are DLC 2
-            if (questId.StartsWith("side_") && questId.Length > 5)
+            // Side quests: side_010_book2 to side_015_book2 are DLC 1, side_016+ are DLC 2
+            if (questId.StartsWith("side_"))
             {
-                if (int.TryParse(questId.Substring(5), out int sideQuestNum))
+                if (questId.EndsWith("_book2"))
                 {
-                    if (sideQuestNum >= 10 && sideQuestNum <= 15)
-                    {
-                        return DLCPackage.ACOMAF_MistAndFury;
-                    }
+                    return DLCPackage.ACOMAF_MistAndFury;
+                }
+                if (questId.EndsWith("_book3"))
+                {
+                    return DLCPackage.ACOWAR_WingsAndRuin;
+                }
+                if (questId.Length > 5 && int.TryParse(questId.Substring(5), out int sideQuestNum))
+                {
                     if (sideQuestNum >= 16)
                     {
                         return DLCPackage.ACOWAR_WingsAndRuin;

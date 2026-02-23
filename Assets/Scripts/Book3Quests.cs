@@ -415,7 +415,7 @@ namespace ACOTAR
                 "side_016",
                 "Defending Velaris",
                 "Protect Velaris from Hybern's attempt to destroy the City of Starlight.",
-                QuestType.SideQuest
+                QuestType.MainStory
             );
             velarisDefense.objectives.Add("Fortify Velaris's defenses");
             velarisDefense.objectives.Add("Repel the Hybern attack");

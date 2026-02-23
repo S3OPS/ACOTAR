@@ -708,7 +708,7 @@ namespace ACOTAR
             int count = 0;
             foreach (var slot in inventory)
             {
-                if (slot.item.itemId == itemId)
+                if (slot.item != null && slot.item.itemId == itemId)
                 {
                     count += slot.quantity;
                 }

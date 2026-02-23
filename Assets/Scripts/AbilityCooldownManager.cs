@@ -242,6 +242,7 @@ namespace ACOTAR
         /// </summary>
         public void ReduceCooldowns(float percentage)
         {
+            percentage = Mathf.Clamp(percentage, 0f, 1f);
             List<string> abilities = new List<string>(abilityCooldowns.Keys);
             foreach (string abilityId in abilities)
             {

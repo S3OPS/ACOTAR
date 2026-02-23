@@ -173,6 +173,7 @@ namespace ACOTAR
             foreach (var material in recipe.requiredMaterials)
             {
                 int available = inventory.GetItemCount(material.Key);
+                if (material.Value <= 0) continue;
                 int possible = available / material.Value;
                 
                 if (possible < maxCraftable)
