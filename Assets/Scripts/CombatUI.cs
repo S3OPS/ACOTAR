@@ -69,6 +69,7 @@ namespace ACOTAR
         private System.Action pendingConfirmAction;
         private MagicType? pendingMagicAbility = null; // v2.6.10: Track selected magic ability for targeting
         private const float SPELL_FADE_IN_DURATION = 0.3f; // v2.6.12: Fade-in duration for spell queue indicator
+        private Coroutine spellFadeCoroutine = null; // v2.6.13: Track running fade so we can stop it before restarting
 
         void Start()
         {
@@ -530,6 +531,8 @@ namespace ACOTAR
             AddCombatLogEntry($"Select a target for {ability}...");
             Debug.Log($"Magic ability selected: {ability}");
 
+            AudioManager.Instance?.PlayUISFXByName("ability_select"); // v2.6.13: audio feedback on spell select
+
             // v2.6.10: Store the ability so OnEnemyTargeted can execute it on the chosen target
             pendingMagicAbility = ability;
             UpdatePendingMagicIndicator(); // v2.6.11
@@ -553,7 +556,8 @@ namespace ACOTAR
             {
                 pendingSpellText.text = $"⚡ Spell Queued: {pendingMagicAbility.Value}";
                 pendingSpellText.color = GetSpellColor(pendingMagicAbility.Value); // v2.6.12
-                StartCoroutine(FadeInPendingSpellText()); // v2.6.12
+                if (spellFadeCoroutine != null) StopCoroutine(spellFadeCoroutine); // v2.6.13: cancel stale fade
+                spellFadeCoroutine = StartCoroutine(FadeInPendingSpellText()); // v2.6.12
             }
             else
             {
@@ -584,6 +588,9 @@ namespace ACOTAR
                 case MagicType.Shadowsinger:       return new Color(0.3f,  0.2f,  0.5f);  // Shadow indigo
                 case MagicType.TruthTelling:       return new Color(1f,    0.9f,  0.3f);  // Truth gold
                 case MagicType.SpellCleaving:      return new Color(0.9f,  0.5f,  1f);    // Arcane purple
+                case MagicType.Winnowing:          return new Color(0.5f,  0.3f,  0.9f);  // v2.6.13: Portal blue-violet
+                case MagicType.Seer:               return new Color(0.85f, 0.9f,  1f);    // v2.6.13: Prophetic silver
+                case MagicType.MatingBond:         return new Color(1f,    0.6f,  0.7f);  // v2.6.13: Mate rose-gold
                 default:                           return Color.white;
             }
         }
