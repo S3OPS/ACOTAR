@@ -522,10 +522,17 @@ namespace ACOTAR
             
             // Restore currency
             var currencySystem = gm.GetCurrencySystem();
-            if (currencySystem != null && data.gold > 0)
+            if (currencySystem != null)
             {
-                // Currency system doesn't have SetGold, so we work around
-                // In a full implementation, add SetGold method or handle differently
+                int deficit = data.gold - currencySystem.Gold;
+                if (deficit > 0)
+                {
+                    currencySystem.AddGold(deficit);
+                }
+                else if (deficit < 0)
+                {
+                    currencySystem.SpendGold(-deficit);
+                }
             }
             
             // Restore game state

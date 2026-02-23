@@ -370,7 +370,7 @@ namespace ACOTAR
         {
             // Starfall Festival
             Quest starfall = new Quest(
-                "side_010",
+                "side_010_book2",
                 "Starfall",
                 "Experience the magical Starfall festival in Velaris.",
                 QuestType.SideQuest
@@ -383,7 +383,7 @@ namespace ACOTAR
 
             // Rita's Bar
             Quest ritas = new Quest(
-                "side_011",
+                "side_011_book2",
                 "A Night at Rita's",
                 "Experience the famous nightlife of Velaris at Rita's bar.",
                 QuestType.SideQuest
@@ -396,7 +396,7 @@ namespace ACOTAR
 
             // Court of Nightmares
             Quest nightmares = new Quest(
-                "side_012",
+                "side_012_book2",
                 "Return to the Hewn City",
                 "Visit the Court of Nightmares again, this time as Rhysand's equal.",
                 QuestType.CourtQuest
@@ -409,7 +409,7 @@ namespace ACOTAR
 
             // The Weaver
             Quest weaver = new Quest(
-                "side_013",
+                "side_013_book2",
                 "The Weaver's Ring",
                 "Retrieve a ring from the Weaver, an ancient immortal in the Middle.",
                 QuestType.SideQuest
@@ -422,7 +422,7 @@ namespace ACOTAR
 
             // The Suriel Again
             Quest surielBook2 = new Quest(
-                "side_014",
+                "side_014_book2",
                 "Wisdom from the Suriel",
                 "Seek the Suriel's wisdom about the upcoming war.",
                 QuestType.SideQuest
@@ -435,7 +435,7 @@ namespace ACOTAR
 
             // Illyrian War Camps
             Quest illyrians = new Quest(
-                "side_015",
+                "side_015_book2",
                 "Wings and Embers",
                 "Visit the Illyrian war camps to secure their support for the coming war.",
                 QuestType.CourtQuest

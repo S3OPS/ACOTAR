@@ -613,8 +613,14 @@ namespace ACOTAR
 
         private string ExecuteEnvironmentalHazard(BossEncounterState state)
         {
+            int countBefore = state.activeHazards.Count;
             ActivateRandomHazard(state);
-            var hazard = state.activeHazards[state.activeHazards.Count - 1];
+            if (state.activeHazards.Count == 0)
+                return "⚠️ Environmental conditions shift!";
+            // Report the newly added hazard if one was added, otherwise the last active hazard
+            var hazard = state.activeHazards.Count > countBefore
+                ? state.activeHazards[state.activeHazards.Count - 1]
+                : state.activeHazards[0];
             return $"⚠️ Environmental hazard activated: {hazard}!";
         }
 

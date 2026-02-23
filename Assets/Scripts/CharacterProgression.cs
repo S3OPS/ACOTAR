@@ -388,6 +388,7 @@ namespace ACOTAR
             }
 
             // Apply actual stat bonuses and rewards
+            CurrencySystem currencySystem = GameManager.Instance?.GetCurrencySystem();
             switch (title)
             {
                 case CharacterTitle.CurseBreaker:
@@ -398,7 +399,6 @@ namespace ACOTAR
                     _character.stats.maxHealth += 100;
                     _character.health = _character.maxHealth; // Heal to full
                     
-                    CurrencySystem currencySystem = GameManager.Instance?.GetCurrencySystem();
                     if (currencySystem != null)
                     {
                         currencySystem.AddGold(1000);
@@ -457,7 +457,6 @@ namespace ACOTAR
                     _character.stats.magicPower += 150;
                     _character.stats.maxHealth += 150;
                     
-                    CurrencySystem currencySystem = GameManager.Instance?.GetCurrencySystem();
                     if (currencySystem != null)
                     {
                         currencySystem.AddGold(5000);

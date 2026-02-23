@@ -378,7 +378,7 @@ namespace ACOTAR
                 case "main_010":
                     return "This is the hardest trial. Steel yourself for what comes next.";
                 case "main_011":
-                    return "The answer to the riddle is 'Love'. Remember what truly matters.";
+                    return "The riddle tests your heart, not your mind. Trust your deepest convictions.";
                 case "main_012":
                     return "This is the climax of Book 1. Prepare for an epic encounter.";
                 default:
