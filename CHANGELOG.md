@@ -7,6 +7,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.6.14] - 2026-02-23
+
+### 🎮 Spell Indicator Polish: Shapeshifting Colour, Coroutine Cleanup & Scale-Punch Animation
+
+This release implements the "What's Next" items from v2.6.13: `Shapeshifting` now has a dedicated shifting-amber colour in the spell-queue indicator, the fade coroutine is properly cancelled and the scale reset when the indicator is cleared, and a scale-up "punch" animation runs alongside the fade-in for extra visual impact.
+
+#### **`Shapeshifting` Spell Colour** 🟠
+- `GetSpellColor()` now returns shifting amber (`new Color(1f, 0.65f, 0.1f)`) for `MagicType.Shapeshifting` — all 18 `MagicType` values now have a dedicated thematic colour (no `Color.white` fallback for any named type)
+
+#### **Coroutine Cancel & Scale Reset on Indicator Clear** 🛡️
+- `UpdatePendingMagicIndicator()` else-branch now stops `spellFadeCoroutine` and resets `pendingSpellText.rectTransform.localScale` to `Vector3.one` before clearing the text
+- Prevents a stale scale or partially-faded text from remaining visible if a spell is cancelled mid-animation
+
+#### **Scale-Punch Animation on Spell Queue** ✨
+- `FadeInPendingSpellText()` now initialises `pendingSpellText.rectTransform.localScale` to `SPELL_SCALE_START` (0.75) at the start of each fade
+- During the animation, scale advances from `SPELL_SCALE_START → 1.0` using `Mathf.SmoothStep` easing, in sync with the alpha fade
+- At completion, scale is snapped to `Vector3.one` and `spellFadeCoroutine` is cleared to `null`
+- Added `SPELL_SCALE_START = 0.75f` constant as a single designer-facing tuning point
+
+### Added
+- `SPELL_SCALE_START` constant in `CombatUI` — controls the scale-punch start size (0.75)
+
+### Enhanced
+- `CombatUI.GetSpellColor()` — `Shapeshifting` now maps to shifting amber; all 18 `MagicType` values have a themed colour
+- `CombatUI.UpdatePendingMagicIndicator()` — cancels coroutine and resets scale when clearing the indicator
+- `CombatUI.FadeInPendingSpellText()` — adds a smooth scale-up punch from `SPELL_SCALE_START` to 1; clears `spellFadeCoroutine` handle on completion
+
+### Technical
+- ~20 lines of new/modified code in 1 file (`CombatUI.cs`)
+- 0 breaking changes
+- 100% backward compatible
+
+---
+
 ## [2.6.13] - 2026-02-23
 
 ### 🎮 Spell Selector Polish & Audio Completeness Update
