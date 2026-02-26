@@ -138,6 +138,7 @@ namespace ACOTAR
                 "combo_cascade",   // Physical or magic cascade combo milestone
                 "synergy_trigger", // Party synergy combo activated
                 "ability_select",  // v2.6.13: Player selects a magic ability to queue
+                "spell_clear",     // v2.6.15: Player cancels a queued magic ability
             };
 
             foreach (string clipName in expectedUISounds)
@@ -956,6 +957,7 @@ namespace ACOTAR
                 "combo_cascade",   // Physical or magic cascade combo milestone
                 "synergy_trigger", // Party synergy combo activated
                 "ability_select",  // v2.6.13: Player selects a magic ability to queue
+                "spell_clear",     // v2.6.15: Player cancels a queued magic ability
             };
 
             foreach (string clipName in expectedUIClipNames)

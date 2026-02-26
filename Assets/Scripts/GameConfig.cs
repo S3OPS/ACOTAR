@@ -199,6 +199,8 @@ namespace ACOTAR
             public const float BUTTON_TRANSITION_DURATION = 0.1f;
             public const float PANEL_FADE_DURATION = 0.25f;
             public const float UI_ANIMATION_SPEED = 1.0f;
+            public const float SPELL_FADE_IN_DURATION = 0.3f;  // v2.6.15: Spell-queue indicator fade-in duration (seconds)
+            public const float SPELL_SCALE_START = 0.75f;      // v2.6.15: Spell-queue indicator punch-animation start scale
         }
 
         // =====================================================
