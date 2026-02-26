@@ -636,31 +636,29 @@ namespace ACOTAR
         /// Briefly flashes the pendingSpellText between white and its spell colour twice to signal
         /// that a legendary ability has been queued. Runs alongside FadeInPendingSpellText.
         /// v2.6.16: NEW — called by UpdatePendingMagicIndicator when IsLegendaryAbility returns true.
+        /// v2.6.17: Shimmer timing moved to GameConfig.UISettings.SPELL_SHIMMER_HALF_DURATION / SPELL_SHIMMER_FLASH_COUNT.
         /// </summary>
         private IEnumerator ShimmerPendingSpellText(Color spellColor)
         {
             if (pendingSpellText == null) yield break;
 
-            const float flashHalfDuration = 0.06f; // seconds per half-cycle (white → colour or colour → white)
-            const int flashCount = 2;              // number of full white↔colour cycles
-
-            for (int i = 0; i < flashCount; i++)
+            for (int i = 0; i < GameConfig.UISettings.SPELL_SHIMMER_FLASH_COUNT; i++)
             {
                 // Flash to white
                 float elapsed = 0f;
-                while (elapsed < flashHalfDuration)
+                while (elapsed < GameConfig.UISettings.SPELL_SHIMMER_HALF_DURATION)
                 {
                     elapsed += Time.deltaTime;
-                    float t = Mathf.Clamp01(elapsed / flashHalfDuration);
+                    float t = Mathf.Clamp01(elapsed / GameConfig.UISettings.SPELL_SHIMMER_HALF_DURATION);
                     pendingSpellText.color = Color.Lerp(spellColor, Color.white, t);
                     yield return null;
                 }
                 // Flash back to spell colour
                 elapsed = 0f;
-                while (elapsed < flashHalfDuration)
+                while (elapsed < GameConfig.UISettings.SPELL_SHIMMER_HALF_DURATION)
                 {
                     elapsed += Time.deltaTime;
-                    float t = Mathf.Clamp01(elapsed / flashHalfDuration);
+                    float t = Mathf.Clamp01(elapsed / GameConfig.UISettings.SPELL_SHIMMER_HALF_DURATION);
                     pendingSpellText.color = Color.Lerp(Color.white, spellColor, t);
                     yield return null;
                 }
