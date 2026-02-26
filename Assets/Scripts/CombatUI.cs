@@ -69,6 +69,7 @@ namespace ACOTAR
         private System.Action pendingConfirmAction;
         private MagicType? pendingMagicAbility = null; // v2.6.10: Track selected magic ability for targeting
         private Coroutine spellFadeCoroutine = null; // v2.6.13: Track running fade so we can stop it before restarting
+        private Coroutine spellShimmerCoroutine = null; // v2.6.16: Track legendary-ability shimmer so it can be cancelled
 
         void Start()
         {
@@ -547,6 +548,7 @@ namespace ACOTAR
         /// Update the HUD indicator that shows which magic ability is currently queued.
         /// v2.6.11: Gives players clear visual confirmation of their spell selection.
         /// v2.6.12: Adds per-magic-type colour coding and a fade-in animation.
+        /// v2.6.16: Plays shimmer flash and "spell_legendary" audio for legendary abilities.
         /// </summary>
         private void UpdatePendingMagicIndicator()
         {
@@ -557,10 +559,19 @@ namespace ACOTAR
                 pendingSpellText.color = GetSpellColor(pendingMagicAbility.Value); // v2.6.12
                 if (spellFadeCoroutine != null) StopCoroutine(spellFadeCoroutine); // v2.6.13: cancel stale fade
                 spellFadeCoroutine = StartCoroutine(FadeInPendingSpellText()); // v2.6.12
+
+                // v2.6.16: Extra shimmer flash for legendary abilities
+                if (IsLegendaryAbility(pendingMagicAbility.Value))
+                {
+                    if (spellShimmerCoroutine != null) StopCoroutine(spellShimmerCoroutine);
+                    spellShimmerCoroutine = StartCoroutine(ShimmerPendingSpellText(GetSpellColor(pendingMagicAbility.Value)));
+                    AudioManager.Instance?.PlayUISFXByName("spell_legendary"); // v2.6.16: audio feedback for legendary spell queue
+                }
             }
             else
             {
                 if (spellFadeCoroutine != null) { StopCoroutine(spellFadeCoroutine); spellFadeCoroutine = null; } // v2.6.14: cancel fade when clearing
+                if (spellShimmerCoroutine != null) { StopCoroutine(spellShimmerCoroutine); spellShimmerCoroutine = null; } // v2.6.16: cancel shimmer when clearing
                 AudioManager.Instance?.PlayUISFXByName("spell_clear"); // v2.6.15: audio feedback when a queued spell is cancelled
                 pendingSpellText.text = string.Empty;
                 pendingSpellText.color = Color.white; // reset colour for next spell
@@ -599,7 +610,67 @@ namespace ACOTAR
         }
 
         /// <summary>
-        /// Fade the pendingSpellText from transparent to fully opaque over SPELL_FADE_IN_DURATION seconds.
+        /// Returns true if the given ability is considered legendary/rare in ACOTAR lore.
+        /// v2.6.16: Used to decide whether to play the shimmer flash animation and "spell_legendary" audio cue.
+        /// Legendary abilities are innate gifts, Cauldron-forged powers, or unique bonds
+        /// that set their bearers apart from ordinary Fae magic users.
+        /// </summary>
+        private static bool IsLegendaryAbility(MagicType ability)
+        {
+            switch (ability)
+            {
+                case MagicType.Daemati:            // Rare mind magic of the Night Court inner circle
+                case MagicType.DeathManifestation: // Nesta's Cauldron-forged power
+                case MagicType.Shadowsinger:       // Azriel's unique gift, not teachable
+                case MagicType.TruthTelling:       // Mor's innate compulsion
+                case MagicType.SpellCleaving:      // Rarest offensive magic
+                case MagicType.MatingBond:         // The bond itself as a wielded force
+                case MagicType.Seer:               // Prophetic visions — few are born with them
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        /// <summary>
+        /// Briefly flashes the pendingSpellText between white and its spell colour twice to signal
+        /// that a legendary ability has been queued. Runs alongside FadeInPendingSpellText.
+        /// v2.6.16: NEW — called by UpdatePendingMagicIndicator when IsLegendaryAbility returns true.
+        /// </summary>
+        private IEnumerator ShimmerPendingSpellText(Color spellColor)
+        {
+            if (pendingSpellText == null) yield break;
+
+            const float flashHalfDuration = 0.06f; // seconds per half-cycle (white → colour or colour → white)
+            const int flashCount = 2;              // number of full white↔colour cycles
+
+            for (int i = 0; i < flashCount; i++)
+            {
+                // Flash to white
+                float elapsed = 0f;
+                while (elapsed < flashHalfDuration)
+                {
+                    elapsed += Time.deltaTime;
+                    float t = Mathf.Clamp01(elapsed / flashHalfDuration);
+                    pendingSpellText.color = Color.Lerp(spellColor, Color.white, t);
+                    yield return null;
+                }
+                // Flash back to spell colour
+                elapsed = 0f;
+                while (elapsed < flashHalfDuration)
+                {
+                    elapsed += Time.deltaTime;
+                    float t = Mathf.Clamp01(elapsed / flashHalfDuration);
+                    pendingSpellText.color = Color.Lerp(Color.white, spellColor, t);
+                    yield return null;
+                }
+            }
+
+            pendingSpellText.color = spellColor; // ensure we end on the exact spell colour
+            spellShimmerCoroutine = null;
+        }
+
+
         /// v2.6.12: NEW — draws the player's eye when a spell is queued.
         /// v2.6.14: Also animates a scale-up "punch" from SPELL_SCALE_START to 1 for extra visual impact.
         /// </summary>
