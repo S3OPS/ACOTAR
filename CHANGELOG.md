@@ -7,6 +7,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.6.15] - 2026-02-26
+
+### 🎮 Spell Indicator: GameConfig Constants & Spell-Clear Audio
+
+This release delivers two "What's Next" items from v2.6.14: the spell-indicator timing constants (`SPELL_FADE_IN_DURATION`, `SPELL_SCALE_START`) are now centralised in `GameConfig.UISettings` alongside other UI timing values, and a `"spell_clear"` audio cue now plays when a queued spell is cancelled — closing the last gap in the spell-queue audio feedback loop.
+
+#### **GameConfig Constants Centralisation** 🔧
+- `SPELL_FADE_IN_DURATION = 0.3f` and `SPELL_SCALE_START = 0.75f` added to `GameConfig.UISettings`
+- `CombatUI.FadeInPendingSpellText()` updated to reference `GameConfig.UISettings` directly — no local private constants needed
+- Private constants removed from `CombatUI` to eliminate duplication
+
+#### **`"spell_clear"` Audio on Spell Cancellation** 🔊
+- `UpdatePendingMagicIndicator()` else-branch now calls `AudioManager.Instance?.PlayUISFXByName("spell_clear")` immediately before clearing the indicator
+- `"spell_clear"` added to `AudioManager.ValidateExpectedSoundClips()` — designers are warned if the clip is missing
+- `"spell_clear"` added to `SoundLibrary.EnsureDefaultUISoundEntries()` — slot pre-populated in the Inspector
+
+### Added
+- `GameConfig.UISettings.SPELL_FADE_IN_DURATION` — centralized constant (0.3 s) for fade-in duration
+- `GameConfig.UISettings.SPELL_SCALE_START` — centralized constant (0.75) for punch-animation start scale
+- `"spell_clear"` to `AudioManager.ValidateExpectedSoundClips()` expected-clip list
+- `"spell_clear"` to `SoundLibrary.EnsureDefaultUISoundEntries()` Inspector slot
+
+### Enhanced
+- `CombatUI.FadeInPendingSpellText()` — references `GameConfig.UISettings` constants
+- `CombatUI.UpdatePendingMagicIndicator()` — plays `"spell_clear"` audio on spell cancel
+
+### Removed
+- `CombatUI` private constants `SPELL_FADE_IN_DURATION` and `SPELL_SCALE_START` — superseded by `GameConfig.UISettings`
+
+### Technical
+- ~6 lines of new/modified code across 3 files (`GameConfig.cs`, `CombatUI.cs`, `AudioManager.cs`)
+- 0 breaking changes
+- 100% backward compatible
+
+---
+
 ## [2.6.14] - 2026-02-23
 
 ### 🎮 Spell Indicator Polish: Shapeshifting Colour, Coroutine Cleanup & Scale-Punch Animation

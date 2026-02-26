@@ -68,8 +68,6 @@ namespace ACOTAR
         private Character playerCharacter;
         private System.Action pendingConfirmAction;
         private MagicType? pendingMagicAbility = null; // v2.6.10: Track selected magic ability for targeting
-        private const float SPELL_FADE_IN_DURATION = 0.3f; // v2.6.12: Fade-in duration for spell queue indicator
-        private const float SPELL_SCALE_START = 0.75f;    // v2.6.14: Starting scale for the spell-queue indicator punch animation
         private Coroutine spellFadeCoroutine = null; // v2.6.13: Track running fade so we can stop it before restarting
 
         void Start()
@@ -563,6 +561,7 @@ namespace ACOTAR
             else
             {
                 if (spellFadeCoroutine != null) { StopCoroutine(spellFadeCoroutine); spellFadeCoroutine = null; } // v2.6.14: cancel fade when clearing
+                AudioManager.Instance?.PlayUISFXByName("spell_clear"); // v2.6.15: audio feedback when a queued spell is cancelled
                 pendingSpellText.text = string.Empty;
                 pendingSpellText.color = Color.white; // reset colour for next spell
                 if (pendingSpellText.rectTransform != null) pendingSpellText.rectTransform.localScale = Vector3.one; // v2.6.14: reset scale
@@ -613,17 +612,17 @@ namespace ACOTAR
 
             // v2.6.14: Initialise scale to the punch-start size
             RectTransform rt = pendingSpellText.rectTransform;
-            if (rt != null) rt.localScale = new Vector3(SPELL_SCALE_START, SPELL_SCALE_START, 1f);
+            if (rt != null) rt.localScale = new Vector3(GameConfig.UISettings.SPELL_SCALE_START, GameConfig.UISettings.SPELL_SCALE_START, 1f);
 
             float elapsed = 0f;
-            while (elapsed < SPELL_FADE_IN_DURATION)
+            while (elapsed < GameConfig.UISettings.SPELL_FADE_IN_DURATION)
             {
                 elapsed += Time.deltaTime;
-                float t = Mathf.Clamp01(elapsed / SPELL_FADE_IN_DURATION);
+                float t = Mathf.Clamp01(elapsed / GameConfig.UISettings.SPELL_FADE_IN_DURATION);
                 pendingSpellText.color = new Color(targetColor.r, targetColor.g, targetColor.b, t);
 
                 // v2.6.14: Scale from SPELL_SCALE_START to 1 using smooth-step easing
-                float scale = Mathf.Lerp(SPELL_SCALE_START, 1f, Mathf.SmoothStep(0f, 1f, t));
+                float scale = Mathf.Lerp(GameConfig.UISettings.SPELL_SCALE_START, 1f, Mathf.SmoothStep(0f, 1f, t));
                 if (rt != null) rt.localScale = new Vector3(scale, scale, 1f);
 
                 yield return null;
