@@ -7,6 +7,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.6.18] - 2026-02-26
+
+### 🎮 Legendary Spell Particle Burst VFX & Spell Queue Animation Header Group
+
+This release delivers two "What's Next" items from v2.6.17: a star/spark particle burst (`legendarySpellBurst`) now fires alongside the shimmer flash whenever a legendary ability is queued — giving the legendary tier a full audio + animation + VFX triple-feedback — and the spell-queue animation constants in `GameConfig.UISettings` are now gathered under a clearly labelled `// --- Spell Queue Animation ---` comment group for easy discovery.
+
+#### **Legendary Spell Particle Burst VFX** ✨
+- Added `legendarySpellBurst` `ParticleSystem` inspector field to `CombatUI` under a new `[Header("Legendary VFX")]`
+- `UpdatePendingMagicIndicator()` calls `legendarySpellBurst.Emit(GameConfig.UISettings.LEGENDARY_PARTICLE_BURST_COUNT)` when a legendary ability is queued — runs in parallel with the shimmer and `"spell_legendary"` audio
+- `UpdatePendingMagicIndicator()` else-branch calls `legendarySpellBurst.Stop()` when the spell is cleared — consistent cleanup alongside the coroutine cancellations
+- `LEGENDARY_PARTICLE_BURST_COUNT = 12` added to `GameConfig.UISettings` — single designer-facing tuning point for the burst size
+
+#### **Spell Queue Animation Header Group in `GameConfig.UISettings`** 🔧
+- All four spell-queue animation constants (`SPELL_FADE_IN_DURATION`, `SPELL_SCALE_START`, `SPELL_SHIMMER_HALF_DURATION`, `SPELL_SHIMMER_FLASH_COUNT`) are now gathered under a `// --- Spell Queue Animation ---` comment separator
+- Improves designer discoverability: every animation knob for the spell indicator lives under one labeled group, no more hunting through the class
+
+### Added
+- `CombatUI.legendarySpellBurst` — `ParticleSystem` inspector field under `[Header("Legendary VFX")]`
+- `GameConfig.UISettings.LEGENDARY_PARTICLE_BURST_COUNT` — centralised constant (12) for the legendary particle burst size
+
+### Enhanced
+- `CombatUI.UpdatePendingMagicIndicator()` — emits `legendarySpellBurst` particle burst when a legendary ability is queued
+- `CombatUI.UpdatePendingMagicIndicator()` — stops `legendarySpellBurst` in the else-branch when spell is cleared
+- `GameConfig.UISettings` — spell queue animation constants gathered under a `// --- Spell Queue Animation ---` comment group
+
+### Technical
+- ~15 lines of new/modified code across 2 files (`CombatUI.cs`, `GameConfig.cs`)
+- 0 breaking changes
+- 100% backward compatible
+
+---
+
 ## [2.6.15] - 2026-02-26
 
 ### 🎮 Spell Indicator: GameConfig Constants & Spell-Clear Audio

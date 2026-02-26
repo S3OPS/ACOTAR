@@ -63,6 +63,9 @@ namespace ACOTAR
         [Header("Spell Queue Indicator")]
         public Text pendingSpellText; // v2.6.11: Shows currently queued magic ability
 
+        [Header("Legendary VFX")]
+        public ParticleSystem legendarySpellBurst; // v2.6.18: Star/spark emitter that fires when a legendary ability is queued
+
         private CombatEncounter currentEncounter;
         private List<GameObject> enemyPanels = new List<GameObject>();
         private Character playerCharacter;
@@ -549,6 +552,7 @@ namespace ACOTAR
         /// v2.6.11: Gives players clear visual confirmation of their spell selection.
         /// v2.6.12: Adds per-magic-type colour coding and a fade-in animation.
         /// v2.6.16: Plays shimmer flash and "spell_legendary" audio for legendary abilities.
+        /// v2.6.18: Emits a particle burst (legendarySpellBurst) when a legendary ability is queued.
         /// </summary>
         private void UpdatePendingMagicIndicator()
         {
@@ -566,12 +570,19 @@ namespace ACOTAR
                     if (spellShimmerCoroutine != null) StopCoroutine(spellShimmerCoroutine);
                     spellShimmerCoroutine = StartCoroutine(ShimmerPendingSpellText(GetSpellColor(pendingMagicAbility.Value)));
                     AudioManager.Instance?.PlayUISFXByName("spell_legendary"); // v2.6.16: audio feedback for legendary spell queue
+
+                    // v2.6.18: Particle burst VFX counterpart to the shimmer
+                    if (legendarySpellBurst != null)
+                    {
+                        legendarySpellBurst.Emit(GameConfig.UISettings.LEGENDARY_PARTICLE_BURST_COUNT);
+                    }
                 }
             }
             else
             {
                 if (spellFadeCoroutine != null) { StopCoroutine(spellFadeCoroutine); spellFadeCoroutine = null; } // v2.6.14: cancel fade when clearing
                 if (spellShimmerCoroutine != null) { StopCoroutine(spellShimmerCoroutine); spellShimmerCoroutine = null; } // v2.6.16: cancel shimmer when clearing
+                if (legendarySpellBurst != null && legendarySpellBurst.isPlaying) legendarySpellBurst.Stop(); // v2.6.18: stop burst when spell cleared
                 AudioManager.Instance?.PlayUISFXByName("spell_clear"); // v2.6.15: audio feedback when a queued spell is cancelled
                 pendingSpellText.text = string.Empty;
                 pendingSpellText.color = Color.white; // reset colour for next spell
