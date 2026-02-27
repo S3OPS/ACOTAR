@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.6.19] - 2026-02-27
+
+### 🎮 Legendary Spell Particle Colour Tinting
+
+This release delivers the #3 "What's Next" item from v2.6.18: `legendarySpellBurst` particles are now tinted to match the queued legendary ability's spell colour (via `GetSpellColor()`) immediately before each burst is emitted. Each legendary ability now produces particles in its own lore-accurate colour — Daemati pulses magenta, Shadowsinger glows shadow-indigo, Death Manifestation burns death-crimson, and so on — reinforcing the existing colour-coded spell text and shimmer.
+
+#### **Legendary Particle Colour Tinting** ✨
+- In `UpdatePendingMagicIndicator()`, the `legendarySpellBurst` `ParticleSystem.main.startColor` is set to `GetSpellColor(pendingMagicAbility.Value)` immediately before `Emit()` is called
+- The tinting is guarded by the existing `legendarySpellBurst != null` null-check — no behaviour change when the field is unassigned
+- Non-legendary abilities are completely unaffected (the tinting block is inside the `IsLegendaryAbility` branch)
+
+### Enhanced
+- `CombatUI.UpdatePendingMagicIndicator()` — tints `legendarySpellBurst.main.startColor` to `GetSpellColor()` before emitting the particle burst
+
+### Technical
+- ~3 lines of new/modified code in 1 file (`CombatUI.cs`)
+- 0 breaking changes
+- 100% backward compatible
+
+---
+
 ## [2.6.18] - 2026-02-26
 
 ### 🎮 Legendary Spell Particle Burst VFX & Spell Queue Animation Header Group
