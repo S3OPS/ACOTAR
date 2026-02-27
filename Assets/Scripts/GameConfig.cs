@@ -199,10 +199,13 @@ namespace ACOTAR
             public const float BUTTON_TRANSITION_DURATION = 0.1f;
             public const float PANEL_FADE_DURATION = 0.25f;
             public const float UI_ANIMATION_SPEED = 1.0f;
-            public const float SPELL_FADE_IN_DURATION = 0.3f;  // v2.6.15: Spell-queue indicator fade-in duration (seconds)
-            public const float SPELL_SCALE_START = 0.75f;      // v2.6.15: Spell-queue indicator punch-animation start scale
+
+            // --- Spell Queue Animation ---                          // v2.6.18: grouped for Inspector discoverability
+            public const float SPELL_FADE_IN_DURATION = 0.3f;       // v2.6.15: Spell-queue indicator fade-in duration (seconds)
+            public const float SPELL_SCALE_START = 0.75f;           // v2.6.15: Spell-queue indicator punch-animation start scale
             public const float SPELL_SHIMMER_HALF_DURATION = 0.06f; // v2.6.17: Seconds per half-cycle of the legendary shimmer flash
             public const int   SPELL_SHIMMER_FLASH_COUNT = 2;       // v2.6.17: Number of full white↔spellColor cycles in the shimmer
+            public const int   LEGENDARY_PARTICLE_BURST_COUNT = 12; // v2.6.18: Number of particles emitted per legendary-ability burst
         }
 
         // =====================================================
