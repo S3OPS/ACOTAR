@@ -553,6 +553,7 @@ namespace ACOTAR
         /// v2.6.12: Adds per-magic-type colour coding and a fade-in animation.
         /// v2.6.16: Plays shimmer flash and "spell_legendary" audio for legendary abilities.
         /// v2.6.18: Emits a particle burst (legendarySpellBurst) when a legendary ability is queued.
+        /// v2.6.19: Tints legendarySpellBurst start-colour to match GetSpellColor() before emitting.
         /// </summary>
         private void UpdatePendingMagicIndicator()
         {
@@ -574,6 +575,9 @@ namespace ACOTAR
                     // v2.6.18: Particle burst VFX counterpart to the shimmer
                     if (legendarySpellBurst != null)
                     {
+                        // v2.6.19: Tint particle start-colour to match the queued spell type
+                        var burstMain = legendarySpellBurst.main;
+                        burstMain.startColor = GetSpellColor(pendingMagicAbility.Value);
                         legendarySpellBurst.Emit(GameConfig.UISettings.LEGENDARY_PARTICLE_BURST_COUNT);
                     }
                 }
